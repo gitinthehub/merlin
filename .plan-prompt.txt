@@ -1,0 +1,43 @@
+You are designing a complete, deployable browser game in this repository (currently only a README.md — treat it as greenfield). Do not modify files or run any commands in this phase. Produce an implementation plan only, in the output format specified at the bottom.
+
+PRODUCT BRIEF — "MERLIN"
+
+A short D&D-style branching interactive story game for the browser. Working title MERLIN — you may propose a better title treatment that keeps MERLIN as the game's name (one fun angle: the vampire Count is literally named "Count Merlin", no relation to the wizard, which he angrily clarifies whenever anyone asks).
+
+- Setting: gothic horror-comedy. A cursed village at the foot of a vampire's castle.
+- Tone: MIXED — genuinely funny characters and dialogue, but dice rolls and stakes are serious. Failure costs HP, items, and opens darker paths. Death is possible.
+- Length: completable in ~10–15 minutes. Deliberately short: ~18–25 scene nodes total including endings. Punchy writing, no filler.
+
+REQUIRED MECHANICS (all must appear in the plan):
+
+1. Character select — exactly 3 pregens with distinct stats (MIGHT, WITS, SPIRIT + HP + starting gold), strong distinct personalities/voices, and at least one character-specific interaction or bonus later in the game.
+2. d20 core — every meaningful action resolves via d20 + stat modifier vs DC. The roll must be shown to the player (animated die + the math: "d20 rolled 14 + WITS 2 = 16 vs DC 12"). Nat 20 = critical success with a bonus effect; nat 1 = critical fail with an extra consequence. Include an "advantage" mechanic (roll 2, keep best) granted by a specific item.
+3. Branching choices — 2–4 options per scene; failures have real consequences; some choices lock/unlock later content; at least 3 distinct endings plus death ending(s).
+4. Shops — exactly 2: (a) the village general store, (b) a shady merchant encountered later. Items have concrete mechanical effects: healing potions, a weapon and/or armor with stat/HP boosts, and at least one advantage-granting charm that interacts with d20 rolls.
+5. XP & leveling — success in encounters grants XP and gold; level-ups raise max HP and a stat (simple but satisfying); visible character sheet / stats panel.
+6. Combat — at least 2 required fights (early weak enemy, late boss) plus at least one optional encounter. Turn-based, dice-driven: player picks attack (MIGHT) / spell or special (SPIRIT) / item / flee; enemy telegraphs its next move. Fleeing requires a WITS check.
+7. Autosave via localStorage on every scene change + explicit "New Game" option. Refreshing mid-game resumes at the current scene with full state.
+8. Inventory — items usable in and out of combat.
+
+UI/UX REQUIREMENTS:
+- Dark gothic aesthetic (candlelight/blood/parchment palette), large readable type, HP/XP bars, gold + level display, inventory panel.
+- Typewriter text effect that is skippable (click to complete, click again to advance).
+- Mobile-friendly (usable at 375px wide) and good on desktop.
+- No frameworks, no dependencies, no build step, no external assets. Vanilla HTML/CSS/JS. Zero network requests at runtime. Text must be real selectable text; graphics via CSS/emoji only.
+- Scene content as a JS data structure (data.js or equivalent), not hardcoded DOM strings.
+- Must work when index.html is opened directly via file:// AND when served on Netlify.
+
+WRITING BAR: NPC dialogue must be actually funny (dry, character-driven; not pun-spam), the villain memorable, atmosphere genuinely gothic. Light horror, no gore, teen-safe.
+
+HARD CONSTRAINTS:
+- Do NOT run git commands. Do NOT create package.json or any build tooling.
+- Final deliverable is only: index.html, CSS file(s), JS file(s), updated README.md.
+
+PLAN OUTPUT FORMAT (return exactly this, no preamble):
+1. Proposed title + 1-paragraph pitch.
+2. File layout with one-line purpose per file.
+3. Scene-node data schema: the exact JS object shape for a node (id, text/speaker, options with stat checks/DCs/effects/next-node, onEnter effects, etc.).
+4. Full scene-by-scene outline: EVERY node id with 1–3 lines of content summary, its rolls (stat, DC, success/failure outcomes), both shops with item lists (name, cost, exact effect), the XP/gold economy table, and all endings.
+5. Mechanics formulas: roll resolution, crits, damage, XP curve, level-up effects.
+6. Implementation step order for the execution phase.
+7. Manual QA checklist (happy path, death path, each ending, shop math, autosave/refresh resume, mobile width).
