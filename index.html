@@ -40,33 +40,38 @@
       </section>
 
       <div id="game" class="game" hidden>
-        <aside id="sheet" class="sheet panel">
-          <div class="sheet-head">
-            <span id="sheet-glyph" class="sheet-glyph"></span>
-            <div>
-              <div id="sheet-name" class="sheet-name"></div>
-              <div id="sheet-role" class="sheet-role"></div>
+        <aside id="sheet" class="sheet panel" hidden>
+          <div class="sheet-compact">
+            <div class="stat-row compact-row">
+              <span>LV <strong id="sheet-level">1</strong></span>
+              <span class="gold">✦ <strong id="sheet-gold">0</strong></span>
             </div>
+            <label class="bar-label">HP <span id="sheet-hp-text"></span></label>
+            <div class="bar hp"><div id="bar-hp" class="bar-fill"></div></div>
+            <button type="button" id="btn-pack" class="btn pack-toggle">
+              Pack
+            </button>
           </div>
-          <div class="stat-row">
-            <span>LV <strong id="sheet-level">1</strong></span>
-            <span class="gold">✦ <strong id="sheet-gold">0</strong></span>
-          </div>
-          <label class="bar-label">HP <span id="sheet-hp-text"></span></label>
-          <div class="bar hp"><div id="bar-hp" class="bar-fill"></div></div>
-          <label class="bar-label">XP <span id="sheet-xp-text"></span></label>
-          <div class="bar xp"><div id="bar-xp" class="bar-fill"></div></div>
-          <dl class="stats">
-            <div><dt>Might</dt><dd id="stat-might">0</dd></div>
-            <div><dt>Wits</dt><dd id="stat-wits">0</dd></div>
-            <div><dt>Spirit</dt><dd id="stat-spirit">0</dd></div>
-          </dl>
-          <button type="button" id="btn-pack" class="btn pack-toggle">
-            Pack
-          </button>
-          <div id="pack" class="pack" hidden>
-            <ul id="pack-list"></ul>
-            <p id="pack-empty" class="muted">Empty pockets.</p>
+          <div class="sheet-full">
+            <div class="sheet-head">
+              <span id="sheet-glyph" class="sheet-glyph"></span>
+              <div>
+                <div id="sheet-name" class="sheet-name"></div>
+                <div id="sheet-role" class="sheet-role"></div>
+              </div>
+            </div>
+            <label class="bar-label">XP <span id="sheet-xp-text"></span></label>
+            <div class="bar xp"><div id="bar-xp" class="bar-fill"></div></div>
+            <dl class="stats">
+              <div><dt>Might</dt><dd id="stat-might">0</dd></div>
+              <div><dt>Wits</dt><dd id="stat-wits">0</dd></div>
+              <div><dt>Spirit</dt><dd id="stat-spirit">0</dd></div>
+            </dl>
+            <p id="sheet-equipped" class="sheet-equipped muted" hidden></p>
+            <div id="pack" class="pack" hidden>
+              <ul id="pack-list"></ul>
+              <p id="pack-empty" class="muted">Empty pockets.</p>
+            </div>
           </div>
         </aside>
 

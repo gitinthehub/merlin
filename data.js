@@ -12,7 +12,7 @@
       wits: 1,
       spirit: 0,
       maxHp: 16,
-      gold: 8,
+      gold: 12,
       special: "Occupational Hazard",
       glyph: "🪦"
     },
@@ -25,7 +25,7 @@
       wits: 2,
       spirit: 3,
       maxHp: 11,
-      gold: 6,
+      gold: 12,
       special: "Unkind Blessing",
       glyph: "🕯️"
     },
@@ -292,7 +292,7 @@
         },
         {
           speaker: "Hob",
-          text: "Soup is complimentary. The soup is mostly beet. The beet is mostly threat."
+          text: "Soup is complimentary. The soup is mostly beet. Mind the aftertaste."
         }
       ],
       options: [
@@ -416,6 +416,40 @@
       ],
       variants: [
         {
+          if: { flag: "mayorPaid" },
+          lines: [
+            {
+              speaker: null,
+              text: "Mayor Cuthbert Lane stands on his crate like a man who has already spent the credit."
+            },
+            {
+              speaker: "Cuthbert",
+              text: "The wreath is handled. My polling is not. Do try not to die somewhere photogenic."
+            }
+          ],
+          options: [
+            {
+              label: "Return to the inn",
+              check: null,
+              success: { lines: [], effects: [], next: "inn" }
+            },
+            {
+              label: "Take the marsh road",
+              check: null,
+              success: {
+                lines: [
+                  {
+                    speaker: "Cuthbert",
+                    text: "Go. Polling starts again at dawn, unfortunately."
+                  }
+                ],
+                effects: [],
+                next: "marsh"
+              }
+            }
+          ]
+        },
+        {
           if: {
             all: [
               { flag: "questGhoul" },
@@ -454,7 +488,7 @@
                 lines: [
                   {
                     speaker: "Cuthbert",
-                    text: "Fine. I'll leave the coin with Hob. Or invent a different promise. One of those."
+                    text: "Take it. Go. The marsh will not invoice me for you."
                   }
                 ],
                 effects: [
@@ -843,7 +877,7 @@
         },
         {
           speaker: "Toll-Wight",
-          text: "Toll is eight. I make change in regrets."
+          text: "Toll is eight. I do not make change."
         }
       ],
       variants: [
@@ -957,6 +991,7 @@
         },
         {
           label: "Those merchant-lights",
+          showIf: { all: [{ flag: "knowsPox" }] },
           check: null,
           success: {
             lines: [
@@ -1547,7 +1582,7 @@
       lines: [
         {
           speaker: "Count Merlin",
-          text: "I am Count Merlin. Not that one. Repeat it incorrectly and I will correct your pulse."
+          text: "I am Count Merlin. Not that one. Repeat it incorrectly and I will correct you. Permanently."
         }
       ]
     },

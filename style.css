@@ -10,7 +10,7 @@
   --blood-bright: #c43a3a;
   --candle: #e8b86d;
   --brass: #b8924a;
-  --mute: #8a7060;
+  --mute: #c4a882;
   --ok: #6a9a5a;
   --bad: #c43a3a;
   --font: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
@@ -325,9 +325,19 @@ body::before {
   vertical-align: baseline;
 }
 
+.continue-cue {
+  display: inline-block;
+  margin-left: 0.35rem;
+  color: var(--candle);
+  animation: blink 1s step-end infinite;
+  font-size: 0.9em;
+  vertical-align: middle;
+}
+
 @keyframes blink {
   50% {
     border-color: transparent;
+    opacity: 0.2;
   }
 }
 
@@ -582,6 +592,54 @@ body::before {
   gap: 0.35rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--panel-edge);
+}
+
+.shop-list li.tappable {
+  cursor: pointer;
+}
+
+.shop-list .price,
+.shop-buy-btn {
+  white-space: nowrap;
+}
+
+.shop-buy-btn {
+  min-height: 44px;
+  min-width: 5.5rem;
+  text-align: center;
+}
+
+.sheet-equipped {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  #app {
+    padding-bottom: 64px;
+  }
+
+  .sheet-full {
+    display: none;
+  }
+
+  .sheet.sheet-expanded .sheet-full {
+    display: block;
+    margin-top: 0.75rem;
+    border-top: 1px solid var(--panel-edge);
+    padding-top: 0.75rem;
+  }
+
+  .sheet-compact .pack-toggle {
+    margin-top: 0.5rem;
+  }
+}
+
+@media (min-width: 481px) {
+  .sheet-full {
+    display: block;
+    margin-top: 0.75rem;
+  }
 }
 
 .shop-list .row {

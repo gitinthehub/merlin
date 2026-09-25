@@ -30,6 +30,7 @@
   function cacheEls() {
     els.splash = $("splash");
     els.game = $("game");
+    els.sheet = $("sheet");
     els.btnContinue = $("btn-continue");
     els.btnStart = $("btn-start");
     els.btnNew = $("btn-new");
@@ -100,16 +101,29 @@
     }
   }
 
-  function startTypewriter(lines, after) {
+  function startTypewriter(lines, after, startIndex) {
     stopTypewriter();
-    typewriter.lines = lines && lines.length ? lines.slice() : [{ speaker: null, text: "" }];
-    typewriter.lineIndex = 0;
+    typewriter.lines =
+      lines && lines.length ? lines.slice() : [{ speaker: null, text: "" }];
+    typewriter.lineIndex = Math.min(
+      startIndex || 0,
+      Math.max(0, typewriter.lines.length - 1)
+    );
     typewriter.charIndex = 0;
     typewriter.done = false;
     typewriter.after = after || null;
     awaitingAdvance = false;
+    if (E.setLineIndex) E.setLineIndex(typewriter.lineIndex);
     paintLineStart();
     tickTypewriter();
+  }
+
+  function showContinueCue() {
+    var cue = document.createElement("span");
+    cue.className = "continue-cue";
+    cue.setAttribute("aria-hidden", "true");
+    cue.textContent = "▾";
+    els.story.appendChild(cue);
   }
 
   function paintLineStart() {
@@ -123,6 +137,14 @@
       show(els.speaker, false);
     }
     els.story.textContent = "";
+  }
+
+  function finishTypewriter() {
+    typewriter.done = true;
+    awaitingAdvance = false;
+    var after = typewriter.after;
+    typewriter.after = null;
+    if (after) after();
   }
 
   function tickTypewriter() {
@@ -139,11 +161,8 @@
     } else {
       els.story.textContent = full;
       awaitingAdvance = true;
-      if (typewriter.lineIndex >= typewriter.lines.length - 1) {
-        typewriter.done = true;
-        awaitingAdvance = false;
-        if (typewriter.after) typewriter.after();
-      }
+      showContinueCue();
+      /* Last line: wait for an extra click before after() */
     }
   }
 
@@ -155,18 +174,20 @@
       typewriter.charIndex = full.length;
       els.story.textContent = full;
       awaitingAdvance = true;
-      if (typewriter.lineIndex >= typewriter.lines.length - 1) {
-        typewriter.done = true;
-        awaitingAdvance = false;
-        if (typewriter.after) typewriter.after();
-      }
+      showContinueCue();
       return true;
     }
-    if (awaitingAdvance && typewriter.lineIndex < typewriter.lines.length - 1) {
-      typewriter.lineIndex += 1;
-      awaitingAdvance = false;
-      paintLineStart();
-      tickTypewriter();
+    if (awaitingAdvance) {
+      if (typewriter.lineIndex < typewriter.lines.length - 1) {
+        typewriter.lineIndex += 1;
+        if (E.setLineIndex) E.setLineIndex(typewriter.lineIndex);
+        awaitingAdvance = false;
+        paintLineStart();
+        tickTypewriter();
+        return true;
+      }
+      /* Final click on last line */
+      finishTypewriter();
       return true;
     }
     return false;
@@ -261,15 +282,17 @@
     var snap = E.snapshot();
     if (!snap || !snap.state.characterId) {
       show(els.btnNew, false);
+      show(els.sheet, false);
       return;
     }
+    show(els.sheet, true);
     show(els.btnNew, true);
     var s = snap.state;
     var c = snap.character;
     els.sheetGlyph.textContent = c.glyph || "";
     els.sheetName.textContent = c.name;
     els.sheetRole.textContent = c.role;
-    els.sheetLevel.textContent = String(s.level);
+    els.sheetLevel.textContent = String(snap.displayLevel != null ? snap.displayLevel : s.level);
     els.sheetGold.textContent = String(s.gold);
     els.sheetHpText.textContent = s.hp + " / " + snap.maxHp;
     els.barHp.style.width =
@@ -281,6 +304,16 @@
     els.statMight.textContent = String(s.might);
     els.statWits.textContent = String(s.wits);
     els.statSpirit.textContent = String(s.spirit);
+
+    var eq = snap.equippedLabels || {};
+    var eqEl = $("sheet-equipped");
+    if (eqEl) {
+      var parts = [];
+      if (eq.weapon) parts.push(eq.weapon);
+      if (eq.armor) parts.push(eq.armor);
+      eqEl.textContent = parts.length ? parts.join(" · ") : "";
+      show(eqEl, parts.length > 0);
+    }
     renderPack();
   }
 
@@ -439,32 +472,37 @@
     var node = snap.node;
     els.sceneTitle.textContent = node.title || "";
 
-    if (node.type === "select") {
-      show(els.speaker, false);
-      startTypewriter(node.lines, function () {
-        renderSelect();
-      });
+    var savedRoll = E.getLastRoll();
+    if (savedRoll && savedRoll.text) {
+      flashDie(savedRoll.text, !!savedRoll.success);
+    }
+
+    if (snap.pendingVictory) {
+      startTypewriter(
+        [{ speaker: null, text: "Victory." }],
+        function () {
+          maybeLevelUp(function () {
+            E.finishVictory();
+            renderScene();
+          });
+        }
+      );
       return;
     }
 
-    if (node.type === "ending") {
-      startTypewriter(node.lines, function () {
-        show(els.endingActions, true);
-      });
-      return;
-    }
+    var startIdx =
+      snap.state.lineIndex && snap.state.lineIndex > 0
+        ? snap.state.lineIndex
+        : 0;
 
-    if (node.type === "shop") {
-      startTypewriter(node.lines, function () {
-        renderShop(snap);
-      });
-      return;
-    }
-
-    if (node.type === "combat") {
-      startTypewriter(node.lines, function () {
-        renderCombat(snap);
-        if (snap.combat && snap.combat.surprised) {
+    function afterScene() {
+      if (node.type === "select") renderSelect();
+      else if (node.type === "ending") show(els.endingActions, true);
+      else if (node.type === "shop") renderShop(E.snapshot());
+      else if (node.type === "combat") {
+        var s = E.snapshot();
+        renderCombat(s);
+        if (s.combat && s.combat.surprised) {
           setTimeout(function () {
             var er = E.combatEnemyFirst();
             if (er && er.rollText) flashDie(er.rollText, false);
@@ -475,14 +513,18 @@
             maybeLevelUp(null);
           }, reducedMotion ? 0 : 400);
         }
-      });
+      } else {
+        renderChoices(E.snapshot());
+      }
+    }
+
+    if (node.type === "select") {
+      show(els.speaker, false);
+      startTypewriter(node.lines, afterScene, 0);
       return;
     }
 
-    /* scene */
-    startTypewriter(node.lines, function () {
-      renderChoices(snap);
-    });
+    startTypewriter(node.lines, afterScene, startIdx);
   }
 
   function refreshStageSoft() {
@@ -567,9 +609,11 @@
       b.type = "button";
       b.className = "btn";
       var label = document.createElement("span");
-      label.textContent = opt.label;
+      label.textContent = opt.disabled
+        ? opt.disabledLabel || opt.label
+        : opt.label;
       b.appendChild(label);
-      if (opt.check) {
+      if (opt.check && !opt.disabled) {
         var dc = E.computeDc(opt);
         var hint = document.createElement("span");
         hint.className = "choice-dc";
@@ -577,15 +621,19 @@
           opt.check.stat.toUpperCase() + " DC " + dc;
         b.appendChild(hint);
       }
-      if (opt.requireToll) {
+      if (opt.requireToll && !opt.disabled) {
         var toll = document.createElement("span");
         toll.className = "choice-dc";
         toll.textContent = snap.tollCost + " gold";
         b.appendChild(toll);
       }
-      b.addEventListener("click", function () {
-        onChoose(idx);
-      });
+      if (opt.disabled) {
+        b.disabled = true;
+      } else {
+        b.addEventListener("click", function () {
+          onChoose(idx);
+        });
+      }
       els.choices.appendChild(b);
     });
   }
@@ -624,6 +672,7 @@
     clear(els.shopList);
     shop.stock.forEach(function (it) {
       var li = document.createElement("li");
+      li.className = "shop-row";
       var row = document.createElement("div");
       row.className = "row";
       var left = document.createElement("div");
@@ -636,28 +685,52 @@
       left.appendChild(blurb);
       row.appendChild(left);
       var right = document.createElement("div");
+      right.className = "shop-buy";
       var price = document.createElement("div");
       price.className = "price";
       price.textContent = it.price + " ✦";
       right.appendChild(price);
-      var buy = btn(
-        it.atCap ? "Max" : it.canAfford ? "Buy" : "Too poor",
-        "btn small",
-        function () {
-          var r = E.buyItem(it.id);
-          if (r.ok) {
-            flashDie("Bought " + it.name + " for " + r.price + " gold.", true);
-            renderSheet();
-            renderShop(E.snapshot());
-          }
-        }
-      );
-      if (!it.canAfford || it.atCap) buy.disabled = true;
+
+      var status = "Buy";
+      var disabled = false;
+      if (it.sold) {
+        status = "Sold";
+        disabled = true;
+      } else if (it.atCap) {
+        status = "Max";
+        disabled = true;
+      } else if (!it.canAfford) {
+        status = "Too poor";
+        disabled = true;
+      }
+
+      var buy = btn(status, "btn small shop-buy-btn", function () {
+        if (disabled) return;
+        doBuy(it.id);
+      });
+      if (disabled) buy.disabled = true;
       right.appendChild(buy);
       row.appendChild(right);
       li.appendChild(row);
+
+      if (!disabled) {
+        li.classList.add("tappable");
+        li.addEventListener("click", function (ev) {
+          if (ev.target.closest && ev.target.closest("button")) return;
+          doBuy(it.id);
+        });
+      }
       els.shopList.appendChild(li);
     });
+  }
+
+  function doBuy(itemId) {
+    var r = E.buyItem(itemId);
+    if (r.ok) {
+      flashDie("Bought for " + r.price + " gold. You lose " + r.price + " gold.", true);
+      renderSheet();
+      renderShop(E.snapshot());
+    }
   }
 
   function renderCombat(snap) {
@@ -695,6 +768,11 @@
     els.combatActions.appendChild(
       btn(c.specialName + " (Spirit)", "btn", function () {
         handleCombatResult(E.combatSpecial(useCoinNext));
+      })
+    );
+    els.combatActions.appendChild(
+      btn("Brace (Wits)", "btn", function () {
+        handleCombatResult(E.combatBrace(useCoinNext));
       })
     );
 
@@ -737,12 +815,27 @@
           result.won ||
           (result.summary && /^Hit /.test(result.summary)) ||
           (result.summary && /flee/i.test(result.summary)) ||
-          (result.summary && /Occupational|Blessing|Estimate/.test(result.summary)));
+          (result.summary && /flee|Brace|Occupational|Blessing|Estimate/i.test(result.summary)));
       flashDie(result.rollText, !!successPaint);
     }
     renderSheet();
 
-    if (result.dead || result.fled || result.won) {
+    if (result.won) {
+      clear(els.combatActions);
+      show(els.combat, false);
+      startTypewriter(
+        [{ speaker: null, text: result.summary || "Victory." }],
+        function () {
+          maybeLevelUp(function () {
+            E.finishVictory();
+            renderScene();
+          });
+        }
+      );
+      return;
+    }
+
+    if (result.dead || result.fled) {
       maybeLevelUp(function () {
         renderScene();
       });
@@ -796,6 +889,10 @@
       packOpen = !packOpen;
       show(els.pack, packOpen);
       els.btnPack.textContent = packOpen ? "Pack ▴" : "Pack";
+      if (els.sheet) {
+        if (packOpen) els.sheet.classList.add("sheet-expanded");
+        else els.sheet.classList.remove("sheet-expanded");
+      }
     });
 
     els.story.addEventListener("click", function () {

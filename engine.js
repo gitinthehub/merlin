@@ -41,8 +41,9 @@
     };
   }
 
-  function formatRoll(roll, stat, mod, total, dc) {
+  function formatRoll(roll, stat, mod, total, dc, vsLabel) {
     var name = String(stat).toUpperCase();
+    var vs = vsLabel || "DC";
     var body;
     if (roll.dice.length === 2) {
       body =
@@ -58,7 +59,9 @@
         mod +
         " = " +
         total +
-        " vs DC " +
+        " vs " +
+        vs +
+        " " +
         dc;
     } else {
       body =
@@ -70,7 +73,9 @@
         mod +
         " = " +
         total +
-        " vs DC " +
+        " vs " +
+        vs +
+        " " +
         dc;
     }
     if (roll.critSuccess) body += " · CRITICAL SUCCESS";
@@ -225,11 +230,12 @@
   function optionVisible(opt) {
     if (opt.showIf && !matchCond(opt.showIf)) return false;
     if (opt.hideIf && matchCond(opt.hideIf)) return false;
+    return true;
+  }
+
+  function optionAffordable(opt) {
     if (opt.requireGold != null && state.gold < opt.requireGold) return false;
-    if (opt.requireToll) {
-      var cost = tollCost();
-      if (state.gold < cost) return false;
-    }
+    if (opt.requireToll && state.gold < tollCost()) return false;
     return true;
   }
 
@@ -246,16 +252,24 @@
   }
 
   function applyEffects(effects) {
-    if (!effects) return { dead: false };
+    if (!effects) return { dead: false, notes: [] };
     var dead = false;
+    var notes = [];
     for (var i = 0; i < effects.length; i++) {
       var e = effects[i];
       if (e.op === "flag") {
         if (e.value === false) delete state.flags[e.key];
         else state.flags[e.key] = e.value;
       } else if (e.op === "gold") {
+        var beforeG = state.gold;
         state.gold += e.amount;
         clampGold();
+        var delta = state.gold - beforeG;
+        if (delta < 0) {
+          notes.push("You lose " + -delta + " gold.");
+        } else if (delta > 0) {
+          notes.push("You gain " + delta + " gold.");
+        }
       } else if (e.op === "heal") {
         applyHeal(e.amount);
       } else if (e.op === "damage") {
@@ -286,9 +300,12 @@
           else pay = 8;
         }
         state.gold += pay;
+        if (pay > 0) notes.push("You gain " + pay + " gold.");
       } else if (e.op === "payToll") {
-        state.gold -= tollCost();
+        var toll = tollCost();
+        state.gold -= toll;
         clampGold();
+        notes.push("You pay " + toll + " gold for the toll.");
       } else if (e.op === "vellumPox") {
         if (state.characterId === "vellum") state.flags.vellumHonest = true;
       } else if (e.op === "vellumOswald") {
@@ -297,25 +314,30 @@
         /* flags only; combat start reads them */
       }
     }
-    return { dead: dead };
+    return { dead: dead, notes: notes };
   }
 
   function tollCost() {
     return state.flags.wightAngry ? 12 : 8;
   }
 
-  function itemPrice(itemId) {
+  function itemPrice(itemId, shopId) {
     var item = data().items[itemId];
     var price = item.price;
     if (itemId === "jack" && state.characterId === "bram") price = 6;
-    if (state.characterId === "pip") price = Math.max(1, price - 2);
+    if (state.characterId === "pip" && shopId === "pox") {
+      price = Math.max(1, price - 2);
+    }
     return price;
   }
 
   function healAmount(itemId) {
     var item = data().items[itemId];
     if (!item) return 0;
-    if (itemId === "draught" && state.characterId === "vellum") {
+    if (
+      itemId === "draught" &&
+      (state.characterId === "vellum" || state.flags.vellumHonest)
+    ) {
       return item.vellumHeal || item.heal;
     }
     return item.heal || 0;
@@ -343,7 +365,11 @@
         combat: state.combat,
         deathCause: state.deathCause,
         lineIndex: state.lineIndex || 0,
-        pendingLevelUps: pendingLevelUps
+        lastRoll: lastRoll
+          ? { text: lastRoll.text, success: !!lastRoll.success }
+          : null,
+        pendingLevelUps: pendingLevelUps,
+        pendingVictory: state.pendingVictory || null
       };
       localStorage.setItem(data().saveKey, JSON.stringify(blob));
     } catch (err) {
@@ -375,11 +401,14 @@
         pardonArmed: !!blob.pardonArmed,
         combat: blob.combat || null,
         deathCause: blob.deathCause || null,
-        lineIndex: blob.lineIndex || 0
+        lineIndex: blob.lineIndex || 0,
+        pendingVictory: blob.pendingVictory || null
       };
       pendingLevelUps = blob.pendingLevelUps || 0;
       pendingCombat = null;
-      lastRoll = null;
+      lastRoll = blob.lastRoll
+        ? { text: blob.lastRoll.text, success: !!blob.lastRoll.success }
+        : null;
       return state;
     } catch (err) {
       return null;
@@ -424,7 +453,8 @@
       pardonArmed: false,
       combat: null,
       deathCause: null,
-      lineIndex: 0
+      lineIndex: 0,
+      pendingVictory: null
     };
     save();
     return state;
@@ -459,7 +489,7 @@
     state.nodeId = nodeId;
     state.lineIndex = 0;
     state.coinReady = true;
-    lastRoll = null;
+    /* keep lastRoll so outcome math stays visible across the click-to-advance beat */
 
     if (node.type !== "combat") {
       state.combat = null;
@@ -584,8 +614,24 @@
     };
 
     if (!opt.check) {
+      if (!optionAffordable(opt)) {
+        result.success = false;
+        result.lines = [
+          {
+            speaker: null,
+            text: "You cannot afford that."
+          }
+        ];
+        result.next = state.nodeId;
+        return result;
+      }
       var plain = applyEffects(opt.success.effects);
       result.lines = (opt.success.lines || []).slice();
+      if (plain.notes && plain.notes.length) {
+        for (var pn = 0; pn < plain.notes.length; pn++) {
+          result.lines.push({ speaker: null, text: plain.notes[pn] });
+        }
+      }
       result.next = opt.success.next;
       result.dead = plain.dead;
       if (result.dead) {
@@ -611,8 +657,10 @@
       var autoBranch = opt.success;
       var autoFx = applyEffects(autoBranch.effects);
       result.lines = (autoBranch.lines || []).slice();
-      if (opt.critSuccess && opt.critSuccess.lines) {
-        /* not a crit */
+      if (autoFx.notes && autoFx.notes.length) {
+        for (var ni = 0; ni < autoFx.notes.length; ni++) {
+          result.lines.push({ speaker: null, text: autoFx.notes[ni] });
+        }
       }
       result.next = autoBranch.next;
       result.dead = autoFx.dead;
@@ -635,34 +683,40 @@
       roll.critSuccess || (!roll.critFail && total >= dc);
 
     result.roll = roll;
-    result.text = formatRoll(roll, stat, mod, total, dc);
+    result.text = formatRoll(roll, stat, mod, total, dc, "DC");
     result.success = success;
     lastRoll = { text: result.text, success: success, roll: roll };
 
     var branch = success ? opt.success : opt.failure || opt.success;
-    var extra = success ? opt.critSuccess : opt.critFail;
     var lines = (branch.lines || []).slice();
     var effects = (branch.effects || []).slice();
 
-    if (extra) {
-      if (extra.lines && extra.lines.length) {
-        lines = lines.concat(extra.lines);
+    if (success && roll.critSuccess && opt.critSuccess) {
+      if (opt.critSuccess.lines && opt.critSuccess.lines.length) {
+        lines = lines.concat(opt.critSuccess.lines);
       }
-      if (extra.effects) {
-        if (success) {
-          effects = effects.concat(extra.effects);
-        } else if (roll.critFail) {
-          /* Crit-fail effects replace the failure's effects, then +2 damage. */
-          effects = [{ op: "damage", amount: 2 }].concat(extra.effects);
-        }
-      } else if (!success && roll.critFail) {
+      if (opt.critSuccess.effects) {
+        effects = effects.concat(opt.critSuccess.effects);
+      }
+    }
+
+    if (!success && roll.critFail) {
+      if (opt.critFail && opt.critFail.effects) {
+        effects = [{ op: "damage", amount: 2 }].concat(opt.critFail.effects);
+      } else {
         effects = [{ op: "damage", amount: 2 }].concat(effects);
       }
-    } else if (!success && roll.critFail) {
-      effects = [{ op: "damage", amount: 2 }].concat(effects);
+      if (opt.critFail && opt.critFail.lines && opt.critFail.lines.length) {
+        lines = lines.concat(opt.critFail.lines);
+      }
     }
 
     var fx = applyEffects(effects);
+    if (fx.notes && fx.notes.length) {
+      for (var nj = 0; nj < fx.notes.length; nj++) {
+        lines.push({ speaker: null, text: fx.notes[nj] });
+      }
+    }
     result.lines = lines;
     result.next = branch.next;
     result.dead = fx.dead;
@@ -706,7 +760,7 @@
     var node = resolveNode(state.nodeId);
     var visible = visibleOptions(node);
     var opt = visible[optIndex];
-    if (!opt) return null;
+    if (!opt || opt.disabled) return null;
     var result = resolveCheck(opt, useAdvantage);
     finishChoice(result);
     return result;
@@ -717,7 +771,40 @@
     var opts = node.options || [];
     var out = [];
     for (var i = 0; i < opts.length; i++) {
-      if (optionVisible(opts[i])) out.push(opts[i]);
+      if (!optionVisible(opts[i])) continue;
+      var opt = opts[i];
+      var copy = opt;
+      var affordable = optionAffordable(opt);
+      if (!affordable) {
+        copy = {
+          label: opt.label,
+          check: opt.check,
+          showIf: opt.showIf,
+          hideIf: opt.hideIf,
+          requireGold: opt.requireGold,
+          requireToll: opt.requireToll,
+          dcAdjust: opt.dcAdjust,
+          success: opt.success,
+          failure: opt.failure,
+          critSuccess: opt.critSuccess,
+          critFail: opt.critFail,
+          deathCause: opt.deathCause,
+          disabled: true
+        };
+        var need =
+          opt.requireToll != null
+            ? tollCost()
+            : opt.requireGold != null
+              ? opt.requireGold
+              : 0;
+        copy.disabledLabel =
+          opt.label +
+          " (" +
+          need +
+          "g) — you have " +
+          state.gold;
+      }
+      out.push(copy);
     }
     return out;
   }
@@ -730,7 +817,7 @@
     var shop = data().shops[node.shopId];
     if (shop.stock.indexOf(itemId) < 0) return { ok: false, reason: "not stocked" };
     var item = data().items[itemId];
-    var price = itemPrice(itemId);
+    var price = itemPrice(itemId, node.shopId);
     if (state.gold < price) return { ok: false, reason: "gold" };
 
     if (item.kind === "weapon" || item.kind === "armor" || item.kind === "charm") {
@@ -821,8 +908,7 @@
 
   function afterPlayerAction(enc, node) {
     if (!enemyAlive()) {
-      winCombat(enc, node);
-      return { won: true, fled: false, dead: false, summary: "", rollText: null };
+      return winCombat(enc, node);
     }
     return resolveEnemyTurn(enc, node);
   }
@@ -843,11 +929,37 @@
   function winCombat(enc, node) {
     if (node.winFlag) state.flags[node.winFlag] = true;
     applyXp(enc.xp || 0);
-    state.gold += enc.gold || 0;
-    combatLog("Victory.");
+    var goldNote = "";
+    if (enc.gold) {
+      state.gold += enc.gold;
+      goldNote = " You gain " + enc.gold + " gold.";
+    }
+    state.pendingVictory = { next: node.onWin };
     state.combat = null;
-    goTo(node.onWin);
-    return { won: true };
+    save();
+    return {
+      won: true,
+      fled: false,
+      dead: false,
+      summary: "Victory." + goldNote,
+      rollText: null
+    };
+  }
+
+  function finishVictory() {
+    var next =
+      state.pendingVictory && state.pendingVictory.next
+        ? state.pendingVictory.next
+        : null;
+    state.pendingVictory = null;
+    if (next) goTo(next);
+    else save();
+  }
+
+  function setLineIndex(idx) {
+    if (!state) return;
+    state.lineIndex = idx;
+    save();
   }
 
   function resolveEnemyTurn(enc, node) {
@@ -896,6 +1008,9 @@
       if (move.goldSteal) {
         state.gold -= move.goldSteal;
         clampGold();
+        var stealLine = "It takes " + move.goldSteal + " gold with it.";
+        result.summary = (result.summary ? result.summary + " " : "") + stealLine;
+        combatLog(stealLine);
       }
       if (move.heal && dealt > 0) {
         c.enemyHp = Math.min(c.enemyMaxHp, c.enemyHp + move.heal);
@@ -946,11 +1061,13 @@
     var ac = enc.ac;
     var hit =
       roll.critSuccess || (!roll.critFail && total >= ac);
-    out.rollText = formatRoll(roll, "might", mod, total, ac);
+    out.rollText = formatRoll(roll, "might", mod, total, ac, "AC");
 
     if (roll.critFail) {
-      out.summary = "Critical miss — the enemy strikes immediately.";
+      out.summary =
+        "Critical miss — the enemy strikes through the opening (+2).";
       combatLog(out.summary);
+      c.damageBonus = (c.damageBonus || 0) + 2;
       return mergeCombat(out, resolveEnemyTurn(enc, node));
     }
 
@@ -961,12 +1078,27 @@
     }
 
     var dice = roll.critSuccess ? rollDie(6) + rollDie(6) : rollDie(6);
-    var dmg = dice + mod + weaponBonus(c.encounter);
+    var wBonus = weaponBonus(c.encounter);
+    var dmg = dice + mod + wBonus;
     c.enemyHp -= dmg;
+    var wName =
+      state.equipped && state.equipped.weapon
+        ? data().items[state.equipped.weapon].name
+        : null;
     out.summary =
       "Hit for " +
       dmg +
-      (roll.critSuccess ? " (critical)!" : ".");
+      (roll.critSuccess ? " (critical)" : "") +
+      (wBonus
+        ? " (" +
+          (roll.critSuccess ? "2d6" : "1d6") +
+          (mod ? "+" + mod + " Might" : "") +
+          "+" +
+          wBonus +
+          (wName ? " " + wName : "") +
+          ")"
+        : "") +
+      ".";
     combatLog(out.summary);
     return mergeCombat(out, afterPlayerAction(enc, node));
   }
@@ -1100,6 +1232,53 @@
     return out;
   }
 
+  function combatBrace(useAdvantage) {
+    var node = data().nodes[state.nodeId];
+    var enc = data().encounters[state.combat.encounter];
+    var c = state.combat;
+    var out = { rollText: null, summary: "", won: false, dead: false, fled: false };
+
+    if (c.skipTurn) {
+      c.skipTurn = false;
+      return mergeCombat(out, resolveEnemyTurn(enc, node));
+    }
+
+    var adv = !!(useAdvantage && canUseCoin());
+    if (adv) state.coinReady = false;
+
+    var roll = rollD20(adv);
+    var mod = state.wits || 0;
+    var dc = enc.fleeDc;
+    var total = roll.kept + mod;
+    var ok =
+      roll.critSuccess || (!roll.critFail && total >= dc);
+    out.rollText = formatRoll(roll, "wits", mod, total, dc, "DC");
+    lastRoll = { text: out.rollText, success: ok, roll: roll };
+
+    if (roll.critFail) {
+      c.damageBonus = (c.damageBonus || 0) + 2;
+      out.summary = "Brace fails badly — the blow lands harder (+2).";
+      combatLog(out.summary);
+      return mergeCombat(out, resolveEnemyTurn(enc, node));
+    }
+
+    if (ok) {
+      if (roll.critSuccess) {
+        c.playerCancel = true;
+        out.summary = "Perfect brace — the telegraphed hit is cancelled.";
+      } else {
+        c.playerHalve = true;
+        out.summary = "You brace — telegraphed damage is halved.";
+      }
+      combatLog(out.summary);
+      return mergeCombat(out, resolveEnemyTurn(enc, node));
+    }
+
+    out.summary = "Brace fails — the blow comes in full.";
+    combatLog(out.summary);
+    return mergeCombat(out, resolveEnemyTurn(enc, node));
+  }
+
   function combatFlee(useAdvantage) {
     var node = data().nodes[state.nodeId];
     var enc = data().encounters[state.combat.encounter];
@@ -1120,12 +1299,13 @@
     var total = roll.kept + mod;
     var ok =
       roll.critSuccess || (!roll.critFail && total >= dc);
-    out.rollText = formatRoll(roll, "wits", mod, total, dc);
+    out.rollText = formatRoll(roll, "wits", mod, total, dc, "DC");
 
     if (ok) {
       if (roll.critSuccess) {
         state.gold += 3;
-        out.summary = "You flee — and snatch 3 gold on the way.";
+        out.summary =
+          "You flee — and snatch 3 gold on the way. You gain 3 gold.";
       } else {
         out.summary = "You flee.";
       }
@@ -1210,8 +1390,31 @@
       pardonArmed: state.pardonArmed,
       needsLevelPick: needsLevelPick(),
       tollCost: tollCost(),
-      shop: node && node.type === "shop" ? shopView(node) : null
+      shop: node && node.type === "shop" ? shopView(node) : null,
+      displayLevel: Math.max(1, state.level - pendingLevelUps),
+      pendingVictory: state.pendingVictory || null,
+      equippedLabels: equippedLabels()
     };
+  }
+
+  function equippedLabels() {
+    var out = { weapon: null, armor: null };
+    if (state.equipped && state.equipped.weapon) {
+      var w = data().items[state.equipped.weapon];
+      out.weapon =
+        w.name + " (+" + (w.bonus || 0) + ")";
+    }
+    if (state.equipped && state.equipped.armor) {
+      var a = data().items[state.equipped.armor];
+      out.armor =
+        a.name +
+        " (+" +
+        (a.maxHp || 0) +
+        " HP, −" +
+        (a.reduction || 0) +
+        " dmg)";
+    }
+    return out;
   }
 
   function shopView(node) {
@@ -1225,22 +1428,24 @@
         item.kind === "weapon" ||
         item.kind === "armor" ||
         item.kind === "charm";
-      if (unique && owned > 0) continue;
+      var price = itemPrice(id, node.shopId);
       stock.push({
         id: id,
         name: item.name,
         blurb: item.blurb,
-        price: itemPrice(id),
+        price: price,
         kind: item.kind,
         owned: owned,
-        canAfford: state.gold >= itemPrice(id),
+        sold: unique && owned > 0,
+        canAfford: state.gold >= price,
         atCap: !unique && owned >= 5
       });
     }
     return {
       keeper: shop.keeper,
       stock: stock,
-      leave: shop.leave
+      leave: shop.leave,
+      shopId: shop.id
     };
   }
 
@@ -1293,6 +1498,7 @@
     combatAttack: combatAttack,
     combatSpecial: combatSpecial,
     combatItem: combatItem,
+    combatBrace: combatBrace,
     combatFlee: combatFlee,
     combatEnemyFirst: combatEnemyFirst,
     applyLevelPick: applyLevelPick,
@@ -1300,6 +1506,8 @@
     getLastRoll: getLastRoll,
     tollCost: tollCost,
     healAmount: healAmount,
-    disarmPardon: disarmPardon
+    disarmPardon: disarmPardon,
+    finishVictory: finishVictory,
+    setLineIndex: setLineIndex
   };
 })();

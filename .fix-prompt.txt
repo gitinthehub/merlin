@@ -1,0 +1,67 @@
+FIX PHASE. Sol's independent QA pass 1 on the live build returned 17 findings, verdict FIX-FIRST. Fix ALL of the following in this workspace. Do NOT run git commands, do NOT commit/push. Do not touch netlify.toml, .plan-prompt.txt, .exec-prompt.txt, or .git/.
+
+I have already located root causes for the two blockers — verify and fix precisely.
+
+=== BLOCKER 1: Outcome lines and rolls vanish (ui.js) ===
+When the typewriter finishes the last outcome line, tickTypewriter() sets done=true and fires after() immediately — the next scene replaces the roll text and outcome after 0ms. Also clicking to skip jumps straight past. FIX: on the LAST line, do not auto-fire after(); set awaitingAdvance=true and require one more click before after() runs. The skip path (skipOrAdvanceTypewriter) must behave the same: first click completes the current line, next click advances, final click fires after(). Nat 20s and death lines must stay on screen until clicked.
+
+=== BLOCKER 2: Crit effects fire on ordinary rolls (engine.js applyOption ~line 640-663) ===
+var extra = success ? opt.critSuccess : opt.critFail; then extra.lines concat unconditionally, and success-side extra.effects merge on ANY success. FIX: merge critSuccess lines+effects ONLY if roll.critSuccess (i.e. success && roll.critSuccess); merge critFail lines+effects (plus the +2 damage) ONLY if (!success && roll.critFail). Non-crit outcomes must not show crit-only lines or set crit-only flags. Also audit the OTHER roll sites that gate on crits (combat ~876, 948, 1005, 1122) and the pardon auto-success path (~611) for the same disease: an ordinary success must never grant crit-only flags like knowsPox or countWeakness.
+
+=== MAJOR 3: No victory beat ===
+Winning combat goes straight to the level-up modal over a stale combat screen. FIX: append a "Victory." line (with the killing blow) to the outcome flow; clear combat UI (hide enemy panel) before the level-up modal opens; disable stale action buttons during the victory beat.
+
+=== MAJOR 4: Shop rows shift under your finger ===
+After buying a unique item it disappears and rows slide up. FIX: keep sold-out unique gear in its row as a disabled "Sold" button (same position); consumables at cap show "Max" in place (already partly there).
+
+=== MAJOR 5: Telegraph unactionable ===
+Add a universal "Brace" combat action: WITS check vs the enemy's fleeDc (a light, always-available defensive read). On a success the telegraphed damage is halved (minimum 1); crit success cancels the hit entirely; crit fail adds +2. This gives every character an answer to every telegraph. Keep Bram/Pip/Vellum specials as-is. Update the QA-claimed coin interaction if needed.
+
+=== MAJOR 6: Economy — Pip discount leaks, others broke ===
+Spec says Pip's -2g discount applies at Pox's cart only, but code applies it at Marta's too. FIX: restrict Pip's discount to the pox shop. Raise starting gold: Bram 8→12, Vellum 6→12 (Pip stays 15).
+
+=== MAJOR 7: Mobile — story below the fold ===
+At <=480px the character sheet takes ~360px before the story. FIX: collapse the sheet to a single compact strip (HP bar, gold, level, Pack button); the full sheet lives behind the Pack panel. On the select screen show NO sheet (or an empty-state placeholder that says nothing until a character is chosen).
+
+=== MINOR 8: Nat-1 penalty that doesn't exist + "vs DC" on attacks ===
+Attack rolls print "vs DC"; label them "vs AC". Make a nat 1 on an attack cost something real: the enemy's telegraph resolves immediately with +2 damage (fumble opening).
+
+=== MINOR 9: Reload restarts the scene from line 0 ===
+lineIndex is always saved as 0. FIX: persist the current typewriter lineIndex (and lastRoll text) in the save blob on every line change, and resume mid-scene with the last roll box restored. The splash Continue must appear on refresh when a mid-scene save exists (it already auto-resumes; just don't lose position).
+
+=== MINOR 10: Contrast ===
+The muted color #8a7060 on panel background is 3.85:1. FIX: lighten muted text to pass 4.5:1 against the panel bg (compute it, don't guess).
+
+=== MINOR 11: Buy button 51x36 at 375px ===
+Minimum touch target 44px height; make the full row tappable for purchase. "Too poor" must not wrap to two lines.
+
+=== MINOR 12: No continue cue ===
+Add a blinking "▾" caret indicator at the end of a completed line while awaiting the click-to-advance (both outcome lines and scene lines).
+
+=== MINOR 13: Unaffordable options silently disappear ===
+Options gated on gold (toll, room) must render DISABLED with the price shown ("Pay the toll (8g) — you have 2"), not hidden.
+
+=== MINOR 14: Silent state changes ===
+Log every gold change in the visible text (the wight's purse grab: "It takes 2 gold with it."). Show equipped weapon/armor bonuses on the sheet ("Cudgel of Complaints (+3)" style) and include the equipped bonus in attack damage printouts.
+
+=== MINOR 15: Stale mayor dialogue ===
+After the mayor pays you, his scene still opens with "A ghoul is wearing my wreath". Add a post-payment variant line using the existing variants mechanism (flag mayorPaid).
+
+=== MINOR 16: Netlify badge overlap ===
+Add bottom padding on mobile so the Netlify badge cannot cover shop/combat buttons (and/or hide the badge via netlify-badge JS-off approach in index.html — but padding is fine; keep it simple: 64px bottom padding on the main container at <=480px).
+
+=== NIT 17: Assorted ===
+a) Sheet flips to LV3 before the level-up modal resolves — level the stat display only after the pick.
+b) knowsPox and vellumHonest flags defined but unused: wire them (knowsPox should reveal the merchant-lights option at the marsh if not already; vellumHonest should apply the 16HP draught — verify both actually fire).
+c) "Take the marsh road instead" pays mayor gold on the spot while the mayor says he'll leave coin with Hob — either change his line to pay now, or pay at the inn. Pick the smaller diff.
+WRITING (from Sol): soften exactly these — Hob "The beet is mostly threat.", Toll-Wight "I make change in regrets.", Count "I will correct your pulse." Keep everything else; do NOT touch the lines Sol praised.
+
+RULES:
+- Vanilla JS/CSS only, no build step, no external assets. Keep the 22-node structure.
+- After fixes, re-run the plan's QA checklist sections for dice math, shop math, combat, autosave/refresh, and mobile. Report results honestly.
+
+FINAL REPORT FORMAT:
+1. Files changed + what changed per file.
+2. For each of the 17 findings: FIXED / PARTIAL / WONTFIX with one-line evidence.
+3. QA re-check results.
+4. Anything you could not verify statically.
