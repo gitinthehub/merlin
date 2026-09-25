@@ -1,0 +1,21 @@
+IMPLEMENTATION PHASE. You are authorized to create and edit files in this workspace. Build the game exactly per the MERLIN PLAN v1 you produced earlier in this chat (22 nodes, 3 characters, 2 shops, 3 encounters, 4 endings, d20 engine, autosave). Follow the plan's file layout, data schema, scene outline, mechanics formulas, and implementation step order (steps 1-10).
+
+Requirements recap (from the approved plan):
+- Deliverables: index.html, style.css, data.js, engine.js, ui.js, README.md. All at repo root. netlify.toml already exists — do not touch it. Do not touch .plan-prompt.txt, .exec-prompt.txt, or .git/.
+- Vanilla HTML/CSS/JS only. No frameworks, no build step, no network requests at runtime, no external assets. Works via file:// and on Netlify.
+- data.js assigns window.MERLIN; no DOM strings in data.
+- Engine pure core separate from rendering. Save blob key merlin.save.v1, written on every node change / shop transaction / level-up / combat turn. Boot resumes mid-scene and mid-combat.
+- Gothic candlelight aesthetic, typewriter with skip, die equation line ("d20 rolled 14 + WITS 2 = 16 vs DC 12"), mobile-usable at 375px.
+- Tone: dry, character-driven comedy; serious stakes. Teen-safe.
+
+Boundaries:
+- Do NOT run any git commands. Do NOT commit, push, or create branches. Stop at working-tree changes.
+- Do NOT create package.json or any build tooling.
+- Before finishing, run the plan's manual QA checklist (section 7) as far as you can statically; fix anything you find.
+- If you cannot verify something statically, note it in your final report rather than skipping it silently.
+
+FINAL REPORT FORMAT (your last message must be):
+1. Files created/modified with approximate line counts.
+2. Any deviations from the plan and why.
+3. QA checks you performed and their results.
+4. Anything left unverified that needs a human or browser pass.

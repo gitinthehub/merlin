@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MERLIN — Not That One</title>
+    <meta
+      name="description"
+      content="A short gothic horror-comedy browser adventure. Dice, shops, and a vampire who is not a wizard."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-title">MERLIN</span>
+          <span class="brand-sub">Not That One</span>
+        </div>
+        <button type="button" id="btn-new" class="btn ghost" hidden>
+          New Game
+        </button>
+      </header>
+
+      <section id="splash" class="panel splash" hidden>
+        <h1 class="splash-title">MERLIN</h1>
+        <p class="splash-sub">Not That One</p>
+        <p class="splash-pitch">
+          A cursed village. A vampire Count who will correct you before he bites
+          you. Three questionable heroes. One short night.
+        </p>
+        <div class="splash-actions">
+          <button type="button" id="btn-continue" class="btn primary" hidden>
+            Continue
+          </button>
+          <button type="button" id="btn-start" class="btn primary">
+            New Game
+          </button>
+        </div>
+      </section>
+
+      <div id="game" class="game" hidden>
+        <aside id="sheet" class="sheet panel">
+          <div class="sheet-head">
+            <span id="sheet-glyph" class="sheet-glyph"></span>
+            <div>
+              <div id="sheet-name" class="sheet-name"></div>
+              <div id="sheet-role" class="sheet-role"></div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <span>LV <strong id="sheet-level">1</strong></span>
+            <span class="gold">✦ <strong id="sheet-gold">0</strong></span>
+          </div>
+          <label class="bar-label">HP <span id="sheet-hp-text"></span></label>
+          <div class="bar hp"><div id="bar-hp" class="bar-fill"></div></div>
+          <label class="bar-label">XP <span id="sheet-xp-text"></span></label>
+          <div class="bar xp"><div id="bar-xp" class="bar-fill"></div></div>
+          <dl class="stats">
+            <div><dt>Might</dt><dd id="stat-might">0</dd></div>
+            <div><dt>Wits</dt><dd id="stat-wits">0</dd></div>
+            <div><dt>Spirit</dt><dd id="stat-spirit">0</dd></div>
+          </dl>
+          <button type="button" id="btn-pack" class="btn pack-toggle">
+            Pack
+          </button>
+          <div id="pack" class="pack" hidden>
+            <ul id="pack-list"></ul>
+            <p id="pack-empty" class="muted">Empty pockets.</p>
+          </div>
+        </aside>
+
+        <main id="stage" class="stage panel">
+          <h2 id="scene-title" class="scene-title"></h2>
+          <div id="speaker" class="speaker" hidden></div>
+          <div id="story" class="story" tabindex="0"></div>
+          <div id="die" class="die" hidden></div>
+          <div id="combat" class="combat" hidden>
+            <div class="combat-head">
+              <strong id="enemy-name"></strong>
+              <span id="enemy-hp"></span>
+            </div>
+            <div class="bar enemy"><div id="bar-enemy" class="bar-fill"></div></div>
+            <p id="telegraph" class="telegraph"></p>
+            <ul id="combat-log" class="combat-log"></ul>
+            <div id="combat-actions" class="choices combat-actions"></div>
+          </div>
+          <div id="shop" class="shop" hidden>
+            <p id="shop-keeper" class="shop-keeper"></p>
+            <ul id="shop-list" class="shop-list"></ul>
+            <button type="button" id="btn-leave-shop" class="btn">Leave</button>
+          </div>
+          <div id="choices" class="choices"></div>
+          <div id="select-chars" class="select-chars" hidden></div>
+          <div id="ending-actions" class="ending-actions" hidden>
+            <button type="button" id="btn-ending-new" class="btn primary">
+              New Game
+            </button>
+          </div>
+        </main>
+      </div>
+
+      <div id="modal" class="modal" hidden>
+        <div class="modal-card panel">
+          <p id="modal-text"></p>
+          <div id="modal-actions" class="modal-actions"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="engine.js"></script>
+    <script src="ui.js"></script>
+  </body>
+</html>

@@ -33,6 +33,8 @@ HARD CONSTRAINTS:
 - Do NOT run git commands. Do NOT create package.json or any build tooling.
 - Final deliverable is only: index.html, CSS file(s), JS file(s), updated README.md.
 
+CRITICAL OUTPUT REQUIREMENT: Your entire final message must be the plan text itself. Do NOT return an empty response or a stub — begin your output with the literal line "MERLIN PLAN v1" followed by the plan. If any part of the design is undecided, decide it yourself and write it down; an incomplete-but-concrete plan is required, never silence.
+
 PLAN OUTPUT FORMAT (return exactly this, no preamble):
 1. Proposed title + 1-paragraph pitch.
 2. File layout with one-line purpose per file.
