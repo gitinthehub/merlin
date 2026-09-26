@@ -27,8 +27,8 @@
               "resolves": []
             },
             "failure": {
-              "text": "The bark sheets off under his weight. He gets the crystal, and every vein in the trunk flares. The pulse leaves the tree shouting across the ash.",
-              "next": "echo-field",
+              "text": "The bark sheets off under his weight. He gets the crystal, and every vein in the trunk flares. The pulse leaves the tree, and the plain answers in the same rhythm before anyone takes a step toward the white.",
+              "next": "end-answered",
               "resolves": []
             },
             "complication": {
@@ -59,8 +59,8 @@
               "resolves": []
             },
             "failure": {
-              "text": "A hold crumbles. He catches the crystal on the way down and the impact rings the trunk. The signal runs out over the ash ahead of them.",
-              "next": "echo-field",
+              "text": "A hold crumbles. He catches the crystal on the way down and the impact rings the trunk. The signal runs out over the ash, and a second pulse stands up in it, close, in the shape of people.",
+              "next": "end-answered",
               "resolves": []
             },
             "complication": {
@@ -87,8 +87,8 @@
               "resolves": []
             },
             "failure": {
-              "text": "The shot clips the housing. The crystal falls intact and the tree answers with a pulse loud enough to lift ash off the ground.",
-              "next": "echo-field",
+              "text": "The shot clips the housing. The crystal falls intact and the tree answers with a pulse loud enough to lift ash off the ground. The ash does not settle. Figures are already in it, and the rhythm is coming from them.",
+              "next": "end-answered",
               "resolves": []
             },
             "complication": {
@@ -115,8 +115,8 @@
               "resolves": []
             },
             "failure": {
-              "text": "The route is right and the climb is heavy. Bark rains the whole way. They have the crystal, and the signal is already walking out across the waste ahead of them.",
-              "next": "echo-field",
+              "text": "The route is right and the climb is heavy. Bark rains the whole way. They have the crystal, and the signal is not walking ahead of them anymore. It is standing at the foot of the tree, answered.",
+              "next": "end-answered",
               "resolves": []
             },
             "complication": {
@@ -151,8 +151,8 @@
               "resolves": ["john-memory"]
             },
             "failure": {
-              "text": "The winter seats itself as memory. He can smell the cellar. He believes grey figures came from the tree and took the names off the doors, and every detail agrees with every other detail. He crosses believing it.",
-              "next": "axe-lock",
+              "text": "The winter seats itself as memory. He can smell the cellar. He believes grey figures came from the tree and took the names off the doors, and every detail agrees with every other detail. He follows that winter off the plain. The door is not on the bearing he trusts.",
+              "next": "end-bearing",
               "resolves": []
             },
             "complication": {
@@ -179,8 +179,8 @@
               "resolves": ["john-memory"]
             },
             "failure": {
-              "text": "The cut closes. The winter rushes in to fill it, consistent and kind, and John takes it. They reach the far ash believing the guardians are the raiders who emptied the lane.",
-              "next": "axe-lock",
+              "text": "The cut closes. The winter rushes in to fill it, consistent and kind, and John takes it. They walk the way the thieves would have run, and the vault is not on that way.",
+              "next": "end-bearing",
               "resolves": []
             },
             "complication": {
@@ -207,8 +207,8 @@
               "resolves": ["john-memory"]
             },
             "failure": {
-              "text": "The shot lands in picture, not in ground. The winter finishes itself around John, cellar and thieves and all, and he trusts it because it does not contradict itself. They leave the field with that winter intact.",
-              "next": "axe-lock",
+              "text": "The shot lands in picture, not in ground. The winter finishes itself around John, cellar and thieves and all, and he trusts it because it does not contradict itself. They leave the field on the lie's heading, and the heading does not come back.",
+              "next": "end-bearing",
               "resolves": []
             },
             "complication": {
@@ -343,8 +343,8 @@
               "resolves": []
             },
             "failure": {
-              "text": "The housing takes blow after blow. The scream wakes every figure in the ring. They watch it die. The signal ends ugly, and it does end.",
-              "next": "end-destroy",
+              "text": "The housing takes blow after blow. The scream wakes every figure in the ring. They watch it die with their eyes open. The signal ends ugly, and the ring does not go back to still.",
+              "next": "end-watched",
               "resolves": []
             },
             "complication": {
@@ -371,8 +371,8 @@
               "resolves": []
             },
             "failure": {
-              "text": "The cadence catches halfway. The beacon still leaves, rough and loud, guardians flinching in the ring, and it is still his call, not an accident.",
-              "next": "end-activate",
+              "text": "The cadence catches halfway. The beacon still leaves, rough and loud, guardians flinching in the ring, and the sky answers with a pull that wants one body. It is still his call.",
+              "next": "end-torn",
               "resolves": []
             },
             "complication": {
@@ -403,8 +403,8 @@
               "resolves": []
             },
             "failure": {
-              "text": "The door opens on a broken shore of that same sky, wreckage and a mean light. He goes anyway. The frame still fits only him.",
-              "next": "end-portal",
+              "text": "The door opens on a broken shore of that same sky, wreckage and a mean light. He goes anyway. The frame still fits only him, and it does not close clean behind his heels.",
+              "next": "end-shore",
               "resolves": []
             },
             "complication": {
@@ -451,6 +451,36 @@
       "id": "end-collapse",
       "title": "The Core Unravels",
       "text": "The decision is stolen by the minimum roll. The housing comes apart along the crash-seams and the cadence stops without a blow, a beacon, or a door. Joel still has the map, read at the lock or finished in the dying light, and he carries the axe because it is the only intact route left. The guardians slump mid-step. Their hands are village hands, the ring is his mother's, and the winter of thieves cannot stand next to those hands. John knows. Rafe chooses the new world as an aftermath he claims: home was in the machine, the machine is gone, and he stays to walk the map out with them rather than dig through the wreck for a door.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-answered",
+      "title": "The Plain Answers",
+      "text": "The answer is a ring of figures in the ash, village hands, and one of them wears his mother's ring. John says the name that used to belong to that hand. Nothing says it back. That silence is the truth: these are his people, changed by the signal, and he knows it without a field to lie to him. The same light runs the carving on the axe in order — well, ridge, tree, vault — and Joel keeps the axe, because the map is the copy that can still walk and the vault under the flare is not a door he can open from here. Above the ring a frame opens on a sky that is not this one, one body wide, speaking the cadence Rafe was born knowing. He turns his back. The frame thins. He stays on the plain with the rifle slung, and he does not ask the light for a second door.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-bearing",
+      "title": "The Wrong Bearing",
+      "text": "They come out of the white onto ash that does not hold the door. Behind them a blue seam is already knitting, the vault closing on a route they walked away from. In that last line Joel reads the map whole — well, ridge, tree, vault — and he drives the axe into the ash on this side so the heading stays marked. He does not carry it. He refuses the inheritance by leaving it where a later walker can find the turn he missed. John turns because the seam shows faces. His mother's ring is on one hand. The cellar and the thieves die against that metal: these are his people, changed by the signal, and he was spared because he was not standing in the light when the lane was taken. He knows it, and the lock is already shut, so he cannot say the names into the grooves. Rafe hears his own cadence in the closing seam, home behind it, and the seam shuts. He chooses this side. He sits where he can see the axe he will not pull, rifle across his knees, and he does not dig.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-watched",
+      "title": "The Ring Watches",
+      "text": "Joel has the map, from the lock or from the core's light finishing the curves the lock withheld: well, ridge, tree, vault. He carries the axe out, and the head is notched where the housing fought. The core is dead, but it died screaming, and the ring watched with open eyes. John looks at the guardian who wears his mother's ring. The winter of grey thieves cannot stand next to that open eye. These are his people, changed by the signal, and they do not answer the name. They saw the axe finish the light that made them. Rafe chooses the new world. He had the cadence that would open home, and he will not send that scream up as the message. The rifle stays slung. He walks out with the other two, and he does not offer the sky anything.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-torn",
+      "title": "The Torn Beacon",
+      "text": "The map is confirmed when the torn beacon lights the same four points, stuttering: well, ridge, tree, vault. Joel carries the axe, and he carries the others back by that route, because a broken light is still a route and he will not lay the map down. John hears the old language come apart in the pulse and still name the figures in the ring as the village. The thieves of a false winter do not survive even the ruined sound. He knows what they are. The guardians flinch and do not kneel. Rafe called home, and the answer is a frame that pulls. He chooses the new world against that pull: he breaks his own cadence, the frame loses its grip, and he stays on the ash while the rough beacon keeps running without him in it.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-shore",
+      "title": "The Broken Shore",
+      "text": "Joel knows the carvings are the ancestral map and he will not take the axe through a sky that is not the route's. He stays, axe in hand, the walk still his on this side, mean light from the frame lying on the ash like a spill. John stays with the ring and the guardians. The cellar story breaks in that spill: the figures were not raiders, they were the people the names fell off of, and he will not follow anyone into wreckage. Rafe chooses home. The frame takes one body onto a broken shore, wreckage and a mean light, rifle left on the ash where the other two can find it. He does not reach back. The shore does not welcome him. He is through.",
       "resolves": ["john-memory", "joel-legacy", "rafe-return"]
     }
   ]

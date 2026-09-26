@@ -136,6 +136,177 @@ for (ch = 0; ch < lock.choices.length; ch++) {
   );
 }
 
+var MIN_FAILURE_FORKS = 10;
+var forkCount = 0;
+var choiceById = {};
+for (ci = 0; ci < arc.chapters.length; ci++) {
+  var chapFork = arc.chapters[ci];
+  for (ch = 0; ch < (chapFork.choices || []).length; ch++) {
+    var cf = chapFork.choices[ch];
+    choiceById[cf.id] = cf;
+    var ccons = cf.consequences || {};
+    if (
+      ccons.success &&
+      ccons.failure &&
+      ccons.failure.next !== ccons.success.next
+    ) {
+      forkCount += 1;
+    }
+  }
+}
+assert(
+  forkCount >= MIN_FAILURE_FORKS,
+  "failure forks >= " + MIN_FAILURE_FORKS + ", got " + forkCount
+);
+
+function assertFork(id, successNext, failureNext) {
+  var c = choiceById[id];
+  assert(c, "choice present " + id);
+  if (!c) return;
+  assert(
+    c.consequences.success.next === successNext,
+    id + " success → " + successNext
+  );
+  assert(
+    c.consequences.failure.next === failureNext,
+    id + " failure → " + failureNext
+  );
+}
+
+assertFork("joel-climbs", "echo-field", "end-answered");
+assertFork("john-climbs", "echo-field", "end-answered");
+assertFork("rafe-shoots", "echo-field", "end-answered");
+assertFork("team-climb", "echo-field", "end-answered");
+assertFork("john-names-it", "axe-lock", "end-bearing");
+assertFork("joel-cuts", "axe-lock", "end-bearing");
+assertFork("rafe-horizon", "axe-lock", "end-bearing");
+assertFork("destroy", "end-destroy", "end-watched");
+assertFork("activate", "end-activate", "end-torn");
+assertFork("portal", "end-portal", "end-shore");
+
+var tree = arc.chapters[0];
+var treeById = {};
+for (ch = 0; ch < tree.choices.length; ch++) {
+  treeById[tree.choices[ch].id] = tree.choices[ch];
+}
+assert(treeById["joel-climbs"].roll.die === "2d6", "joel-climbs die 2d6");
+assert(treeById["joel-climbs"].roll.dc === 9, "joel-climbs dc 9");
+assert(treeById["john-climbs"].roll.die === "d20", "john-climbs die d20");
+assert(
+  treeById["john-climbs"].roll.tier === "medium",
+  "john-climbs tier medium"
+);
+assert(treeById["rafe-shoots"].roll.die === "d10", "rafe-shoots die d10");
+assert(treeById["rafe-shoots"].roll.dc === 8, "rafe-shoots dc 8");
+assert(treeById["team-climb"].roll.die === "2d6", "team-climb die 2d6");
+assert(treeById["team-climb"].roll.dc === 7, "team-climb dc 7");
+
+var chapterIdSet = {};
+var endingIdSet = {};
+for (ci = 0; ci < arc.chapters.length; ci++) {
+  if (arc.chapters[ci] && arc.chapters[ci].id) {
+    chapterIdSet[arc.chapters[ci].id] = true;
+  }
+}
+for (ei = 0; ei < (arc.endings || []).length; ei++) {
+  if (arc.endings[ei] && arc.endings[ei].id) {
+    endingIdSet[arc.endings[ei].id] = true;
+  }
+}
+
+var visitedFromStart = {};
+var walkQueue = [arc.chapters[0].id];
+visitedFromStart[arc.chapters[0].id] = true;
+while (walkQueue.length) {
+  var wid = walkQueue.shift();
+  var wchap = null;
+  for (ci = 0; ci < arc.chapters.length; ci++) {
+    if (arc.chapters[ci].id === wid) {
+      wchap = arc.chapters[ci];
+      break;
+    }
+  }
+  if (!wchap) continue;
+  for (ch = 0; ch < (wchap.choices || []).length; ch++) {
+    var wcons = wchap.choices[ch].consequences || {};
+    var wkeys = ["success", "failure", "complication", "bonus"];
+    var wki;
+    for (wki = 0; wki < wkeys.length; wki++) {
+      var wn = wcons[wkeys[wki]];
+      if (!wn || !wn.next) continue;
+      assert(
+        chapterIdSet[wn.next] || endingIdSet[wn.next],
+        "next is chapter or ending: " + wn.next + " from " + wchap.choices[ch].id
+      );
+      if (chapterIdSet[wn.next] && !visitedFromStart[wn.next]) {
+        visitedFromStart[wn.next] = true;
+        walkQueue.push(wn.next);
+      }
+      if (endingIdSet[wn.next]) {
+        visitedFromStart[wn.next] = true;
+      }
+    }
+  }
+}
+for (ci = 0; ci < arc.chapters.length; ci++) {
+  assert(
+    visitedFromStart[arc.chapters[ci].id],
+    "chapter reachable from start: " + arc.chapters[ci].id
+  );
+}
+for (ei = 0; ei < (arc.endings || []).length; ei++) {
+  assert(
+    visitedFromStart[arc.endings[ei].id],
+    "ending reachable from start: " + arc.endings[ei].id
+  );
+}
+
+var canFinish = {};
+function markFinish(nodeId, stack) {
+  if (endingIdSet[nodeId]) {
+    canFinish[nodeId] = true;
+    return true;
+  }
+  if (!chapterIdSet[nodeId]) return false;
+  if (Object.prototype.hasOwnProperty.call(canFinish, nodeId)) {
+    return canFinish[nodeId];
+  }
+  if (stack[nodeId]) {
+    canFinish[nodeId] = false;
+    return false;
+  }
+  stack[nodeId] = true;
+  var mchap = null;
+  for (ci = 0; ci < arc.chapters.length; ci++) {
+    if (arc.chapters[ci].id === nodeId) {
+      mchap = arc.chapters[ci];
+      break;
+    }
+  }
+  var ok = false;
+  if (mchap) {
+    for (ch = 0; ch < (mchap.choices || []).length; ch++) {
+      var mcons = mchap.choices[ch].consequences || {};
+      var mkeys = ["success", "failure", "complication", "bonus"];
+      var mki;
+      for (mki = 0; mki < mkeys.length; mki++) {
+        var mn = mcons[mkeys[mki]];
+        if (!mn || !mn.next) continue;
+        if (markFinish(mn.next, stack)) ok = true;
+      }
+    }
+  }
+  delete stack[nodeId];
+  canFinish[nodeId] = ok;
+  return ok;
+}
+for (ci = 0; ci < arc.chapters.length; ci++) {
+  assert(
+    markFinish(arc.chapters[ci].id, {}),
+    "chapter can reach an ending: " + arc.chapters[ci].id
+  );
+}
+
 var src = fs.readFileSync(outJs, "utf8");
 assert(src.indexOf("OronathArcBundle") !== -1, "assigns OronathArcBundle");
 assert(src.indexOf("import ") === -1, "no import");

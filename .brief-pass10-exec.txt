@@ -1,0 +1,26 @@
+IMPLEMENTATION PHASE — MERLIN PASS 10. You are authorized to create and edit files in this workspace.
+
+Build exactly what you planned in this chat: make failed checks route the run somewhere a success would not have gone, in "The Last Signal of Oronath", and author the content for those roads.
+
+Requirements:
+
+1. Edit `arcs/last-signal.json` (the source of truth). Then regenerate the artefact with the KEYLESS path, with the key variables unset:
+   `env -u XAI_API_KEY -u OPENAI_API_KEY node tools/build-arc.js --from arcs/last-signal.json --out arcs/last-signal.js`
+   Confirm it reports the validation error count as 0. NEVER hand-edit `arcs/last-signal.js`.
+2. Honour every hard constraint in the planning brief: the owner's chapter 1 choices and thresholds stay as they are; every ending resolves all three threads; `complication.next` differs from `failure.next` everywhere; the validator stays untouched; no key, no network, no new dependency, no build step, no ES modules; and `engine.js`, `ui.js`, `data.js`, `dice-view.js`, `style.css`, `dice.js`, `arc.js`, `characters.js`, `loop.js`, `persist.js`, `sample-arc.js` are all BYTE-IDENTICAL after this pass.
+3. Add the structural assertions to `tests/last-signal.test.js` so the new property cannot silently regress: fail below the minimum number of forking choices you committed to, and assert every chapter is reachable and no road dead-ends.
+4. Update `ROADMAP.md` and `roadmap.js` in the same commit, only where a chip genuinely changes.
+5. Run every test suite in `tests/` and make them all pass: `for t in dice arc characters loop persist build-arc last-signal; do node tests/$t.test.js; done`
+
+Then report, in this order:
+
+- Files changed, with line counts.
+- The byte-identical confirmation for the protected v1 and engine files (the actual `git diff --stat` output for them, which must be empty).
+- The keyless bundle command and its real output, including the validation error count.
+- The node graph after the change: chapter by chapter, marking which choices now fork, and where roads converge.
+- The chapter/choice/ending counts, and the threads each ending resolves.
+- The exact test commands and their real, unedited output.
+- The specific run path that walks a FAILURE road, with the branch taken at each step — and the command or script that produced it.
+- Deviations from the brief, and anything you could not verify.
+
+Do not reply with a plan or an acknowledgement. Make the changes, run the tests, fix what fails, then report.

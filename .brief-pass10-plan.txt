@@ -1,0 +1,47 @@
+MERLIN — PASS 10 (ORONATH ARC: FAILURE FORKING) PLANNING BRIEF. PLAN ONLY.
+
+RETURN THE PLAN AS TEXT IN YOUR FINAL MESSAGE. An empty reply, a stub, or a bare acknowledgement is a non-result and fails this task. Begin with the literal first line:
+
+MERLIN PASS 10 PLAN
+
+BACKGROUND
+
+The Last Signal of Oronath ships as the default arc (`arcs/last-signal.json`, bundled to `arcs/last-signal.js` by `tools/build-arc.js --from`). It validates clean, plays end to end, and every ending closes all three threads. One weakness is being fixed in this pass:
+
+  In the arc's own game design, "failure must create a new consequence/branch, never a try again". Right now every choice's `failure.next` points at the SAME node as its `success.next` in most cases. The failure text differs and nothing retries, so it satisfies the letter of the rule, but a failed check does not change WHERE the story goes. The owner wants failures to genuinely fork the road.
+
+TASK
+
+Deepen the arc so that a failed check routes the run somewhere a success would not have gone, and author the content for those roads. Plan it concretely: name the new chapter(s), the nodes, every choice, every consequence and every ending that changes.
+
+HARD CONSTRAINTS
+
+1. The validator is the gate and must be 0 errors: `node tools/build-arc.js --from arcs/last-signal.json --out <tmp>` must succeed, and `tests/last-signal.test.js` must pass. Read `arc.js` for the exact rules (chapter count bounds, choice count bounds per chapter, no dangling `next`, no self-`next`, no unreachable node, every ending resolving every thread, `complication.next` differing from `failure.next`).
+2. The chapter count must stay within the validator's bound (read it — do not guess). If you need a sixth node to route failures through, it must be a chapter the validator accepts, or the routing must reuse existing chapters. Say which, and why.
+3. KEEP the owner's chapter 1 unchanged in its choices and thresholds: Joel climbs (2d6, DC 9), John stealth-climbs (d20 medium), Rafe shoots (d10, DC 8), team combo (2d6, DC 7). Their failure consequences may now lead somewhere new.
+4. Every ending must still resolve all three threads (john-memory, joel-legacy, rafe-return). If a new road needs its own ending, it must resolve all three too.
+5. `complication.next` must differ from `failure.next` for every choice, and every choice must still have no retry path.
+6. The bundled artefact is GENERATED. Never hand-edit `arcs/last-signal.js`. Edit the JSON, re-run the keyless bundle with the key variables unset, and let the tool write the artefact.
+7. Do not weaken the validator or the tests to make content pass. If a rule blocks you, say so in the plan instead of relaxing it.
+8. No key, no network, no new dependency, no `package.json`, no build step, no ES modules. Everything the browser loads stays plain scripts.
+9. These files must be BYTE-IDENTICAL after this pass: `engine.js`, `ui.js`, `data.js`, `dice-view.js`, `style.css`, `dice.js`, `arc.js`, `characters.js`, `loop.js`, `persist.js`, `sample-arc.js`. This pass changes content (the arc), not the engine.
+10. `ROADMAP.md` and `roadmap.js` move in the same commit. Only a chip whose text or status actually changes needs editing; do not invent drift.
+
+ALSO PLAN
+
+11. A STRUCTURAL ASSERTION for the new property, added to `tests/last-signal.test.js`, so this cannot silently regress: the suite must count the choices where `failure.next !== success.next` and fail below a stated minimum, and must assert that every chapter is reachable from the start and that no road dead-ends. State the minimum you will enforce and why that number.
+12. Whether the failure roads change where you go but still converge on the same ending, or lead to their own endings. Argue for one and commit to it. Convergence with different costs is cheaper; divergent endings are more interesting. Pick, justify in one or two sentences, and be consistent.
+13. The play evidence you will present: a specific run path (chapter by chapter, with the branch taken) showing a failure road being walked, and the command that proves it.
+
+RETURN, in this order, eight numbered sections:
+
+1. Goal — what changes for the player, in two sentences.
+2. Files to change — exact paths, with what changes in each.
+3. The new route — the node graph: every chapter, every choice, success/failure/complication targets, marking which are NEW, which changes, and where roads converge.
+4. The new content — the actual prose, chapter by chapter, in the game's voice. Real lines, not placeholders.
+5. Endings — the full list after this pass, and which threads each resolves.
+6. Tests — the assertions added, the minimum enforced, and the exact commands.
+7. Verification — how you will prove a failure road is walked, and how you will prove the artefact still matches its source.
+8. Risks and open questions — anything the constraints do not settle.
+
+PLAN ONLY: do not edit any file, do not create any file, do not run any command. Write the plan now.
