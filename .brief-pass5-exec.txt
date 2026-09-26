@@ -1,0 +1,25 @@
+IMPLEMENTATION PHASE — MERLIN PASS 5. You are authorized to create and edit files in this workspace. Build exactly the three items you planned in this chat (ROADMAP.md items 1.1, 1.2, 1.7):
+
+1.1 **A die you can see.** A real rendered die component that always shows the face actually rolled — d20 with the rolled number on its top face, d10, and d6/2d6 (two dice plus total); advantage shows both dice with the kept one highlighted; nat 20 / nat 1 called out on the die itself; `prefers-reduced-motion` shows the final face with no tumble. The engine must expose the real dice to the UI (structured roll payload at every roll site), while every printed equation line stays exactly as it is.
+1.2 **Character portraits.** Each pregen's portrait from `images/char-*.png` on the character-select screen and in the character sheet head, falling back to the existing glyph if a file is missing, without breaking the 375px layout.
+1.7 **Visual roadmap page.** `roadmap.html` at the repo root: every story plot point from ROADMAP.md's plot-point table as a card with its `images/beat-*.png` art and an animated die for the check it demands, every roadmap phase as a milestone chip with an animated die badge, shared die component, splash-screen link both ways.
+
+Constraints (unchanged from the plan):
+- Vanilla HTML/CSS/JS. No framework, no build step, no `package.json`, no new dependency, no external asset, no runtime network request. Works via `file://` and on Netlify.
+- Reference only image files that actually exist in `images/` — check with `ls` first; never invent or generate placeholder art.
+- Do not break autosave or any shipped behaviour; the game stays fully playable end to end.
+- Additive only: do not reword shipped writing, never remove an ending.
+- Mobile-usable at 375px; teen-safe; gothic candlelight look.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, the `.brief-pass*.txt` files, or `.git/`.
+
+Also required:
+- Update `ROADMAP.md` in the same change set: mark 1.1, 1.2 and 1.7 with their real status (✅ only if built and verified, otherwise 🔨), and add a Changelog line for this pass. Do not touch other rows.
+- Run the plan's manual QA checklist as far as you can statically (including loading every changed page from `file://` in a headless check if you can), and fix what you find.
+
+Boundaries: do NOT run any git command. Do NOT commit, push, branch, or deploy. Stop at working-tree changes.
+
+FINAL REPORT (your last message must be):
+1. Files created/modified, with line counts.
+2. Any deviations from the plan and why.
+3. QA checks performed and their results — including which image files you found in `images/` and how each was used.
+4. Anything left unverified that needs a browser pass.

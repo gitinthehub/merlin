@@ -24,6 +24,13 @@
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* Wire only conventional portrait paths; onerror falls back to glyph. */
+  var PORTRAIT_FILES = {
+    bram: "images/char-bram.png",
+    vellum: "images/char-vellum.png",
+    pip: "images/char-pip.png"
+  };
+
   function $(id) {
     return document.getElementById(id);
   }
@@ -531,7 +538,11 @@
     show(els.btnNew, true);
     var s = snap.state;
     var c = snap.character;
-    els.sheetGlyph.textContent = c.glyph || "";
+    mountPortrait(
+      els.sheetGlyph,
+      PORTRAIT_FILES[s.characterId] || null,
+      c.glyph || ""
+    );
     els.sheetName.textContent = c.name;
     els.sheetRole.textContent = c.role;
     els.sheetLevel.textContent = String(snap.displayLevel != null ? snap.displayLevel : s.level);
@@ -644,22 +655,56 @@
     });
   }
 
+  /* ——— Portraits ——— */
+
+  function mountPortrait(frame, src, glyph) {
+    if (!frame) return;
+    frame.textContent = glyph || "";
+    if (!src) return;
+    var img = new Image();
+    img.alt = "";
+    img.className = "portrait-img";
+    img.onload = function () {
+      while (frame.firstChild) frame.removeChild(frame.firstChild);
+      frame.appendChild(img);
+    };
+    img.onerror = function () {
+      frame.textContent = glyph || "";
+    };
+    img.src = src;
+  }
+
   /* ——— Die display ——— */
 
-  function flashDie(text, success) {
+  function flashDie(text, success, rolls) {
     if (!text) {
       show(els.die, false);
       return;
     }
     show(els.die, true);
-    els.die.className = "die tumbling " + (success ? "success" : "fail");
-    els.die.textContent = text;
-    if (!reducedMotion) {
-      setTimeout(function () {
-        els.die.classList.remove("tumbling");
-      }, 600);
+    els.die.className = "die " + (success ? "success" : "fail");
+
+    var faces = els.die.querySelector(".die-faces");
+    var eq = els.die.querySelector(".die-eq");
+    if (!faces) {
+      faces = document.createElement("div");
+      faces.className = "die-faces";
+      els.die.appendChild(faces);
+    }
+    if (!eq) {
+      eq = document.createElement("div");
+      eq.className = "die-eq";
+      els.die.appendChild(eq);
+    }
+    eq.textContent = text;
+
+    if (rolls && rolls.length && window.MerlinDice) {
+      window.MerlinDice.mount(faces, rolls, {
+        size: "stage",
+        animate: !reducedMotion
+      });
     } else {
-      els.die.classList.remove("tumbling");
+      while (faces.firstChild) faces.removeChild(faces.firstChild);
     }
   }
 
@@ -719,7 +764,7 @@
 
     var savedRoll = E.getLastRoll();
     if (savedRoll && savedRoll.text) {
-      flashDie(savedRoll.text, !!savedRoll.success);
+      flashDie(savedRoll.text, !!savedRoll.success, savedRoll.rolls);
     }
 
     if (snap.pendingVictory) {
@@ -753,7 +798,7 @@
         if (s.combat && s.combat.surprised) {
           setTimeout(function () {
             var er = E.combatEnemyFirst();
-            if (er && er.rollText) flashDie(er.rollText, false);
+            if (er && er.rollText) flashDie(er.rollText, false, er.rolls);
             renderSheet();
             var s2 = E.snapshot();
             if (s2.node && s2.node.type === "combat") renderCombat(s2);
@@ -794,7 +839,7 @@
       card.innerHTML = "";
       var g = document.createElement("div");
       g.className = "glyph";
-      g.textContent = c.glyph;
+      mountPortrait(g, PORTRAIT_FILES[id], c.glyph);
       var n = document.createElement("div");
       n.className = "name";
       n.textContent = c.name;
@@ -895,7 +940,7 @@
       return;
     }
 
-    if (result.text) flashDie(result.text, result.success);
+    if (result.text) flashDie(result.text, result.success, result.rolls);
     else show(els.die, false);
 
     var lines = result.lines && result.lines.length ? result.lines : null;
@@ -1064,7 +1109,7 @@
           (result.summary && /^Hit /.test(result.summary)) ||
           (result.summary && /flee/i.test(result.summary)) ||
           (result.summary && /flee|Brace|Occupational|Blessing|Estimate/i.test(result.summary)));
-      flashDie(result.rollText, !!successPaint);
+      flashDie(result.rollText, !!successPaint, result.rolls);
     }
     renderSheet();
 

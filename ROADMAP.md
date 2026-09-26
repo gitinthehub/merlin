@@ -32,13 +32,18 @@ The polish pass: the dice have to *look* like dice, the heroes have to have face
 
 | # | Item | Size | Depends on | Status |
 |---|------|------|-----------|--------|
-| 1.1 | **A die you can see.** Replace the text-only roll chip with a real rendered polyhedral die (d20 / d10 / 2d6) that tumbles and lands showing the face that was actually rolled — d20 with the rolled number upright on the top face, advantage showing both dice with the kept one highlighted, nat 20 / nat 1 called out on the die itself. Respects `prefers-reduced-motion` (static face, no tumble). Pure CSS/SVG — no image assets, no new dependency. | M | — | ⬜ |
-| 1.2 | **Character portraits.** A painted portrait for each pregen on the select screen and in the character sheet, so the player knows who they are picking. Art in `images/char-*.png`, wired as `<img>` with the existing glyph as the fallback if a file is missing. | S | art | ⬜ |
+| 1.1 | **A die you can see.** Replace the text-only roll chip with a real rendered polyhedral die (d20 / d10 / 2d6) that tumbles and lands showing the face that was actually rolled — d20 with the rolled number upright on the top face, advantage showing both dice with the kept one highlighted, nat 20 / nat 1 called out on the die itself. Respects `prefers-reduced-motion` (static face, no tumble). Pure CSS/SVG — no image assets, no new dependency. | M | — | ✅ |
+| 1.2 | **Character portraits.** A painted portrait for each pregen on the select screen and in the character sheet, so the player knows who they are picking. Art in `images/char-*.png`, wired as `<img>` with the existing glyph as the fallback if a file is missing. | S | art | ✅ |
 | 1.3 | **The Count's Epitaph Card** — every ending (deaths included) produces a shareable image card: character, ending title, run stats (nat 20s, nat 1s, gold wasted), one custom line from the Count, and the site URL, with one "Copy / Save image" button. | M | — | ✅ |
 | 1.4 | **Fates Ledger with the Count's hints** — an endings screen showing which endings you have found and which are still locked, with a snide but useful Count hint for each locked one; stored in its own save slot so New Game does not wipe it. | S | — | ✅ |
 | 1.5 | **He Remembers You** — carry a little memory between runs (last character, how you died, which ending) and have the Count and Clarence bring it up. | M | 1.4 | ✅ |
 | 1.6 | **Call Him a Wizard** — optional dialogue choices that make you deliberately call him a wizard, with a hidden counter: each jab makes him flustered (next telegraphed move weaker) or furious (hits harder), and enough jabs unlock a secret ending or special epitaph. | S–M | — | ✅ |
-| 1.7 | **Visual roadmap page.** `roadmap.html` — every plot point below as a card with its art, the check it demands, and a live dice animation for that check; every roadmap phase as a milestone chip with an animated die badge. Linked from the splash screen. Plain HTML/CSS/JS at the repo root, same zero-dependency contract as the game. | M | 1.1, 1.2 | ⬜ |
+| 1.7 | **Visual roadmap page.** `roadmap.html` — every plot point below as a card with its art, the check it demands, and a live dice animation for that check; every roadmap phase as a milestone chip with an animated die badge. Linked from the splash screen. Plain HTML/CSS/JS at the repo root, same zero-dependency contract as the game. | M | 1.1, 1.2 | ✅ |
+| 1.8 | **The Daily Curse.** A date-seeded run: same hero, same dice for everyone that day, with the seed shown and the run reproducible from it; at the end a Wordle-style share line (`MERLIN #N 🧛 Pip · 🎲 20 · 7 · 2 · 17 · Ending: The Correction`) plus one line from the Count. Reuses the pass-4 share plumbing. | M | 1.3 | ⬜ |
+| 1.9 | **The Count reviews your visit.** A per-run review written in the Count's voice from that run's own flags ("Paid the toll. Did not tip the bat. Called me the other thing once, in the marsh, where you thought I couldn't hear. Two stars."), shown on every ending and on the share card. Additive to 1.5, which only carries memory *between* runs. | M | 1.3, 1.5 | ⬜ |
+| 1.10 | **Tombstone line, as specified.** The card's death line must say **what killed them and where** and **gold owed** ("Pip, clerk. Lectured to death in the throne room. Owed 3 gold."), not the current stat-box wording. | S | 1.3 | ⬜ |
+| 1.11 | **Oswald's guest book + the castle-gate checkpoint.** Reframe the Fates Ledger as Oswald's guest book (blank lines for unfound entries, Oswald's voice, the secret entries), and add a checkpoint at the castle gate so a death costs a minute instead of the whole run. | S–M | 1.4 | ⬜ |
+| 1.12 | **Portraits must be prominent.** The painted portraits are currently 40px thumbnails, too small to answer "what does this character look like". On the character-select screen each hero's portrait must be a real card image (full-width of the card, ~160–240px tall on desktop, ~96–120px on mobile) with the name, role, stats and voice line under it; in the character sheet head it should read clearly at ~72px. Text must not wrap into a ragged single column at 800px. | S | 1.2 | ⬜ |
 
 ---
 
@@ -61,17 +66,39 @@ Four endings resolve here — The Stake, The Correction, The Board, Flight — p
 
 ---
 
-## Top 4 ideas (from Grok Bot's *Ideas Guy*)
+## Top 4 ideas (the owner's list — authoritative)
 
-_Ranked by the bot, in its own words. Source: Grok Bot → **Ideas Guy**, 2026-09-26 12:56 AM ET. The bot's own framing: ranked by how likely each one is to make a player share it._
+_Source: Grok Bot, the **MERLIN PASS 3** room (Sol / Site QA Bot), reposted by the owner 2026-09-26. Ranked by how likely each one is to make a player share it._
 
-**1. The Count's Epitaph Card (M).** Every ending, deaths included, produces a shareable image card. It shows the character, the ending title, a few run stats (nat 20s, nat 1s, gold wasted), and one custom line from the Count, like "Died to a ghoul. A GHOUL. Not a wizard." Add a single "Copy / Save image" button with the URL on the card. You already have a separate death text for each cause, so the funniest lines are written; this gets them out of the browser tab and in front of new players.
+**1. Shareable tombstones (S–M).** When you die, the game draws a tombstone image with the epitaph, the hero, **what killed them and where** ("Pip, clerk. Lectured to death in the throne room. Owed 3 gold."), plus the site URL. The four epitaphs are the best writing in the game, and right now the funniest moment of a run vanishes when you click New Game.
 
-**2. Fates Ledger with hints from the Count (S).** Add an endings screen that shows which endings you've found and which are still locked. For each locked one, the Count gives a snide, slightly useful hint ("There is an ending where you live and I am improved. You won't find it."). Store it in its own save slot so "New Game" doesn't wipe it. With a 10–15 minute game and several endings, this is the cheapest way to turn one playthrough into three.
+**2. The Daily Curse (M).** Once a day, everyone plays the same **seeded** run with the same hero and the same dice. At the end you get a Wordle-style share line such as `MERLIN #41 🧛 Pip · 🎲 20 · 7 · 2 · 17 · Ending: The Correction`, plus one line from the Count. Because everyone gets the same dice, players have something to compare ("how did you survive the wight on a 2?").
 
-**3. He Remembers You (M).** Carry a little memory between runs: the last character you played, how you died, and which ending you got. The Count and Clarence bring it up ("You again. Last time you fled. Clarence logged it."). Players who replay get something new, and it's the kind of surprise people screenshot.
+**3. The Guest Book (S–M).** A collection page styled as **Oswald's guest book**, holding all 4 endings, every epitaph and a couple of secret entries. Unfound ones show as blank lines with a hint in Oswald's voice ("A guest who was polite to the bat. We have not had one."). The game already branches in real ways (Pip's ledger, the withdraw route that caps the Count at 20 HP, the letter-opener stake) but nothing tells players those branches exist. **Pair it with a checkpoint at the castle gate so a death costs a minute instead of the whole run.**
 
-**4. Call Him a Wizard (S–M).** Add optional dialogue choices where you deliberately call him Merlin the wizard. A hidden counter tracks how many times you do it. Each jab has a real cost or benefit: he gets flustered and his next telegraphed move is weaker, or he gets furious and hits harder. Enough jabs unlock a secret ending or a special epitaph. This turns the game's best joke into a risk the player chooses, and it gives people a strategy to argue about ("I called him a wizard 6 times and lived").
+**4. The Count reviews your visit (M).** Whichever ending you reach, Count Merlin writes a short **review of that run** in his voice, built from what you actually did: *"Paid the toll. Did not tip the bat. Called me the other thing once, in the marsh, where you thought I couldn't hear. Two stars."* It uses flags the game already tracks, so every run ends on a punchline written about you — and that's the screenshot people send with "the vampire roasted me".
+
+_Owner's own build order: start with the tombstones; then the guest book and the Count's review together, because both run on the same record of what the player did._
+
+### How the shipped pass-4 work maps onto the owner's four
+
+| Owner's idea | Already shipped (pass 4, live) | The real gap |
+|---|---|---|
+| 1. Shareable tombstones | **Mostly.** The Epitaph Card fires on every ending *and* every death, shows the hero, the ending title, run stats (nat 20s, nat 1s), a Count line and the URL, with a working Copy / Save image button | The tombstone **line** is not the requested shape: it must say **what killed them and where** and **gold owed** ("Pip, clerk. Lectured to death in the throne room. Owed 3 gold."), not "Gold wasted" |
+| 2. The Daily Curse | **Nothing** | The whole idea: a date-seeded run (same hero, same dice for everyone) plus the Wordle-style share line and the Count's one-liner |
+| 3. The Guest Book | **Mostly.** The Fates Ledger already lists found vs locked with a Count hint per locked ending and lives in its own save slot so New Game cannot wipe it | Reframe as **Oswald's guest book** (blank lines, Oswald's voice, secret entries), and add the **castle-gate checkpoint** |
+| 4. The Count reviews your visit | **Partly.** He Remembers You carries the last character / death / ending into the next run and the Count and Clarence bring it up | The **per-run review** built from this run's own flags ("Paid the toll. Did not tip the bat… Two stars.") — a punchline about what you just did |
+
+---
+
+## Secondary source — Grok Bot's *Ideas Guy* (same direction, independent wording)
+
+_Asked directly for "top 4 ideas for MERLIN" on 2026-09-26 12:56 AM ET; its four largely parallel the owner's list above, which is why pass 4 shipped what it did. Recorded for completeness._
+
+**1. The Count's Epitaph Card (M)** — a shareable card per ending incl. deaths: character, ending title, run stats, a custom Count line, the URL, one Copy / Save button. **Shipped as pass 4, item 1.3.**
+**2. Fates Ledger with hints from the Count (S)** — found vs locked endings with a snide hint per locked one, its own save slot. **Shipped as pass 4, item 1.4.**
+**3. He Remembers You (M)** — cross-run memory (last character, how you died, ending) that the Count and Clarence bring up. **Shipped as pass 4, item 1.5.**
+**4. Call Him a Wizard (S–M)** — optional jabs with a hidden counter, real cost/benefit, and a secret ending. **Shipped as pass 4, item 1.6.**
 
 ---
 
@@ -107,5 +134,6 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-26** — Pass 5: die you can see, character portraits, visual roadmap page (roadmap 1.1, 1.2, 1.7).
 - **2026-09-26** — Pass 4: Epitaph Card, Fates Ledger, He Remembers You, Call Him a Wizard (roadmap 1.3–1.6).
 - **2026-09-26** — Roadmap created. v1.0 recorded as shipped; v1.1 (dice you can see, character portraits, Ideas Guy's top 4, visual roadmap page) and v2.0 (the Oronath engine) opened.

@@ -1,0 +1,67 @@
+MERLIN — PASS 5 PLANNING BRIEF. PLAN ONLY: do not modify any file, do not run any command, do not create anything. Your entire final message must be the plan.
+
+## Context
+
+This repository is a shipped, live, static game — vanilla HTML/CSS/JS, no build step, no dependencies, no network requests at runtime:
+
+- `index.html` — shell · `style.css` — gothic candlelight UI
+- `data.js` — content (`window.MERLIN`): characters, items, shops, encounters, 22-node scene graph
+- `engine.js` — pure logic, no DOM (`window.MerlinEngine`): rolls, combat, economy, localStorage save
+- `ui.js` — typewriter, character sheet, shops, combat UI
+- `README.md`, `ROADMAP.md` — READ FIRST; ROADMAP.md is the source of truth and items 1.1, 1.2 and 1.7 are the ones you are planning here
+- `images/` — painted assets (character portraits `char-*.png`, story-beat art `beat-*.png`); CHECK WITH `ls` WHAT ACTUALLY EXISTS and plan against the real list
+
+Live at https://merlin-dnd.netlify.app. Autosave key `merlin.save.v1`; refresh resumes mid-scene and mid-fight. A previous pass (roadmap 1.3–1.6: epitaph card, Fates Ledger, cross-run memory, "call him a wizard") may already be in this working tree — read the current files rather than trusting this description of them.
+
+## Task — plan exactly three items
+
+### 1.1 A die you can see — the headline requirement
+
+Today there is no die. `ui.js` has `flashDie(text, success)` which writes the roll's **text** into a single `#die` div and toggles a `.tumbling` class for 600ms; `engine.js:formatRoll()` builds that string. The owner's requirement, verbatim: *"MAKE SURE that there is a cool dice roll animation or at least that it shows the dice in the faces up that it should (if d20 then at least show the d20 with the right top number showing)."*
+
+Plan a real rendered polyhedral die component that always shows **the face that was actually rolled**:
+
+- **d20** — a genuine d20 silhouette (icosahedron look: hexagonal outline with internal triangle edges), the rolled number upright and readable on the top/front face.
+- **d10** — pentagonal-trapezohedron silhouette, showing its rolled value.
+- **d6 / 2d6** — cube(s); 2d6 renders two dice plus the total.
+- **Advantage** — two d20s rendered, the kept one highlighted, the dropped one dimmed, with the kept number on top.
+- **Crits** — natural 20 / natural 1 called out on the die itself (not only in the text line).
+- **Reduced motion** — `prefers-reduced-motion` shows the final face immediately, no tumble.
+- Keep the existing equation line (e.g. `d20 rolled 14 + WITS 2 = 16 vs DC 12`) — the die is an addition, not a replacement for the maths.
+
+This requires the engine to hand the UI the actual dice. Audit **every** roll site in `engine.js` — `formatRoll` callers and the damage rolls (`applyOption`, the combat resolvers, the save-check path, the flee path, the `1d6`/`2d6` damage rolls, the crit paths) — and specify a structured roll payload (e.g. `{ kind, dice, kept, dropped, total, stat, mod, dc, critSuccess, critFail }`) attached to each result/outcome without changing the printed text.
+
+### 1.2 Character portraits
+
+Show each pregen's painted portrait (`images/char-bram.png`, `images/char-vellum.png`, `images/char-pip.png`) on the character-select screen and in the character sheet head, so the player knows who they are picking. If a file is missing, fall back to the existing glyph emoji with no broken-image icon. Must not break the 375px layout and must not push the select-screen choices below the fold.
+
+### 1.7 Visual roadmap page
+
+A new `roadmap.html` at the repo root — plain static, same zero-dependency contract, works via `file://` and on Netlify:
+
+- every **story plot point** from the plot-point table in `ROADMAP.md` as a card: title, node ids, the check it demands, its art from `images/beat-*.png`, and an **animated die for that check**;
+- every **roadmap phase / milestone** as a chip with an animated die badge and its status;
+- the game's splash screen links to it, and it links back to the game;
+- the die component should be shared with the game (a small module both pages load) rather than duplicated.
+
+## Hard constraints — violating any of these fails the pass
+
+- Vanilla HTML/CSS/JS only. No framework, no build step, no `package.json`, no new runtime dependency, no external asset, **no network request at runtime**. Must work via `file://` **and** on Netlify.
+- No image files may be invented, and no generated placeholder art: reference only files that exist in `images/`.
+- Do not break the autosave or any shipped behaviour; the game must remain fully playable end to end.
+- Do not reword shipped writing, and never remove an ending.
+- Mobile-usable at 375px; teen-safe; keep the gothic candlelight aesthetic and its type/colour system.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, the `.brief-pass*.txt` files, or `.git/`.
+
+## Output contract
+
+Begin your final message with the literal first line `MERLIN PASS 5 PLAN`, then:
+
+1. **Die component** — the exact geometry for d20 / d10 / d6 (how the silhouette and its internal edges are constructed in SVG or CSS, and how the number is positioned so it reads as sitting on the top face), the tumble→settle animation spec and timings, the crit and advantage treatments, and the reduced-motion path.
+2. **Engine roll payload** — a call-site-by-call-site list: function, what it rolls today, what fields the payload gains, and which printed strings must not change.
+3. **Portraits** — exactly which DOM nodes change in which file, the fallback path, and the 375px treatment.
+4. **`roadmap.html`** — file layout, the shared-die module's interface, where its card data comes from (a data object in the page, derived from ROADMAP.md's tables), and how the plot-point dice pick their numbers.
+5. **Step order** for implementation.
+6. **Manual QA checklist** — each die type, an advantage roll, a nat 20 and a nat 1, a 2d6 damage roll, reduced motion, a missing-portrait fallback, `roadmap.html` at 375px and via `file://`, refresh-resume mid-scene and mid-fight, and each of the four endings plus a death.
+
+Decide any open design question yourself and write the decision down. An incomplete-but-concrete plan is required; never silence.

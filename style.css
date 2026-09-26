@@ -157,6 +157,21 @@ body::before {
 .sheet-glyph {
   font-size: 1.75rem;
   line-height: 1;
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sheet-glyph .portrait-img,
+.char-card .glyph .portrait-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--brass);
 }
 
 .sheet-name {
@@ -360,26 +375,95 @@ body::before {
   color: #e8a0a0;
 }
 
-.die.tumbling::before {
-  content: "⚄ ";
-  display: inline-block;
-  animation: tumble 0.6s ease;
+.die-faces {
+  margin-bottom: 0.45rem;
 }
 
-@keyframes tumble {
+.die-eq {
+  line-height: 1.4;
+}
+
+.die-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mdie-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mdie-wrap.is-kept {
+  box-shadow: 0 0 0 2px var(--candle);
+  border-radius: 2px;
+}
+
+.mdie-wrap.is-dropped {
+  opacity: 0.45;
+}
+
+.mdie {
+  display: block;
+  width: 72px;
+  height: auto;
+}
+
+.die-row--card .mdie {
+  width: 64px;
+}
+
+.die-row--chip .mdie {
+  width: 28px;
+}
+
+.die-sum {
+  font-size: 0.85rem;
+  color: var(--brass);
+  letter-spacing: 0.04em;
+}
+
+.die-row.is-tumbling .mdie-wrap {
+  animation: die-tumble 0.7s cubic-bezier(0.15, 0.7, 0.2, 1);
+}
+
+.die-row.is-tumbling .mdie-wrap.is-dropped {
+  animation-duration: 0.78s;
+}
+
+.die-row.is-tumbling .mdie-num,
+.die-row.is-tumbling .mdie-banner-text {
+  animation: die-num-in 0.7s ease forwards;
+}
+
+@keyframes die-tumble {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) scale(0.92);
   }
-  40% {
-    transform: rotate(180deg) scale(1.2);
+  55% {
+    transform: rotate(520deg) scale(1.06);
   }
   100% {
-    transform: rotate(360deg);
+    transform: rotate(720deg) scale(1);
+  }
+}
+
+@keyframes die-num-in {
+  0%,
+  72% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .die.tumbling::before {
+  .die-row.is-tumbling .mdie-wrap,
+  .die-row.is-tumbling .mdie-num,
+  .die-row.is-tumbling .mdie-banner-text {
     animation: none;
   }
   .bar-fill {
@@ -516,6 +600,12 @@ body::before {
 
 .char-card .glyph {
   font-size: 1.75rem;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .char-card .name {
@@ -632,6 +722,11 @@ body::before {
 
   .sheet-compact .pack-toggle {
     margin-top: 0.5rem;
+  }
+
+  .char-card {
+    padding: 0.75rem;
+    gap: 0.35rem;
   }
 }
 
@@ -804,3 +899,169 @@ body::before {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* ——— Roadmap page ——— */
+
+.roadmap-page .roadmap-app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem 2.5rem;
+}
+
+.roadmap-head {
+  text-align: center;
+  padding: 2rem 1.25rem 1.5rem;
+  margin: 1rem auto 1.5rem;
+}
+
+.roadmap-head .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: 0.75rem;
+  text-decoration: none;
+  text-align: center;
+}
+
+.roadmap-section {
+  margin-bottom: 2rem;
+}
+
+.beat-cards {
+  display: grid;
+  gap: 1rem;
+}
+
+.beat-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.beat-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 140px;
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid var(--panel-edge);
+  overflow: hidden;
+}
+
+.beat-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.beat-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid var(--brass);
+  box-sizing: border-box;
+  color: var(--mute);
+  font-size: 0.9rem;
+}
+
+.beat-placeholder strong {
+  color: var(--candle);
+  font-size: 0.95rem;
+}
+
+.beat-placeholder p {
+  margin: 0;
+}
+
+.beat-body {
+  padding: 0.85rem 1rem 1rem;
+}
+
+.beat-title {
+  margin: 0 0 0.35rem;
+  color: var(--candle);
+  letter-spacing: 0.04em;
+  font-size: 1.05rem;
+}
+
+.beat-nodes {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-family: var(--mono);
+}
+
+.beat-check {
+  margin: 0 0 0.65rem;
+  color: var(--parchment-dim);
+  font-size: 0.95rem;
+}
+
+.beat-die {
+  min-height: 1px;
+}
+
+.milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.phase-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.mile-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mile-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--panel-edge);
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 0.85rem;
+  color: var(--parchment);
+  min-height: 44px;
+}
+
+.mile-chip.phase-chip {
+  border-color: var(--brass);
+  color: var(--candle);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.mile-chip.is-dim {
+  opacity: 0.7;
+}
+
+.mile-chip.status-done {
+  border-color: var(--ok);
+}
+
+.mile-chip.status-in-progress {
+  border-color: var(--candle);
+}
+
+.mile-die {
+  flex-shrink: 0;
+}
+
+.splash-actions .btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+

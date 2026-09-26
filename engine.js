@@ -239,6 +239,52 @@
     };
   }
 
+  function rollPool(sides, count) {
+    var faces = [];
+    var sum = 0;
+    var n = count || 1;
+    for (var i = 0; i < n; i++) {
+      var f = rollDie(sides);
+      faces.push(f);
+      sum += f;
+    }
+    return { faces: faces, sum: sum };
+  }
+
+  function packCheck(roll, stat, mod, total, dc) {
+    var dropped = null;
+    if (roll.dice && roll.dice.length === 2) {
+      dropped = roll.dice[0] === roll.kept ? roll.dice[1] : roll.dice[0];
+    }
+    return {
+      kind: "d20",
+      dice: (roll.dice || [roll.kept]).slice(),
+      kept: roll.kept,
+      dropped: dropped,
+      total: total,
+      stat: stat || null,
+      mod: mod == null ? 0 : mod,
+      dc: dc == null ? null : dc,
+      critSuccess: !!roll.critSuccess,
+      critFail: !!roll.critFail
+    };
+  }
+
+  function packPool(kind, pool) {
+    return {
+      kind: kind,
+      dice: pool.faces.slice(),
+      kept: null,
+      dropped: null,
+      total: pool.sum,
+      stat: null,
+      mod: 0,
+      dc: null,
+      critSuccess: false,
+      critFail: false
+    };
+  }
+
   function formatRoll(roll, stat, mod, total, dc, vsLabel) {
     var name = String(stat).toUpperCase();
     var vs = vsLabel || "DC";
@@ -570,7 +616,11 @@
         deathCause: state.deathCause,
         lineIndex: state.lineIndex || 0,
         lastRoll: lastRoll
-          ? { text: lastRoll.text, success: !!lastRoll.success }
+          ? {
+              text: lastRoll.text,
+              success: !!lastRoll.success,
+              rolls: lastRoll.rolls || null
+            }
           : null,
         pendingLevelUps: pendingLevelUps,
         pendingVictory: state.pendingVictory || null,
@@ -630,7 +680,11 @@
       pendingLevelUps = blob.pendingLevelUps || 0;
       pendingCombat = null;
       lastRoll = blob.lastRoll
-        ? { text: blob.lastRoll.text, success: !!blob.lastRoll.success }
+        ? {
+            text: blob.lastRoll.text,
+            success: !!blob.lastRoll.success,
+            rolls: blob.lastRoll.rolls || null
+          }
         : null;
       return state;
     } catch (err) {
@@ -921,7 +975,12 @@
     result.roll = roll;
     result.text = formatRoll(roll, stat, mod, total, dc, "DC");
     result.success = success;
-    lastRoll = { text: result.text, success: success, roll: roll };
+    result.rolls = [packCheck(roll, stat, mod, total, dc)];
+    lastRoll = {
+      text: result.text,
+      success: success,
+      rolls: result.rolls
+    };
 
     var branch = success ? opt.success : opt.failure || opt.success;
     var lines = (branch.lines || []).slice();
@@ -1157,6 +1216,9 @@
     out.dead = out.dead || follow.dead;
     if (follow.rollText && !out.rollText) out.rollText = follow.rollText;
     else if (follow.rollText) out.rollText = (out.rollText || "") + " · " + follow.rollText;
+    if (follow.rolls && follow.rolls.length) {
+      out.rolls = (out.rolls || []).concat(follow.rolls);
+    }
     if (follow.summary) {
       out.summary = (out.summary ? out.summary + " " : "") + follow.summary;
     }
@@ -1202,7 +1264,7 @@
   function resolveEnemyTurn(enc, node) {
     var c = state.combat;
     var move = getMove(enc, c.moveId);
-    var result = { won: false, fled: false, dead: false, rollText: null, summary: "" };
+    var result = { won: false, fled: false, dead: false, rollText: null, summary: "", rolls: [] };
 
     if (c.playerCancel) {
       combatLog("The telegraphed hit is cancelled.");
@@ -1227,6 +1289,7 @@
       var ok =
         roll.critSuccess || (!roll.critFail && total >= dc);
       result.rollText = formatRoll(roll, move.save.stat, mod, total, dc);
+      result.rolls = [packCheck(roll, move.save.stat, mod, total, dc)];
       if (ok) {
         result.summary = "You resist.";
         combatLog(result.summary);
@@ -1288,7 +1351,7 @@
     var node = data().nodes[state.nodeId];
     var enc = data().encounters[state.combat.encounter];
     var c = state.combat;
-    var out = { rollText: null, summary: "", won: false, dead: false, fled: false };
+    var out = { rollText: null, summary: "", won: false, dead: false, fled: false, rolls: [] };
 
     if (c.skipTurn) {
       c.skipTurn = false;
@@ -1307,6 +1370,7 @@
     var hit =
       roll.critSuccess || (!roll.critFail && total >= ac);
     out.rollText = formatRoll(roll, "might", mod, total, ac, "AC");
+    out.rolls = [packCheck(roll, "might", mod, total, ac)];
 
     if (roll.critFail) {
       out.summary =
@@ -1322,9 +1386,10 @@
       return mergeCombat(out, afterPlayerAction(enc, node));
     }
 
-    var dice = roll.critSuccess ? rollDie(6) + rollDie(6) : rollDie(6);
+    var pool = rollPool(6, roll.critSuccess ? 2 : 1);
+    out.rolls.push(packPool("d6", pool));
     var wBonus = weaponBonus(c.encounter);
-    var dmg = dice + mod + wBonus;
+    var dmg = pool.sum + mod + wBonus;
     c.enemyHp -= dmg;
     var wName =
       state.equipped && state.equipped.weapon
@@ -1353,7 +1418,7 @@
     var enc = data().encounters[state.combat.encounter];
     var c = state.combat;
     var char = data().characters[state.characterId];
-    var out = { rollText: null, summary: "", won: false, dead: false, fled: false };
+    var out = { rollText: null, summary: "", won: false, dead: false, fled: false, rolls: [] };
 
     if (c.skipTurn) {
       c.skipTurn = false;
@@ -1382,6 +1447,7 @@
       var total = roll.kept + mod;
       hit = roll.critSuccess || (!roll.critFail && total >= dc);
       out.rollText = formatRoll(roll, "spirit", mod, total, dc);
+      out.rolls = [packCheck(roll, "spirit", mod, total, dc)];
     }
 
     if (!auto && roll && roll.critFail) {
@@ -1400,8 +1466,9 @@
     var id = state.characterId;
 
     if (id === "bram") {
-      var bd = crit ? rollDie(4) + rollDie(4) : rollDie(4);
-      var bDmg = bd + (state.spirit || 0);
+      var bPool = rollPool(4, crit ? 2 : 1);
+      out.rolls.push(packPool("d4", bPool));
+      var bDmg = bPool.sum + (state.spirit || 0);
       c.enemyHp -= bDmg;
       if (crit) c.playerCancel = true;
       else c.playerHalve = true;
@@ -1410,8 +1477,9 @@
         bDmg +
         (crit ? " and cancels their hit." : " and halves their hit.");
     } else if (id === "vellum") {
-      var vd = crit ? rollDie(8) + rollDie(8) : rollDie(8);
-      var vDmg = vd + (state.spirit || 0);
+      var vPool = rollPool(8, crit ? 2 : 1);
+      out.rolls.push(packPool("d8", vPool));
+      var vDmg = vPool.sum + (state.spirit || 0);
       c.enemyHp -= vDmg;
       var heal = crit ? 4 : 2;
       applyHeal(heal);
@@ -1432,7 +1500,7 @@
     var node = data().nodes[state.nodeId];
     var enc = data().encounters[state.combat.encounter];
     var c = state.combat;
-    var out = { rollText: null, summary: "", won: false, dead: false, fled: false };
+    var out = { rollText: null, summary: "", won: false, dead: false, fled: false, rolls: [] };
 
     if (c.skipTurn) {
       c.skipTurn = false;
@@ -1482,7 +1550,7 @@
     var node = data().nodes[state.nodeId];
     var enc = data().encounters[state.combat.encounter];
     var c = state.combat;
-    var out = { rollText: null, summary: "", won: false, dead: false, fled: false };
+    var out = { rollText: null, summary: "", won: false, dead: false, fled: false, rolls: [] };
 
     if (c.skipTurn) {
       c.skipTurn = false;
@@ -1500,7 +1568,8 @@
     var ok =
       roll.critSuccess || (!roll.critFail && total >= dc);
     out.rollText = formatRoll(roll, "wits", mod, total, dc, "DC");
-    lastRoll = { text: out.rollText, success: ok, roll: roll };
+    out.rolls = [packCheck(roll, "wits", mod, total, dc)];
+    lastRoll = { text: out.rollText, success: ok, rolls: out.rolls };
 
     if (roll.critFail) {
       c.damageBonus = (c.damageBonus || 0) + 2;
@@ -1530,7 +1599,7 @@
     var node = data().nodes[state.nodeId];
     var enc = data().encounters[state.combat.encounter];
     var c = state.combat;
-    var out = { rollText: null, summary: "", won: false, dead: false, fled: false };
+    var out = { rollText: null, summary: "", won: false, dead: false, fled: false, rolls: [] };
 
     if (c.skipTurn) {
       c.skipTurn = false;
@@ -1548,6 +1617,7 @@
     var ok =
       roll.critSuccess || (!roll.critFail && total >= dc);
     out.rollText = formatRoll(roll, "wits", mod, total, dc, "DC");
+    out.rolls = [packCheck(roll, "wits", mod, total, dc)];
 
     if (ok) {
       if (roll.critSuccess) {
