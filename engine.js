@@ -9,6 +9,204 @@
   var pendingLevelUps = 0;
   var levelPickQueue = [];
 
+  function emptyStats() {
+    return { nat20: 0, nat1: 0, goldWasted: 0 };
+  }
+
+  function ensureStats() {
+    if (!state) return emptyStats();
+    if (!state.stats) state.stats = emptyStats();
+    if (state.stats.nat20 == null) state.stats.nat20 = 0;
+    if (state.stats.nat1 == null) state.stats.nat1 = 0;
+    if (state.stats.goldWasted == null) state.stats.goldWasted = 0;
+    return state.stats;
+  }
+
+  function noteCrit(roll) {
+    if (!roll || !state) return;
+    var s = ensureStats();
+    if (roll.critSuccess) s.nat20 += 1;
+    if (roll.critFail) s.nat1 += 1;
+  }
+
+  function noteGoldLost(before, after) {
+    if (!state) return;
+    var lost = before - after;
+    if (lost > 0) ensureStats().goldWasted += lost;
+  }
+
+  function emptyFound() {
+    return {
+      end_stake: false,
+      end_clause: false,
+      end_board: false,
+      end_fled: false,
+      death: false,
+      end_wizard: false
+    };
+  }
+
+  function emptyFates() {
+    return { v: 1, found: emptyFound(), memory: null };
+  }
+
+  function readFates() {
+    try {
+      var raw = localStorage.getItem(data().fatesKey);
+      if (!raw) return emptyFates();
+      var blob = JSON.parse(raw);
+      if (!blob || blob.v !== 1) return emptyFates();
+      var found = emptyFound();
+      if (blob.found) {
+        var keys = Object.keys(found);
+        for (var i = 0; i < keys.length; i++) {
+          if (blob.found[keys[i]]) found[keys[i]] = true;
+        }
+      }
+      return {
+        v: 1,
+        found: found,
+        memory: blob.memory || null
+      };
+    } catch (err) {
+      return emptyFates();
+    }
+  }
+
+  function writeFates(blob) {
+    try {
+      localStorage.setItem(data().fatesKey, JSON.stringify(blob));
+    } catch (err) {
+      /* ignore quota / private mode */
+    }
+  }
+
+  function recordFate(endingId) {
+    if (!state || !endingId) return;
+    var fates = readFates();
+    if (fates.found[endingId] !== undefined) fates.found[endingId] = true;
+    fates.memory = {
+      characterId: state.characterId,
+      endingId: endingId,
+      deathCause: endingId === "death" ? state.deathCause : null,
+      wizardJabs: state.wizardJabs || 0
+    };
+    writeFates(fates);
+  }
+
+  function fillMemory(template, memory) {
+    if (!template || !memory) return "";
+    var char = data().characters[memory.characterId];
+    var name = char ? char.name : "a stranger";
+    return String(template).split("{name}").join(name);
+  }
+
+  function memoryTemplate(bucket, memory) {
+    if (!bucket || !memory) return null;
+    if (memory.endingId === "death") {
+      var deaths = bucket.death || {};
+      return (
+        deaths[memory.deathCause] ||
+        deaths.default ||
+        null
+      );
+    }
+    return bucket[memory.endingId] || null;
+  }
+
+  function appendMemory(out) {
+    if (!out || (out.id !== "gate" && out.id !== "throne")) return out;
+    var fates = readFates();
+    if (!fates.memory || !fates.memory.endingId) return out;
+    var who = out.id === "gate" ? "clarence" : "count";
+    var speaker = out.id === "gate" ? "Clarence" : "Count Merlin";
+    var bucket = data().memoryLines && data().memoryLines[who];
+    var tmpl = memoryTemplate(bucket, fates.memory);
+    if (!tmpl) return out;
+    out.lines = (out.lines || []).slice();
+    out.lines.push({
+      speaker: speaker,
+      text: fillMemory(tmpl, fates.memory)
+    });
+    return out;
+  }
+
+  function epitaphLine(nodeId, deathCauseOverride) {
+    var epi = data().epitaphs || {};
+    if (nodeId === "death") {
+      var deaths = epi.death || {};
+      var cause =
+        deathCauseOverride != null
+          ? deathCauseOverride
+          : state && state.deathCause;
+      return deaths[cause] || deaths.default || "The night kept you.";
+    }
+    return epi[nodeId] || "";
+  }
+
+  function fatesView() {
+    var fates = readFates();
+    var order = data().fateOrder || [];
+    var hints = data().fateHints || {};
+    var rows = [];
+    for (var i = 0; i < order.length; i++) {
+      var id = order[i];
+      var found = !!(fates.found && fates.found[id]);
+      var node = data().nodes[id];
+      var deathCause =
+        id === "death" && fates.memory ? fates.memory.deathCause : null;
+      rows.push({
+        id: id,
+        title: found && node ? node.title : "Locked",
+        found: found,
+        hint: found ? null : hints[id] || "",
+        line: found ? epitaphLine(id, deathCause) : null
+      });
+    }
+    var mem = fates.memory;
+    var memView = null;
+    if (mem && mem.characterId) {
+      var c = data().characters[mem.characterId];
+      memView = {
+        characterId: mem.characterId,
+        characterName: c ? c.name : "a stranger",
+        endingId: mem.endingId,
+        deathCause: mem.deathCause || null,
+        wizardJabs: mem.wizardJabs || 0
+      };
+    }
+    return { rows: rows, memory: memView };
+  }
+
+  function applyWizardMood(enc, move) {
+    if (!state || !state.combat || state.combat.encounter !== "count") {
+      return { damageDelta: 0, saveDcDelta: 0 };
+    }
+    var mood = state.wizardNext;
+    if (!mood) return { damageDelta: 0, saveDcDelta: 0 };
+    var deltas = data().wizardMoodDelta || { fluster: -2, fury: 2 };
+    var delta = mood === "fury" ? deltas.fury : deltas.fluster;
+    state.wizardNext = null;
+    if (mood === "fury") {
+      combatLog("He is furious. The blow comes in harder.");
+    } else {
+      combatLog("He stumbles on the word. The blow comes in weaker.");
+    }
+    if (move && move.save) {
+      return { damageDelta: 0, saveDcDelta: delta };
+    }
+    return { damageDelta: delta, saveDcDelta: 0 };
+  }
+
+  function applyWizardUnlock(opt, result) {
+    if (!opt || !opt.wizardUnlock || !state) return;
+    var need = data().wizardUnlockAt || 3;
+    if ((state.wizardJabs || 0) >= need) {
+      result.next = "end_wizard";
+      state.wizardNext = null;
+    }
+  }
+
   function data() {
     return D || (D = window.MERLIN);
   }
@@ -224,7 +422,7 @@
         }
       }
     }
-    return out;
+    return appendMemory(out);
   }
 
   function optionVisible(opt) {
@@ -264,6 +462,7 @@
         var beforeG = state.gold;
         state.gold += e.amount;
         clampGold();
+        noteGoldLost(beforeG, state.gold);
         var delta = state.gold - beforeG;
         if (delta < 0) {
           notes.push("You lose " + -delta + " gold.");
@@ -302,9 +501,11 @@
         state.gold += pay;
         if (pay > 0) notes.push("You gain " + pay + " gold.");
       } else if (e.op === "payToll") {
+        var tollBefore = state.gold;
         var toll = tollCost();
         state.gold -= toll;
         clampGold();
+        noteGoldLost(tollBefore, state.gold);
         notes.push("You pay " + toll + " gold for the toll.");
       } else if (e.op === "vellumPox") {
         if (state.characterId === "vellum") state.flags.vellumHonest = true;
@@ -312,6 +513,9 @@
         if (state.characterId === "vellum") state.flags.oswaldSoft = true;
       } else if (e.op === "prepareCount") {
         /* flags only; combat start reads them */
+      } else if (e.op === "wizardJab") {
+        state.wizardJabs = (state.wizardJabs || 0) + 1;
+        state.wizardNext = e.mood || "fluster";
       }
     }
     return { dead: dead, notes: notes };
@@ -346,7 +550,7 @@
   function save() {
     try {
       var blob = {
-        v: 1,
+        v: 2,
         nodeId: state.nodeId,
         characterId: state.characterId,
         might: state.might,
@@ -369,7 +573,10 @@
           ? { text: lastRoll.text, success: !!lastRoll.success }
           : null,
         pendingLevelUps: pendingLevelUps,
-        pendingVictory: state.pendingVictory || null
+        pendingVictory: state.pendingVictory || null,
+        stats: ensureStats(),
+        wizardJabs: state.wizardJabs || 0,
+        wizardNext: state.wizardNext || null
       };
       localStorage.setItem(data().saveKey, JSON.stringify(blob));
     } catch (err) {
@@ -377,12 +584,25 @@
     }
   }
 
+  function migrateRun(blob) {
+    if (!blob.stats) blob.stats = emptyStats();
+    if (blob.stats.nat20 == null) blob.stats.nat20 = 0;
+    if (blob.stats.nat1 == null) blob.stats.nat1 = 0;
+    if (blob.stats.goldWasted == null) blob.stats.goldWasted = 0;
+    if (blob.wizardJabs == null) blob.wizardJabs = 0;
+    if (blob.wizardNext === undefined) blob.wizardNext = null;
+    return blob;
+  }
+
   function load() {
     try {
       var raw = localStorage.getItem(data().saveKey);
       if (!raw) return null;
       var blob = JSON.parse(raw);
-      if (!blob || blob.v !== 1 || !blob.characterId) return null;
+      if (!blob || (blob.v !== 1 && blob.v !== 2) || !blob.characterId) {
+        return null;
+      }
+      blob = migrateRun(blob);
       state = {
         nodeId: blob.nodeId,
         characterId: blob.characterId,
@@ -402,7 +622,10 @@
         combat: blob.combat || null,
         deathCause: blob.deathCause || null,
         lineIndex: blob.lineIndex || 0,
-        pendingVictory: blob.pendingVictory || null
+        pendingVictory: blob.pendingVictory || null,
+        stats: blob.stats,
+        wizardJabs: blob.wizardJabs || 0,
+        wizardNext: blob.wizardNext || null
       };
       pendingLevelUps = blob.pendingLevelUps || 0;
       pendingCombat = null;
@@ -454,7 +677,10 @@
       combat: null,
       deathCause: null,
       lineIndex: 0,
-      pendingVictory: null
+      pendingVictory: null,
+      stats: emptyStats(),
+      wizardJabs: 0,
+      wizardNext: null
     };
     save();
     return state;
@@ -479,6 +705,9 @@
     state.pardonArmed = false;
     state.combat = null;
     state.deathCause = null;
+    state.stats = emptyStats();
+    state.wizardJabs = 0;
+    state.wizardNext = null;
     goTo("arrival");
     return state;
   }
@@ -507,6 +736,10 @@
       startCombat(node);
     }
 
+    if (node.type === "ending") {
+      recordFate(nodeId);
+    }
+
     save();
   }
 
@@ -516,6 +749,7 @@
     state.hp = 0;
     state.nodeId = "death";
     state.lineIndex = 0;
+    recordFate("death");
     save();
   }
 
@@ -634,6 +868,7 @@
       }
       result.next = opt.success.next;
       result.dead = plain.dead;
+      applyWizardUnlock(opt, result);
       if (result.dead) {
         die(state.deathCause || "count");
         result.next = "death";
@@ -678,6 +913,7 @@
     }
 
     var roll = rollD20(adv);
+    noteCrit(roll);
     var total = roll.kept + mod;
     var success =
       roll.critSuccess || (!roll.critFail && total >= dc);
@@ -828,6 +1064,7 @@
     }
 
     state.gold -= price;
+    noteGoldLost(state.gold + price, state.gold);
     addItem(itemId, 1);
     save();
     return { ok: true, price: price };
@@ -973,15 +1210,18 @@
       c.playerHalve = false;
       c.damageReduce = 0;
       c.saveDcDelta = 0;
+      if (c.encounter === "count") state.wizardNext = null;
       advanceTelegraph(enc, node);
       save();
       return result;
     }
 
+    var mood = applyWizardMood(enc, move);
+
     if (move.save) {
-      var dc = move.save.dc + (c.saveDcDelta || 0);
-      var adv = false;
+      var dc = move.save.dc + (c.saveDcDelta || 0) + (mood.saveDcDelta || 0);
       var roll = rollD20(false);
+      noteCrit(roll);
       var mod = state[move.save.stat] || 0;
       var total = roll.kept + mod;
       var ok =
@@ -1000,14 +1240,18 @@
     } else {
       var dmg = move.damage || 0;
       dmg += c.damageBonus || 0;
+      dmg += mood.damageDelta || 0;
       if (c.damageReduce) dmg = Math.max(0, dmg - c.damageReduce);
       if (c.playerHalve) dmg = Math.max(1, Math.floor(dmg / 2));
+      if (dmg < 0) dmg = 0;
       var dealt = applyDamage(dmg);
       result.summary = enc.name + " hits for " + dealt + ".";
       combatLog(result.summary);
       if (move.goldSteal) {
+        var beforeSteal = state.gold;
         state.gold -= move.goldSteal;
         clampGold();
+        noteGoldLost(beforeSteal, state.gold);
         var stealLine = "It takes " + move.goldSteal + " gold with it.";
         result.summary = (result.summary ? result.summary + " " : "") + stealLine;
         combatLog(stealLine);
@@ -1056,6 +1300,7 @@
     if (adv) state.coinReady = false;
 
     var roll = rollD20(adv);
+    noteCrit(roll);
     var mod = state.might || 0;
     var total = roll.kept + mod;
     var ac = enc.ac;
@@ -1132,6 +1377,7 @@
       var adv = !!(useAdvantage && canUseCoin());
       if (adv) state.coinReady = false;
       roll = rollD20(adv);
+      noteCrit(roll);
       var mod = state.spirit || 0;
       var total = roll.kept + mod;
       hit = roll.critSuccess || (!roll.critFail && total >= dc);
@@ -1247,6 +1493,7 @@
     if (adv) state.coinReady = false;
 
     var roll = rollD20(adv);
+    noteCrit(roll);
     var mod = state.wits || 0;
     var dc = enc.fleeDc;
     var total = roll.kept + mod;
@@ -1294,6 +1541,7 @@
     if (adv) state.coinReady = false;
 
     var roll = rollD20(adv);
+    noteCrit(roll);
     var mod = state.wits || 0;
     var dc = enc.fleeDc;
     var total = roll.kept + mod;
@@ -1393,7 +1641,25 @@
       shop: node && node.type === "shop" ? shopView(node) : null,
       displayLevel: Math.max(1, state.level - pendingLevelUps),
       pendingVictory: state.pendingVictory || null,
-      equippedLabels: equippedLabels()
+      equippedLabels: equippedLabels(),
+      stats: ensureStats(),
+      wizardJabs: state.wizardJabs || 0,
+      wizardNext: state.wizardNext || null,
+      epitaph:
+        node && node.type === "ending" && char
+          ? {
+              title: node.title,
+              line: epitaphLine(node.id),
+              glyph: char.glyph,
+              name: char.name,
+              role: char.role,
+              nat20: ensureStats().nat20,
+              nat1: ensureStats().nat1,
+              goldWasted: ensureStats().goldWasted,
+              wizardJabs: state.wizardJabs || 0,
+              url: data().siteUrl
+            }
+          : null
     };
   }
 
@@ -1508,6 +1774,8 @@
     healAmount: healAmount,
     disarmPardon: disarmPardon,
     finishVictory: finishVictory,
-    setLineIndex: setLineIndex
+    setLineIndex: setLineIndex,
+    fatesView: fatesView,
+    epitaphLine: epitaphLine
   };
 })();

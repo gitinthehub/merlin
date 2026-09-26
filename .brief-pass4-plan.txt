@@ -1,0 +1,50 @@
+MERLIN — PASS 4 PLANNING BRIEF. PLAN ONLY: do not modify any file, do not run any command, do not create anything. Your entire final message must be the plan.
+
+## Context
+
+This repository is a shipped, live, static game — vanilla HTML/CSS/JS, no build step, no dependencies, no network requests at runtime:
+
+- `index.html` — shell
+- `style.css` — gothic candlelight UI
+- `data.js` — content: characters, items, shops, encounters, 22-node scene graph (`window.MERLIN`)
+- `engine.js` — pure logic, no DOM (`window.MerlinEngine`): rolls, combat, economy, localStorage save
+- `ui.js` — typewriter, character sheet, shops, combat UI
+- `README.md`, `ROADMAP.md`
+
+Live at https://merlin-dnd.netlify.app. Autosave is `localStorage` key `merlin.save.v1`, written on every scene change, shop transaction, level-up and combat turn; a refresh resumes mid-scene and mid-fight. Four endings (`end_stake`, `end_clause`, `end_board`, `end_fled`) plus `death` (An Epitaph, which already has cause-specific text for `ghoul`, `wight`, `count`, `fall`, `marsh`).
+
+READ `ROADMAP.md` FIRST. It is the source of truth, and the four ideas below are quoted there verbatim in the "Top 4 ideas" section.
+
+## Task
+
+Produce an implementation plan for exactly these four items (roadmap 1.3–1.6). Nothing else — no dice-animation work, no art wiring, no roadmap page; those are a separate pass.
+
+**1.3 The Count's Epitaph Card (M).** Every ending, deaths included, produces a shareable image card. It shows the character, the ending title, a few run stats (nat 20s, nat 1s, gold wasted), and one custom line from the Count, like "Died to a ghoul. A GHOUL. Not a wizard." Add a single "Copy / Save image" button with the site URL on the card.
+
+**1.4 Fates Ledger with hints from the Count (S).** An endings screen that shows which endings you've found and which are still locked. For each locked one, the Count gives a snide, slightly useful hint ("There is an ending where you live and I am improved. You won't find it."). Store it in its own save slot so "New Game" doesn't wipe it.
+
+**1.5 He Remembers You (M).** Carry a little memory between runs: the last character you played, how you died, and which ending you got. The Count and Clarence bring it up ("You again. Last time you fled. Clarence logged it.").
+
+**1.6 Call Him a Wizard (S–M).** Optional dialogue choices where you deliberately call him Merlin the wizard. A hidden counter tracks how many times you do it. Each jab has a real cost or benefit: he gets flustered and his next telegraphed move is weaker, or he gets furious and hits harder. Enough jabs unlock a secret ending or a special epitaph.
+
+## Hard constraints — violating any of these fails the pass
+
+- Vanilla HTML/CSS/JS only. No framework, no build step, no `package.json`, no new runtime dependency, no external asset, **no network request at runtime**. Must work when `index.html` is opened directly via `file://` and when served from Netlify.
+- The share card is drawn by the client itself (canvas or DOM) — no image service, no server, no analytics. "Copy / Save image" must work offline.
+- Do not break the existing autosave: an in-progress run still resumes mid-scene and mid-fight, and the Fates Ledger must survive **New Game**.
+- New run stats (nat 20s, nat 1s, gold wasted) must be counted from real events, not guessed, and must survive a refresh — so they belong in the run save.
+- All four ideas are additive. Do not reword shipped writing except where a new line is genuinely required, and never remove or gate off an existing ending.
+- Mobile-usable at 375px. Teen-safe. Keep the gothic candlelight aesthetic and the existing type/colour system.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, or `.git/`.
+
+## Output contract
+
+Begin your final message with the literal first line `MERLIN PASS 4 PLAN`, then:
+
+1. **Per idea** — the exact data additions (`data.js` shapes), the engine changes (named functions, where the counters live, what `snapshot()` exposes), and the UI changes (new DOM nodes/screens and where they hang off the existing ones in `index.html`/`ui.js`).
+2. **Share card** — the exact rendering technique, the card's layout and dimensions, and precisely how Copy and Save work with no server and no dependency.
+3. **Save layout** — key names for the new run stats and the separate Fates Ledger slot, plus the migration path from the existing `merlin.save.v1` blob.
+4. **Step order** for the implementation.
+5. **Manual QA checklist** — every ending, a death, ledger persistence across New Game, a fresh profile with no previous-run memory, enough wizard-jabs to trigger the secret, refresh-resume mid-scene and mid-fight, and 375px.
+
+Decide any open design question yourself and write the decision down. An incomplete-but-concrete plan is required; never silence.

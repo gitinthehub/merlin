@@ -17,9 +17,12 @@
           <span class="brand-title">MERLIN</span>
           <span class="brand-sub">Not That One</span>
         </div>
-        <button type="button" id="btn-new" class="btn ghost" hidden>
-          New Game
-        </button>
+        <div class="topbar-actions">
+          <button type="button" id="btn-fates" class="btn ghost">Fates</button>
+          <button type="button" id="btn-new" class="btn ghost" hidden>
+            New Game
+          </button>
+        </div>
       </header>
 
       <section id="splash" class="panel splash" hidden>
@@ -37,6 +40,12 @@
             New Game
           </button>
         </div>
+      </section>
+
+      <section id="fates" class="panel fates" hidden>
+        <h2 class="scene-title">Fates Ledger</h2>
+        <ul id="fates-list" class="fates-list"></ul>
+        <button type="button" id="btn-fates-back" class="btn">Back</button>
       </section>
 
       <div id="game" class="game" hidden>
@@ -98,6 +107,17 @@
           <div id="choices" class="choices"></div>
           <div id="select-chars" class="select-chars" hidden></div>
           <div id="ending-actions" class="ending-actions" hidden>
+            <canvas
+              id="epitaph-canvas"
+              class="epitaph-canvas"
+              width="800"
+              height="1000"
+              aria-hidden="true"
+            ></canvas>
+            <button type="button" id="btn-epitaph" class="btn">
+              Copy / Save image
+            </button>
+            <p id="epitaph-status" class="epitaph-status muted" aria-live="polite"></p>
             <button type="button" id="btn-ending-new" class="btn primary">
               New Game
             </button>

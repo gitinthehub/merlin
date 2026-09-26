@@ -277,6 +277,24 @@
             effects: [],
             next: "churchyard"
           }
+        },
+        {
+          label: "He's a wizard, then",
+          hideIf: { flag: "jabArrival" },
+          check: null,
+          success: {
+            lines: [
+              {
+                speaker: "Mags",
+                text: "Say that nearer the castle. He fines the air, and then the speaker."
+              }
+            ],
+            effects: [
+              { op: "flag", key: "jabArrival", value: true },
+              { op: "wizardJab", mood: "fluster" }
+            ],
+            next: "inn"
+          }
         }
       ]
     },
@@ -1191,6 +1209,24 @@
               }
             ]
           }
+        },
+        {
+          label: "He is Merlin the wizard",
+          hideIf: { flag: "jabGate" },
+          check: null,
+          success: {
+            lines: [
+              {
+                speaker: "Clarence",
+                text: "Logged. He will hate the spelling, and the noun. Enter."
+              }
+            ],
+            effects: [
+              { op: "flag", key: "jabGate", value: true },
+              { op: "wizardJab", mood: "fury" }
+            ],
+            next: "foyer"
+          }
         }
       ]
     },
@@ -1566,6 +1602,25 @@
             ],
             next: "fight_count"
           }
+        },
+        {
+          label: "You are Merlin the wizard",
+          hideIf: { flag: "jabThrone" },
+          wizardUnlock: true,
+          check: null,
+          success: {
+            lines: [
+              {
+                speaker: "Count Merlin",
+                text: "I am not. I am not. I am—"
+              }
+            ],
+            effects: [
+              { op: "flag", key: "jabThrone", value: true },
+              { op: "wizardJab", mood: "fluster" }
+            ],
+            next: "fight_count"
+          }
         }
       ]
     },
@@ -1690,6 +1745,27 @@
       options: []
     },
 
+    end_wizard: {
+      id: "end_wizard",
+      title: "The Misnomer",
+      type: "ending",
+      lines: [
+        {
+          speaker: null,
+          text: "The mirror finishes the sentence for him, and gets it wrong. The curse hiccups. Dawn gets in."
+        },
+        {
+          speaker: "Count Merlin",
+          text: "I am not a wizard. I am not. You may leave while the word is stuck."
+        },
+        {
+          speaker: "Clarence",
+          text: "Logged under the wrong column. On purpose. Do not request a refund."
+        }
+      ],
+      options: []
+    },
+
     death: {
       id: "death",
       title: "An Epitaph",
@@ -1749,6 +1825,98 @@
     encounters: encounters,
     nodes: nodes,
     xpThresholds: [0, 20, 50],
-    saveKey: "merlin.save.v1"
+    saveKey: "merlin.save.v1",
+    fatesKey: "merlin.fates.v1",
+    siteUrl: "https://merlin-dnd.netlify.app",
+    wizardUnlockAt: 3,
+    wizardMoodDelta: { fluster: -2, fury: 2 },
+    fateOrder: [
+      "end_stake",
+      "end_clause",
+      "end_board",
+      "end_fled",
+      "death",
+      "end_wizard"
+    ],
+    fateHints: {
+      end_stake:
+        "There is an ending where I stop talking. It takes a weapon and worse judgment than running.",
+      end_clause:
+        "There is an ending where you live and I am improved. You won't find it.",
+      end_board:
+        "Oswald keeps a seat that pays in not being eaten. Bring a proposal, not a stake.",
+      end_fled: "Clarence holds a door. Running is a kind of paperwork.",
+      death:
+        "Many nights end with a name and two dates. The churchyard, the marsh, the wall, and I are all hiring.",
+      end_wizard:
+        "Call me the other profession three times in one night, and say it to my face. I keep count."
+    },
+    epitaphs: {
+      end_stake: "You put me down. Write vampire. I will haunt the kerning.",
+      end_clause:
+        "You lived, and I am improved. I will never thank you. The sign, however, is corrected.",
+      end_board:
+        "You took the seat. Eternity is proofreading. Try not to enjoy it.",
+      end_fled:
+        "You ran. Clarence logged it. I will pretend I did not read the log.",
+      end_wizard:
+        "You said wizard until the word stuck. I am not improved. I am, regrettably, speechless. You live.",
+      death: {
+        ghoul: "Died to a ghoul. A GHOUL. Not a wizard.",
+        wight:
+          "The marsh filed you under paid. I would have charged more, and spelled it correctly.",
+        count:
+          "I wrote your name and the dates. Three drafts implied wizardry. I rejected all three.",
+        fall: "The wall declined you. Clarence wrote declined. I agree with the wall.",
+        default: "The night kept you. I did not request the company."
+      }
+    },
+    memoryLines: {
+      clarence: {
+        end_fled:
+          "You again. Last time you fled. Clarence logged it. The previous entry is {name}.",
+        end_stake:
+          "You again. Last time you put him down. Clarence logged the sequel under {name}.",
+        end_clause:
+          "You again. Last time you improved him. Clarence logged the improvement under {name}.",
+        end_board:
+          "You again. Last time you joined the board. Clarence logged the badge under {name}.",
+        end_wizard:
+          "You again. Last time you used the other noun. Clarence logged it under {name}, in the wrong column.",
+        death: {
+          ghoul:
+            "You again. Last time a ghoul kept you. Clarence logged the wreath under {name}.",
+          wight:
+            "You again. Last time the marsh filed you under paid. Clarence logged the receipt under {name}.",
+          count:
+            "You again. Last time he wrote your dates. Clarence logged the rejected draft under {name}.",
+          fall:
+            "You again. Last time the wall declined you. Clarence logged declined under {name}.",
+          default:
+            "You again. Last time the night kept you. Clarence logged the gap under {name}."
+        }
+      },
+      count: {
+        end_fled:
+          "You again. Last time you fled. Clarence logged it, and I read the log. The name was {name}.",
+        end_stake: "You again. Last time {name} ended me. Rude, and accurate.",
+        end_clause:
+          "You again. Last time {name} improved me. I remain ungrateful.",
+        end_board:
+          "You again. Last time {name} took the seat. The badge mouldered.",
+        end_wizard:
+          "You again. Last time {name} said the other noun to my face. I am still not a wizard.",
+        death: {
+          ghoul: "You again. Last time {name} died to a ghoul. A ghoul.",
+          wight:
+            "You again. Last time the marsh kept {name}. I would have charged more.",
+          count:
+            "You again. Last time I wrote the dates for {name}. Gently. Annoyingly.",
+          fall:
+            "You again. Last time the wall declined {name}. I agreed with the wall.",
+          default: "You again. Last time the night kept {name}."
+        }
+      }
+    }
   };
 })();

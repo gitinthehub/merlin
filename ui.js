@@ -19,6 +19,7 @@
   var awaitingAdvance = false;
   var pendingResultLines = null;
   var packOpen = false;
+  var fatesReturn = null;
   var reducedMotion =
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -30,6 +31,10 @@
   function cacheEls() {
     els.splash = $("splash");
     els.game = $("game");
+    els.fates = $("fates");
+    els.fatesList = $("fates-list");
+    els.btnFates = $("btn-fates");
+    els.btnFatesBack = $("btn-fates-back");
     els.sheet = $("sheet");
     els.btnContinue = $("btn-continue");
     els.btnStart = $("btn-start");
@@ -69,9 +74,246 @@
     els.selectChars = $("select-chars");
     els.endingActions = $("ending-actions");
     els.btnEndingNew = $("btn-ending-new");
+    els.epitaphCanvas = $("epitaph-canvas");
+    els.btnEpitaph = $("btn-epitaph");
+    els.epitaphStatus = $("epitaph-status");
     els.modal = $("modal");
     els.modalText = $("modal-text");
     els.modalActions = $("modal-actions");
+  }
+
+  function cssVar(name, fallback) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+      v = (v || "").trim();
+      return v || fallback;
+    } catch (err) {
+      return fallback;
+    }
+  }
+
+  function wrapCanvasText(ctx, text, maxWidth) {
+    var words = String(text || "").split(/\s+/);
+    var lines = [];
+    var line = "";
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? line + " " + words[i] : words[i];
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = words[i];
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawEpitaph(epitaph) {
+    var canvas = els.epitaphCanvas;
+    if (!canvas || !epitaph) return;
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var W = 800;
+    var H = 1000;
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    canvas.style.width = "100%";
+    canvas.style.maxWidth = "20rem";
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var bg = cssVar("--bg", "#140c0a");
+    var parchment = cssVar("--parchment", "#e8d4b0");
+    var parchmentDim = cssVar("--parchment-dim", "#c4a882");
+    var candle = cssVar("--candle", "#e8b86d");
+    var brass = cssVar("--brass", "#b8924a");
+    var edge = cssVar("--panel-edge", "#3a2418");
+    var font =
+      'Georgia, "Palatino Linotype", Palatino, "Book Antiqua", serif';
+
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(16, 16, W - 32, H - 32);
+
+    var pad = 48;
+    var cx = W / 2;
+
+    ctx.fillStyle = candle;
+    ctx.font = "700 42px " + font;
+    ctx.textAlign = "center";
+    ctx.fillText("MERLIN", cx, 70);
+    ctx.fillStyle = parchmentDim;
+    ctx.font = "italic 22px " + font;
+    ctx.fillText("Not That One", cx, 102);
+
+    ctx.font = "96px " + font;
+    ctx.fillStyle = parchment;
+    ctx.fillText(epitaph.glyph || "", cx, 210);
+    ctx.font = "700 34px " + font;
+    ctx.fillStyle = parchment;
+    ctx.fillText(epitaph.name || "", cx, 260);
+    ctx.font = "italic 22px " + font;
+    ctx.fillStyle = parchmentDim;
+    ctx.fillText(epitaph.role || "", cx, 292);
+
+    ctx.fillStyle = parchment;
+    ctx.font = "700 40px " + font;
+    ctx.fillText(epitaph.title || "", cx, 370);
+
+    ctx.fillStyle = brass;
+    ctx.font = "600 18px " + font;
+    ctx.fillText("The Count", cx, 430);
+    ctx.fillStyle = candle;
+    ctx.font = "italic 24px " + font;
+    var quoteLines = wrapCanvasText(ctx, epitaph.line || "", W - pad * 2);
+    var qy = 470;
+    for (var qi = 0; qi < quoteLines.length; qi++) {
+      ctx.fillText(quoteLines[qi], cx, qy);
+      qy += 32;
+    }
+
+    var statsY = 700;
+    var boxW = 200;
+    var gap = 24;
+    var totalW = boxW * 3 + gap * 2;
+    var startX = (W - totalW) / 2;
+    var stats = [
+      { label: "Nat 20s", value: epitaph.nat20 },
+      { label: "Nat 1s", value: epitaph.nat1 },
+      { label: "Gold wasted", value: epitaph.goldWasted }
+    ];
+    for (var si = 0; si < stats.length; si++) {
+      var sx = startX + si * (boxW + gap);
+      ctx.strokeStyle = edge;
+      ctx.strokeRect(sx, statsY, boxW, 100);
+      ctx.fillStyle = parchmentDim;
+      ctx.font = "18px " + font;
+      ctx.fillText(stats[si].label, sx + boxW / 2, statsY + 36);
+      ctx.fillStyle = candle;
+      ctx.font = "700 36px " + font;
+      ctx.fillText(String(stats[si].value == null ? 0 : stats[si].value), sx + boxW / 2, statsY + 78);
+    }
+
+    if (epitaph.wizardJabs > 0) {
+      ctx.fillStyle = parchmentDim;
+      ctx.font = "18px " + font;
+      ctx.fillText("Called him a wizard", cx, 850);
+      ctx.fillStyle = candle;
+      ctx.font = "700 28px " + font;
+      ctx.fillText(String(epitaph.wizardJabs), cx, 886);
+    }
+
+    ctx.fillStyle = brass;
+    ctx.font = "18px " + font;
+    ctx.fillText(epitaph.url || "", cx, 960);
+  }
+
+  function copyOrSaveEpitaph() {
+    var canvas = els.epitaphCanvas;
+    if (!canvas) return;
+    var snap = E.snapshot();
+    if (snap && snap.epitaph) drawEpitaph(snap.epitaph);
+    if (els.btnEpitaph) els.btnEpitaph.disabled = true;
+    if (els.epitaphStatus) els.epitaphStatus.textContent = "";
+
+    function finish(msg) {
+      if (els.epitaphStatus) els.epitaphStatus.textContent = msg;
+      if (els.btnEpitaph) els.btnEpitaph.disabled = false;
+    }
+
+    if (!canvas.toBlob) {
+      finish("Could not export image.");
+      return;
+    }
+
+    canvas.toBlob(function (blob) {
+      if (!blob) {
+        finish("Could not export image.");
+        return;
+      }
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "merlin-epitaph.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 1000);
+
+      var copied = false;
+      if (
+        navigator.clipboard &&
+        window.ClipboardItem &&
+        typeof navigator.clipboard.write === "function"
+      ) {
+        try {
+          navigator.clipboard
+            .write([new ClipboardItem({ "image/png": blob })])
+            .then(function () {
+              finish("Copied and saved.");
+            })
+            .catch(function () {
+              finish("Saved.");
+            });
+          copied = true;
+        } catch (err) {
+          copied = false;
+        }
+      }
+      if (!copied) finish("Saved.");
+    }, "image/png");
+  }
+
+  function renderFates() {
+    var view = E.fatesView();
+    clear(els.fatesList);
+    (view.rows || []).forEach(function (row) {
+      var li = document.createElement("li");
+      li.className = "fate " + (row.found ? "fate-found" : "fate-locked");
+      var title = document.createElement("div");
+      title.className = "fate-title";
+      title.textContent = row.title;
+      li.appendChild(title);
+      if (row.found && row.line) {
+        var line = document.createElement("p");
+        line.className = "fate-line";
+        line.textContent = row.line;
+        li.appendChild(line);
+      } else if (!row.found && row.hint) {
+        var hint = document.createElement("p");
+        hint.className = "fate-hint";
+        hint.textContent = row.hint;
+        li.appendChild(hint);
+      }
+      els.fatesList.appendChild(li);
+    });
+  }
+
+  function showFates() {
+    fatesReturn = {
+      splash: !els.splash.hasAttribute("hidden"),
+      game: !els.game.hasAttribute("hidden")
+    };
+    show(els.splash, false);
+    show(els.game, false);
+    show(els.fates, true);
+    renderFates();
+  }
+
+  function hideFates() {
+    show(els.fates, false);
+    if (fatesReturn && fatesReturn.game) {
+      show(els.game, true);
+      show(els.splash, false);
+    } else {
+      show(els.splash, true);
+      show(els.game, false);
+    }
+    fatesReturn = null;
   }
 
   function show(el, on) {
@@ -426,6 +668,7 @@
   function showSplash() {
     show(els.splash, true);
     show(els.game, false);
+    show(els.fates, false);
     show(els.btnNew, false);
     var has = E.hasSave();
     show(els.btnContinue, has);
@@ -434,6 +677,7 @@
 
   function showSelect() {
     show(els.splash, false);
+    show(els.fates, false);
     show(els.game, true);
     E.newGame();
     renderScene();
@@ -445,6 +689,7 @@
       return;
     }
     show(els.splash, false);
+    show(els.fates, false);
     show(els.game, true);
     renderScene();
     maybeLevelUp(null);
@@ -497,8 +742,11 @@
 
     function afterScene() {
       if (node.type === "select") renderSelect();
-      else if (node.type === "ending") show(els.endingActions, true);
-      else if (node.type === "shop") renderShop(E.snapshot());
+      else if (node.type === "ending") {
+        show(els.endingActions, true);
+        if (els.epitaphStatus) els.epitaphStatus.textContent = "";
+        if (snap.epitaph) drawEpitaph(snap.epitaph);
+      } else if (node.type === "shop") renderShop(E.snapshot());
       else if (node.type === "combat") {
         var s = E.snapshot();
         renderCombat(s);
@@ -880,6 +1128,24 @@
       });
     });
 
+    if (els.btnEpitaph) {
+      els.btnEpitaph.addEventListener("click", function () {
+        copyOrSaveEpitaph();
+      });
+    }
+
+    if (els.btnFates) {
+      els.btnFates.addEventListener("click", function () {
+        showFates();
+      });
+    }
+
+    if (els.btnFatesBack) {
+      els.btnFatesBack.addEventListener("click", function () {
+        hideFates();
+      });
+    }
+
     els.btnLeaveShop.addEventListener("click", function () {
       E.leaveShop();
       renderScene();
@@ -902,6 +1168,7 @@
     document.addEventListener("keydown", function (ev) {
       if (ev.key === "Enter" || ev.key === " ") {
         if (els.modal && !els.modal.hasAttribute("hidden")) return;
+        if (els.fates && !els.fates.hasAttribute("hidden")) return;
         if (skipOrAdvanceTypewriter()) ev.preventDefault();
       }
     });

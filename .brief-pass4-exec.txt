@@ -1,0 +1,27 @@
+IMPLEMENTATION PHASE — MERLIN PASS 4. You are authorized to create and edit files in this workspace. Build exactly the four items you planned in this chat (ROADMAP.md items 1.3–1.6):
+
+1.3 The Count's Epitaph Card — every ending, deaths included, produces a shareable image card (character, ending title, run stats: nat 20s, nat 1s, gold wasted, one custom line from the Count, the site URL) with a single "Copy / Save image" button.
+1.4 Fates Ledger with the Count's hints — an endings screen showing found vs locked endings, a snide but useful Count hint per locked ending, stored in its OWN save slot so New Game cannot wipe it.
+1.5 He Remembers You — memory carried between runs (last character, how you died, which ending), brought up by the Count and Clarence.
+1.6 Call Him a Wizard — optional dialogue choices to deliberately call him a wizard, with a hidden counter and real mechanical cost/benefit (flustered → next telegraphed move weaker; furious → hits harder), and a secret ending or special epitaph for enough jabs.
+
+Constraints (unchanged from the plan):
+- Vanilla HTML/CSS/JS. No framework, no build step, no `package.json`, no new dependency, no external asset, no runtime network request. Must work via `file://` and on Netlify.
+- The share card is client-rendered (canvas or DOM) and "Copy / Save image" works offline.
+- Do not break autosave: refresh still resumes mid-scene and mid-fight; the Fates Ledger survives New Game.
+- Run stats are counted from real events and persisted in the run save.
+- Additive only: do not reword shipped writing except where a new line is required, and never remove an ending.
+- Mobile-usable at 375px; teen-safe; keep the gothic candlelight look.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, `.brief-pass4-plan.txt`, or `.git/`.
+
+Also required:
+- Update `ROADMAP.md` in the same change set: mark 1.3, 1.4, 1.5, 1.6 with their real status (✅ done only if you actually built it and verified it; 🔨 in progress otherwise), and add a Changelog line for this pass. Do not touch the other roadmap rows.
+- Run the plan's manual QA checklist as far as you can statically, and fix what you find.
+
+Boundaries: do NOT run any git command. Do NOT commit, push, branch, or deploy. Stop at working-tree changes.
+
+FINAL REPORT (your last message must be):
+1. Files created/modified, with line counts.
+2. Any deviations from the plan and why.
+3. QA checks performed and their results.
+4. Anything left unverified that needs a browser pass.
