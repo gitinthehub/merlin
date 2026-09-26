@@ -52,7 +52,7 @@
     {
       title: "7. Castle Gate & Foyer",
       nodes: "gate, foyer",
-      check: "WITS d20 vs DC 14 · MIGHT d20 vs DC 16 (or the ledge)",
+      check: "WITS d20 vs DC 14 · MIGHT d20 vs DC 16 (tunnel the wall)",
       file: "images/beat-castle.png",
       dice: [
         { kind: "d20", dice: [14], kept: 14, dropped: null, total: 14, stat: "wits", mod: 0, dc: 14, critSuccess: false, critFail: false },

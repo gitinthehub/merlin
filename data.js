@@ -228,6 +228,7 @@
         {
           label: "Tell me something I can use",
           check: { stat: "wits", dc: 12 },
+          deathCause: "arrival",
           success: {
             lines: [
               {
@@ -559,6 +560,7 @@
             ]
           },
           check: { stat: "wits", dc: 13 },
+          deathCause: "mayor",
           success: {
             lines: [
               {
@@ -669,6 +671,7 @@
           label: "That plot is two feet short",
           check: { stat: "spirit", dc: 14 },
           dcAdjust: [{ if: { character: "bram" }, delta: -5 }],
+          deathCause: "churchyard",
           success: {
             lines: [
               {
@@ -725,6 +728,7 @@
         {
           label: "Sneak the long way past",
           check: { stat: "wits", dc: 15 },
+          deathCause: "churchyard",
           success: {
             lines: [
               {
@@ -814,6 +818,7 @@
           label: "Search the loose earth",
           showIf: { all: [{ notFlag: "searchedGrave" }] },
           check: { stat: "wits", dc: 11 },
+          deathCause: "search",
           success: {
             lines: [
               {
@@ -984,6 +989,7 @@
         {
           label: "I don't see anyone",
           check: { stat: "wits", dc: 13 },
+          deathCause: "marsh",
           dcAdjust: [{ if: { flag: "wightAngry" }, delta: 2 }],
           success: {
             lines: [
@@ -1151,6 +1157,7 @@
         {
           label: "Invent a correction",
           check: { stat: "wits", dc: 14 },
+          deathCause: "gate",
           success: {
             lines: [
               {
@@ -1311,6 +1318,7 @@
             all: [{ notFlag: "stoleSilver" }, { notFlag: "stealFailed" }]
           },
           check: { stat: "wits", dc: 13 },
+          deathCause: "foyer",
           success: {
             lines: [
               {
@@ -1339,6 +1347,7 @@
             next: "foyer"
           },
           critFail: {
+            replaceLines: true,
             effects: [
               { op: "damage", amount: 2 },
               { op: "flag", key: "stealFailed", value: true }
@@ -1397,6 +1406,7 @@
         {
           label: "Read for the latch-clause",
           check: { stat: "wits", dc: 12 },
+          deathCause: "ledger",
           success: {
             lines: [
               {
@@ -1840,6 +1850,51 @@
               text: "Clarence writes 'declined' in the guest book. The wall remains unimpressed."
             }
           ]
+        },
+        {
+          if: { deathCause: "gate" },
+          lines: [
+            {
+              speaker: null,
+              text: "Educational bats. The lesson is fatal. Clarence writes the name anyway."
+            }
+          ]
+        },
+        {
+          if: { deathCause: "marsh" },
+          lines: [
+            {
+              speaker: null,
+              text: "The bell finds you before the fight does. Seeing was optional. Dying was not."
+            }
+          ]
+        },
+        {
+          if: { deathCause: "foyer" },
+          lines: [
+            {
+              speaker: null,
+              text: "Oswald does not ring the bell. The bruise does the paperwork."
+            }
+          ]
+        },
+        {
+          if: { deathCause: "ledger" },
+          lines: [
+            {
+              speaker: null,
+              text: "The ink laughs last. The garlic column becomes an obituary."
+            }
+          ]
+        },
+        {
+          if: { deathCause: "search" },
+          lines: [
+            {
+              speaker: null,
+              text: "The grave you searched searches back. Hob will not set a bowl."
+            }
+          ]
         }
       ],
       options: []
@@ -1890,7 +1945,12 @@
         "end_board",
         "end_fled",
         "ghoul",
+        "search",
         "wight",
+        "marsh",
+        "gate",
+        "foyer",
+        "ledger",
         "count",
         "fall",
         "end_wizard",
@@ -1905,7 +1965,12 @@
           "A guest who took the seat and the salary of not being eaten. The chair is empty.",
         end_fled: "A guest who ran. I held the door. The log has a gap.",
         ghoul: "A guest the churchyard kept. The wreath has a vacancy.",
+        search: "A guest who dug where the earth was still hungry.",
         wight: "A guest the marsh filed under paid. No receipt.",
+        marsh: "A guest who insisted the marsh was empty. The bell disagrees.",
+        gate: "A guest the bat tutored. The knocker is still warm.",
+        foyer: "A guest who reached for the silver and met the tray.",
+        ledger: "A guest the invoices kept. The garlic column is a landscape.",
         count:
           "A guest he lectured until the dates were written. The drafts are blank.",
         fall: "A guest the wall declined. I have not written declined again.",
@@ -1915,7 +1980,12 @@
       },
       titles: {
         ghoul: "The Churchyard",
+        search: "The Loose Earth",
         wight: "The Marsh",
+        marsh: "The Unseen Toll",
+        gate: "The Gate",
+        foyer: "The Foyer",
+        ledger: "The Ledger",
         count: "The Throne",
         fall: "The Wall",
         polite_bat: "Polite to the bat"
@@ -1927,7 +1997,26 @@
     tombstone: {
       ghoul: { how: "Mauled to death", where: "the churchyard" },
       wight: { how: "Drowned by the toll", where: "the marsh" },
-      fall: { how: "Dropped to death", where: "the castle gate" },
+      fall: { how: "Dropped to death", prep: "at", where: "the castle gate" },
+      gate: {
+        how: "Schooled to death",
+        prep: "at",
+        where: "the castle gate"
+      },
+      marsh: { how: "Noticed to death", where: "the marsh" },
+      arrival: {
+        how: "Quoted to death",
+        prep: "at",
+        where: "the village gate"
+      },
+      mayor: { how: "Taxed to death", where: "the square" },
+      churchyard: { how: "Shovelled to death", where: "the churchyard" },
+      foyer: { how: "Bruised to death", where: "the foyer" },
+      ledger: { how: "Invoiced to death", where: "the ledger" },
+      search: {
+        how: "Bitten to death",
+        where: "the churchyard earth"
+      },
       count: {
         where: "the throne room",
         blows: {
@@ -1935,6 +2024,7 @@
           backhand: "Backhanded to death",
           drain: "Drained to death",
           mesmer: "Stilled to death",
+          flee: "Died running",
           default: "Corrected to death"
         }
       }
@@ -1956,6 +2046,14 @@
         count:
           "I wrote your name and the dates. Three drafts implied wizardry. I rejected all three.",
         fall: "The wall declined you. Clarence wrote declined. I agree with the wall.",
+        gate: "Clarence logged the tuition. I did not ask for a student.",
+        marsh:
+          "You said you saw no one. The marsh disagreed, and filed you.",
+        foyer: "The candlestick stayed. You did not. Silver notices everything.",
+        ledger:
+          "Late fees. I would have itemised them. You collected them with your life.",
+        search:
+          "The loose earth kept a digger's fee. I do not refund soil.",
         default: "The night kept you. I did not request the company."
       }
     },
@@ -1980,6 +2078,16 @@
             "You again. Last time he wrote your dates. Clarence logged the rejected draft under {name}.",
           fall:
             "You again. Last time the wall declined you. Clarence logged declined under {name}.",
+          gate:
+            "You again. Last time Clarence tutored you at the gate. He logged the tuition under {name}.",
+          marsh:
+            "You again. Last time you saw no one in the marsh. Clarence logged the bell under {name}.",
+          foyer:
+            "You again. Last time the silver tray kept you. Clarence logged the bruise under {name}.",
+          ledger:
+            "You again. Last time the invoices kept you. Clarence logged the late fee under {name}.",
+          search:
+            "You again. Last time the loose earth kept you. Clarence logged the dig under {name}.",
           default:
             "You again. Last time the night kept you. Clarence logged the gap under {name}."
         }
@@ -2002,6 +2110,16 @@
             "You again. Last time I wrote the dates for {name}. Gently. Annoyingly.",
           fall:
             "You again. Last time the wall declined {name}. I agreed with the wall.",
+          gate:
+            "You again. Last time Clarence schooled {name} at the gate. Educational.",
+          marsh:
+            "You again. Last time {name} insisted the marsh was empty. It was not.",
+          foyer:
+            "You again. Last time the foyer silver kept {name}. I noticed.",
+          ledger:
+            "You again. Last time the ledger invoiced {name}. I approved the fee.",
+          search:
+            "You again. Last time the churchyard earth kept {name}. A digger's fee.",
           default: "You again. Last time the night kept {name}."
         }
       }

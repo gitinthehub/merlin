@@ -24,8 +24,13 @@
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* Wire only conventional portrait paths; onerror falls back to glyph. */
+  /* Wire only conventional portrait paths; onerror falls back to png, then glyph. */
   var PORTRAIT_FILES = {
+    bram: "images/char-bram.jpg",
+    vellum: "images/char-vellum.jpg",
+    pip: "images/char-pip.jpg"
+  };
+  var PORTRAIT_FALLBACK = {
     bram: "images/char-bram.png",
     vellum: "images/char-vellum.png",
     pip: "images/char-pip.png"
@@ -48,7 +53,10 @@
     els.btnDaily = $("btn-daily");
     els.dailyBlurb = $("daily-blurb");
     els.btnNew = $("btn-new");
+    els.btnTitle = $("btn-title");
+    els.btnEndingTitle = $("btn-ending-title");
     els.sheetGlyph = $("sheet-glyph");
+    els.sheetCompactGlyph = $("sheet-compact-glyph");
     els.sheetName = $("sheet-name");
     els.sheetRole = $("sheet-role");
     els.sheetLevel = $("sheet-level");
@@ -83,6 +91,7 @@
     els.selectChars = $("select-chars");
     els.endingActions = $("ending-actions");
     els.btnEndingNew = $("btn-ending-new");
+    els.tombstoneLine = $("tombstone-line");
     els.epitaphCanvas = $("epitaph-canvas");
     els.btnEpitaph = $("btn-epitaph");
     els.epitaphStatus = $("epitaph-status");
@@ -560,16 +569,23 @@
     var snap = E.snapshot();
     if (!snap || !snap.state.characterId) {
       show(els.btnNew, false);
+      show(els.btnTitle, false);
       show(els.sheet, false);
       return;
     }
     show(els.sheet, true);
     show(els.btnNew, true);
+    show(els.btnTitle, true);
     var s = snap.state;
     var c = snap.character;
     mountPortrait(
       els.sheetGlyph,
-      PORTRAIT_FILES[s.characterId] || null,
+      s.characterId,
+      c.glyph || ""
+    );
+    mountPortrait(
+      els.sheetCompactGlyph,
+      s.characterId,
       c.glyph || ""
     );
     els.sheetName.textContent = c.name;
@@ -686,9 +702,11 @@
 
   /* ——— Portraits ——— */
 
-  function mountPortrait(frame, src, glyph) {
+  function mountPortrait(frame, characterId, glyph) {
     if (!frame) return;
     frame.textContent = glyph || "";
+    var src = characterId ? PORTRAIT_FILES[characterId] : null;
+    var fallback = characterId ? PORTRAIT_FALLBACK[characterId] : null;
     if (!src) return;
     var img = new Image();
     img.alt = "";
@@ -698,6 +716,10 @@
       frame.appendChild(img);
     };
     img.onerror = function () {
+      if (fallback && img.src.indexOf(fallback) === -1) {
+        img.src = fallback;
+        return;
+      }
       frame.textContent = glyph || "";
     };
     img.src = src;
@@ -744,10 +766,15 @@
     show(els.game, false);
     show(els.fates, false);
     show(els.btnNew, false);
+    show(els.btnTitle, false);
     var has = E.hasSave();
     show(els.btnContinue, has);
     els.btnStart.textContent = has ? "New Game" : "Begin";
     updateDailyBlurb();
+  }
+
+  function backToTitle() {
+    showSplash();
   }
 
   function updateDailyBlurb() {
@@ -852,6 +879,15 @@
       else if (node.type === "ending") {
         show(els.endingActions, true);
         if (els.epitaphStatus) els.epitaphStatus.textContent = "";
+        if (els.tombstoneLine) {
+          if (snap.epitaph && snap.epitaph.tombstone) {
+            els.tombstoneLine.textContent = snap.epitaph.tombstone;
+            show(els.tombstoneLine, true);
+          } else {
+            els.tombstoneLine.textContent = "";
+            show(els.tombstoneLine, false);
+          }
+        }
         if (snap.epitaph) drawEpitaph(snap.epitaph);
         if (els.visitReview) {
           els.visitReview.textContent =
@@ -899,7 +935,13 @@
       return;
     }
 
-    startTypewriter(node.lines, afterScene, startIdx);
+    var sceneLines = node.lines || [];
+    if (node.id === "death" && snap.killingLine) {
+      sceneLines = [{ speaker: null, text: snap.killingLine }].concat(
+        sceneLines
+      );
+    }
+    startTypewriter(sceneLines, afterScene, startIdx);
   }
 
   function refreshStageSoft() {
@@ -921,7 +963,7 @@
       card.innerHTML = "";
       var g = document.createElement("div");
       g.className = "glyph";
-      mountPortrait(g, PORTRAIT_FILES[id], c.glyph);
+      mountPortrait(g, id, c.glyph);
       var n = document.createElement("div");
       n.className = "name";
       n.textContent = c.name;
@@ -1266,6 +1308,17 @@
         showSelect();
       });
     });
+
+    if (els.btnTitle) {
+      els.btnTitle.addEventListener("click", function () {
+        backToTitle();
+      });
+    }
+    if (els.btnEndingTitle) {
+      els.btnEndingTitle.addEventListener("click", function () {
+        backToTitle();
+      });
+    }
 
     if (els.btnEpitaph) {
       els.btnEpitaph.addEventListener("click", function () {

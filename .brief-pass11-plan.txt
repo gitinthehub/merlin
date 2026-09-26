@@ -1,0 +1,59 @@
+MERLIN — PASS 11 (QA-DRIVEN IMPROVEMENTS) PLANNING BRIEF. PLAN ONLY: do not modify any file, do not create anything, do not run any command. Your entire final message must be the plan.
+
+RETURN THE PLAN AS TEXT IN YOUR FINAL MESSAGE — an empty reply, a stub, or a bare acknowledgement is a non-result and fails this task. Begin with the literal first line:
+
+MERLIN PASS 11 PLAN
+
+READ FIRST, IN THIS ORDER
+
+1. `.qa/qa-pass4.md` — an independent QA review of the live site by a separate reviewer bot, written after playing the game, the roadmap page and the Oronath surface. This is the SOURCE of the work in this pass. Its findings are ranked by it, not by me.
+2. `ROADMAP.md` — the source of truth for what is done and what is planned.
+3. `README.md` — the repo's own description of the game and its constraints.
+4. The live surfaces, so you judge the real thing rather than the description of it:
+   - https://merlin-dnd.netlify.app/ (the game)
+   - https://merlin-dnd.netlify.app/roadmap.html
+   - https://merlin-dnd.netlify.app/oronath.html
+
+WHAT THE PASS IS FOR
+
+Turn the QA review into shipped improvements. It is a QUALITY pass on a live game, not a rewrite.
+
+TRIAGE IS PART OF THE JOB
+
+The review is input, not instruction. For EVERY recommendation, decide and record one of:
+
+- **BUILD** — worth it, in scope, and it makes the game better for a player.
+- **REJECT** — say why in one line. Reasons that are acceptable: it needs a server or a framework; it contradicts a design decision the game is built on; it would regress something shipped; it is taste dressed up as a defect; it is already how the game works.
+- **DEFER** — worth doing, but not in this pass. Say what it should wait for.
+
+Do not silently drop anything. The plan must account for every ranked item and every defect the review raised. If the review contradicts itself, say so.
+
+STANDING CONSTRAINTS (unchanged from every previous pass)
+
+1. The site is STATIC: plain HTML/CSS/JS, loaded straight from the repo root. No `package.json`, no build step, no ES modules, no new dependency, no server, no network call at runtime. `file://` must keep working.
+2. **v1 must not regress.** The shipped game — its story graph, dice, saves, endings, share text — must behave exactly as it does now unless the review explicitly found a defect there and the fix is the point. If a change touches v1 behaviour, say so in the plan and justify it.
+3. The zero-dependency Node test suites in `tests/` must keep passing, and you must add assertions for anything new that can regress. `node tests/<name>.test.js` for each; `tests/harness.html` must still print ok in a browser with zero JS errors.
+4. `ROADMAP.md` is the source of truth and `roadmap.js` mirrors it. Both move in the same commit. A new item gets a row and a chip; a status change gets both.
+5. Anything the browser loads must degrade gracefully: a missing image falls back to the existing glyph or captioned placeholder, never a broken icon.
+6. Accessibility and motion: honour `prefers-reduced-motion` for any new animation, keyboard-reachable controls, and no colour-only signalling.
+7. No secrets, ever, in anything the browser loads.
+
+DELIVERABLE SHAPE
+
+Prefer FEWER, BETTER changes over a long tail of small ones. If the review's top three items are worth it and the rest are not, build the top three and say so.
+
+For anything you build, say how it will be verified with a real command or a real walk — not "looks right".
+
+RETURN, in this order, nine numbered sections:
+
+1. Goal — what a player gets from this pass, in two sentences.
+2. Triage table — every QA item (ranked position, short name) against BUILD / REJECT / DEFER, with the one-line reason. This is the most important section; be complete.
+3. Files to change — exact paths, and what changes in each.
+4. The changes, one by one — for each BUILT item: what it does now, what it will do, and the exact strings or rules involved. Real content, not placeholders.
+5. What stays byte-identical — the list of files this pass must not touch, and how you will prove it.
+6. Tests — every assertion added or changed, and the exact commands.
+7. Verification — how each built item will be proven, including the walk or command that shows it working.
+8. Roadmap — the exact `ROADMAP.md` rows and `roadmap.js` chips that change, and the changelog line.
+9. Risks and open questions — including anything where you disagree with the QA review, and anything you could not verify.
+
+PLAN ONLY: do not edit any file, do not create any file, do not run any command. Write the plan now.

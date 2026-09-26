@@ -292,6 +292,7 @@
     TIERS: TIERS,
     LIMITS: LIMITS,
     dcFor: dcFor,
+    effectiveDc: effectiveDc,
     d10Value: d10Value,
     createRng: createRng,
     rngFromState: rngFromState,

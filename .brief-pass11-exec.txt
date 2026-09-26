@@ -1,0 +1,23 @@
+IMPLEMENTATION PHASE — MERLIN PASS 11. You are authorized to create and edit files in this workspace.
+
+Build exactly what you planned in this chat: the improvements triaged from the independent QA review in `.qa/qa-pass4.md`, following the plan you just wrote.
+
+Requirements:
+
+1. Build the items you marked BUILD, at the scope you proposed. Do not expand the scope, and do not add the items you marked REJECT or DEFER.
+2. Honour every standing constraint in the planning brief: static site (no `package.json`, no build step, no ES modules, no new dependency, no runtime network call, `file://` still works); v1 must not regress; the protected files stay byte-identical; `ROADMAP.md` and `roadmap.js` move together; missing images degrade to the existing fallback; `prefers-reduced-motion` honoured for any new animation; no secrets.
+3. Add the tests you planned, and make every suite in `tests/` pass:
+   `for t in dice arc characters loop persist build-arc last-signal; do node tests/$t.test.js; done`
+   plus whatever new suite this pass adds. `tests/harness.html` must still run clean from `file://` with zero JS errors.
+4. Verify each built item with the real walk or command you planned, and report the actual output.
+
+Then report, in this order:
+
+- Files changed, with line counts.
+- The byte-identical confirmation for the protected files — the actual `git diff --stat` output for them, which must be empty.
+- Each BUILT item: what it does now, the exact strings or rules, and the command or walk that proves it working, with real output.
+- The exact test commands and their real, unedited output.
+- Anything from the QA review you deliberately did not build, and why (one line each).
+- Deviations from the plan, and anything you could not verify.
+
+Do not reply with a plan or an acknowledgement. Make the changes, run the tests, fix what fails, then report.

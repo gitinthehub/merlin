@@ -48,7 +48,17 @@
   }
 
   function emptyDeaths() {
-    return { ghoul: false, wight: false, count: false, fall: false };
+    return {
+      ghoul: false,
+      wight: false,
+      count: false,
+      fall: false,
+      gate: false,
+      marsh: false,
+      foyer: false,
+      ledger: false,
+      search: false
+    };
   }
 
   function emptySecrets() {
@@ -204,14 +214,17 @@
     var tomb = data().tombstone || {};
     var how = "Corrected to death";
     var where = "the night";
+    var prep = "in";
     if (cause === "count") {
       var countT = tomb.count || {};
       where = countT.where || "the throne room";
+      prep = countT.prep || "in";
       var blows = countT.blows || {};
       how = blows[state.killingBlow] || blows.default || how;
     } else if (tomb[cause]) {
       how = tomb[cause].how || how;
       where = tomb[cause].where || where;
+      prep = tomb[cause].prep || "in";
     }
     return (
       shortName +
@@ -219,7 +232,9 @@
       epithet +
       ". " +
       how +
-      " in " +
+      " " +
+      prep +
+      " " +
       where +
       ". Owed " +
       (state.gold || 0) +
@@ -235,6 +250,21 @@
     return "Five stars.";
   }
 
+  function jabCountWords(n) {
+    if (n === 1) return "once";
+    if (n === 2) return "twice";
+    if (n === 3) return "three times";
+    if (n === 4) return "four times";
+    return n + " times";
+  }
+
+  function joinList(items) {
+    if (!items || !items.length) return "";
+    if (items.length === 1) return items[0];
+    if (items.length === 2) return items[0] + " and " + items[1];
+    return items.slice(0, -1).join(", ") + ", and " + items[items.length - 1];
+  }
+
   function visitReview(endingId) {
     if (!state) return "A short visit. Two stars.";
     var flags = state.flags || {};
@@ -245,6 +275,7 @@
     else if (flags.wightDead) parts.push("Killed the toll.");
     else if (flags.wightSnuck) parts.push("Did not pay the toll.");
     else if (flags.wightAngry) parts.push("Fled the toll.");
+    else if (flags.jabMarsh) parts.push("Did not pay the toll.");
 
     if (flags.politeEntry) parts.push("Tipped the bat.");
     else if (flags.rudeEntry || flags.viaRampart || flags.jabGate) {
@@ -253,27 +284,27 @@
 
     var jabs = state.wizardJabs || 0;
     if (jabs > 0) {
+      var overheard = [];
+      var aloud = [];
+      if (flags.jabArrival) overheard.push("at the village gate");
+      if (flags.jabMarsh) overheard.push("in the marsh");
+      if (flags.jabGate) aloud.push("at the castle gate");
+      if (flags.jabThrone) aloud.push("in the throne room, to my face");
       var places = [];
-      if (flags.jabArrival) {
-        places.push("at the village gate, where you thought I couldn't hear");
+      if (overheard.length) {
+        places.push(
+          joinList(overheard) + ", where you thought I couldn't hear"
+        );
       }
-      if (flags.jabMarsh) {
-        places.push("in the marsh, where you thought I couldn't hear");
-      }
-      if (flags.jabGate) places.push("at the castle gate");
-      if (flags.jabThrone) places.push("in the throne room, to my face");
+      for (var ai = 0; ai < aloud.length; ai++) places.push(aloud[ai]);
       if (places.length === 0) places.push("somewhere I overheard");
-      if (jabs === 1) {
-        parts.push("Called me the other thing once, " + places[0] + ".");
-      } else if (jabs === 2) {
-        parts.push(
-          "Called me the other thing twice, " + places.join(" and ") + "."
-        );
-      } else {
-        parts.push(
-          "Called me the other thing three times, " + places.join(", ") + "."
-        );
-      }
+      parts.push(
+        "Called me the other thing " +
+          jabCountWords(jabs) +
+          ", " +
+          joinList(places) +
+          "."
+      );
     }
 
     var stars = 2;
@@ -320,7 +351,12 @@
         id === "ghoul" ||
         id === "wight" ||
         id === "count" ||
-        id === "fall"
+        id === "fall" ||
+        id === "gate" ||
+        id === "marsh" ||
+        id === "foyer" ||
+        id === "ledger" ||
+        id === "search"
       ) {
         found = !!(fates.deaths && fates.deaths[id]);
         title = found ? titles[id] || id : "—";
@@ -571,22 +607,35 @@
   }
 
   function shareLine(endingId) {
-    if (!state || !state.daily) return "";
+    if (!state) return "";
     var char = data().characters[state.characterId];
     var shortName = char ? char.shortName || char.name : "?";
-    var node = data().nodes[endingId || state.nodeId];
+    var url = data().siteUrl || "https://merlin-dnd.netlify.app";
+    var eid = endingId || state.nodeId;
+    if (eid === "death") {
+      return tombstoneLine() + " · " + url;
+    }
+    var node = data().nodes[eid];
     var title = node ? node.title : "Unknown";
-    var faces = state.diceLog && state.diceLog.length ? state.diceLog.join(" · ") : "—";
-    return (
-      "MERLIN #" +
-      state.daily.number +
-      " 🧛 " +
-      shortName +
-      " · 🎲 " +
-      faces +
-      " · Ending: " +
-      title
-    );
+    if (state.daily) {
+      var faces =
+        state.diceLog && state.diceLog.length
+          ? state.diceLog.join(" · ")
+          : "—";
+      return (
+        "MERLIN #" +
+        state.daily.number +
+        " 🧛 " +
+        shortName +
+        " · 🎲 " +
+        faces +
+        " · Ending: " +
+        title +
+        " · " +
+        url
+      );
+    }
+    return shortName + " · " + title + " · " + url;
   }
 
   function startDaily(now) {
@@ -900,11 +949,9 @@
         state.gold += pay;
         if (pay > 0) notes.push("You gain " + pay + " gold.");
       } else if (e.op === "payToll") {
-        var tollBefore = state.gold;
         var toll = tollCost();
         state.gold -= toll;
         clampGold();
-        noteGoldLost(tollBefore, state.gold);
         notes.push("You pay " + toll + " gold for the toll.");
       } else if (e.op === "vellumPox") {
         if (state.characterId === "vellum") state.flags.vellumHonest = true;
@@ -968,6 +1015,7 @@
         combat: state.combat,
         deathCause: state.deathCause,
         killingBlow: state.killingBlow || null,
+        killingLine: state.killingLine || null,
         lineIndex: state.lineIndex || 0,
         lastRoll: lastRoll
           ? {
@@ -999,6 +1047,7 @@
     if (blob.wizardJabs == null) blob.wizardJabs = 0;
     if (blob.wizardNext === undefined) blob.wizardNext = null;
     if (blob.killingBlow === undefined) blob.killingBlow = null;
+    if (blob.killingLine === undefined) blob.killingLine = null;
     if (!blob.diceLog) blob.diceLog = [];
     if (blob.daily === undefined) blob.daily = null;
     if (blob.rng === undefined) blob.rng = null;
@@ -1037,6 +1086,7 @@
         combat: blob.combat || null,
         deathCause: blob.deathCause || null,
         killingBlow: blob.killingBlow || null,
+        killingLine: blob.killingLine || null,
         lineIndex: blob.lineIndex || 0,
         pendingVictory: blob.pendingVictory || null,
         stats: blob.stats,
@@ -1114,6 +1164,7 @@
       combat: null,
       deathCause: null,
       killingBlow: null,
+      killingLine: null,
       lineIndex: 0,
       pendingVictory: null,
       stats: emptyStats(),
@@ -1149,6 +1200,7 @@
     state.combat = null;
     state.deathCause = null;
     state.killingBlow = null;
+    state.killingLine = null;
     state.stats = emptyStats();
     state.wizardJabs = 0;
     state.wizardNext = null;
@@ -1164,7 +1216,7 @@
     state.nodeId = nodeId;
     state.lineIndex = 0;
     state.coinReady = true;
-    /* keep lastRoll so outcome math stays visible across the click-to-advance beat */
+    lastRoll = null;
 
     if (node.type !== "combat") {
       state.combat = null;
@@ -1215,6 +1267,7 @@
       combat: overrides.combat !== undefined ? overrides.combat : state.combat,
       deathCause: state.deathCause,
       killingBlow: state.killingBlow || null,
+      killingLine: state.killingLine || null,
       lineIndex: overrides.lineIndex != null ? overrides.lineIndex : state.lineIndex || 0,
       lastRoll: null,
       pendingLevelUps: 0,
@@ -1274,6 +1327,7 @@
         combat: null,
         deathCause: null,
         killingBlow: null,
+        killingLine: null,
         lineIndex: 0,
         pendingVictory: null,
         stats: blob.stats,
@@ -1285,6 +1339,7 @@
       pendingLevelUps = 0;
       pendingCombat = null;
       lastRoll = null;
+      state.hp = maxHp();
       if (blob.daily && blob.rng) {
         installRng(blob.rng);
       } else if (blob.daily && blob.daily.seed != null) {
@@ -1299,10 +1354,16 @@
     }
   }
 
-  function die(cause) {
-    if (state.combat && state.combat.moveId) {
+  function die(cause, opts) {
+    opts = opts || {};
+    if (opts.blow !== undefined) {
+      state.killingBlow = opts.blow;
+    } else if (state.combat && state.combat.moveId) {
       state.killingBlow = state.combat.moveId;
     }
+    if (opts.line) state.killingLine = opts.line;
+    else state.killingLine = null;
+    if (!opts.keepRoll) lastRoll = null;
     state.deathCause = cause || state.deathCause || "count";
     state.combat = null;
     state.hp = 0;
@@ -1507,7 +1568,11 @@
         effects = [{ op: "damage", amount: 2 }].concat(effects);
       }
       if (opt.critFail && opt.critFail.lines && opt.critFail.lines.length) {
-        lines = lines.concat(opt.critFail.lines);
+        if (opt.critFail.replaceLines) {
+          lines = opt.critFail.lines.slice();
+        } else {
+          lines = lines.concat(opt.critFail.lines);
+        }
       }
     }
 
@@ -1533,7 +1598,7 @@
           if (effects[i].op === "death") cause = effects[i].cause;
         }
       }
-      die(cause);
+      die(cause, { keepRoll: true });
       result.next = "death";
     }
 
@@ -1628,7 +1693,6 @@
     }
 
     state.gold -= price;
-    noteGoldLost(state.gold + price, state.gold);
     addItem(itemId, 1);
     save();
     return { ok: true, price: price };
@@ -1829,7 +1893,10 @@
         combatLog(enc.name + " drains " + move.heal + " HP.");
       }
       if (state.hp <= 0) {
-        die(node.deathCause || "count");
+        die(node.deathCause || "count", {
+          blow: move.id,
+          line: enc.name + " hits for " + dealt + "."
+        });
         result.dead = true;
         save();
         return result;
@@ -2145,7 +2212,10 @@
     if (roll.critFail) {
       applyDamage(2);
       if (state.hp <= 0) {
-        die(node.deathCause || "count");
+        die(node.deathCause || "count", {
+          blow: "flee",
+          line: "The flight fails. You take 2."
+        });
         out.dead = true;
         save();
         return out;
@@ -2239,7 +2309,8 @@
           : null,
       hasCheckpoint: hasCheckpoint(),
       daily: state.daily || null,
-      shareLine: state.daily ? shareLine(node && node.id) : null
+      killingLine: state.killingLine || null,
+      shareLine: shareLine(node && node.id)
     };
   }
 

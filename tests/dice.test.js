@@ -166,6 +166,10 @@
     "roll() d20"
   );
 
+  eq(Dice.effectiveDc(9, -2), 7, "effectiveDc 9+-2");
+  eq(Dice.effectiveDc(9, 0), 9, "effectiveDc 9+0");
+  eq(Dice.effectiveDc(1, -5), 1, "effectiveDc floor 1");
+
   if (fails === 0) {
     console.log("dice ok");
   } else {

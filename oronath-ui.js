@@ -42,15 +42,19 @@
 
   function rollBlurb(check, roll) {
     var bits = [];
+    var Dice = window.OronathDice;
+    var baseDc = check.dc != null ? check.dc : roll.dc;
+    var shownDc =
+      Dice && typeof Dice.effectiveDc === "function"
+        ? Dice.effectiveDc(baseDc, check.modifier)
+        : baseDc;
     if (roll.die === "d20") {
-      bits.push("d20 · " + (roll.tier || check.tier));
-    } else {
-      bits.push(roll.die + " · DC " + (check.dc != null ? check.dc : roll.dc));
-    }
-    if (check.modifier) {
       bits.push(
-        "mod " + (check.modifier > 0 ? "+" : "") + check.modifier
+        "d20 · DC " +
+          (shownDc != null ? shownDc : roll.tier || check.tier)
       );
+    } else {
+      bits.push(roll.die + " · DC " + shownDc);
     }
     if (check.advantage) bits.push("advantage due to build");
     if (check.matchedTraits && check.matchedTraits.length) {

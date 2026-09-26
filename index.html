@@ -19,6 +19,9 @@
         </div>
         <div class="topbar-actions">
           <button type="button" id="btn-fates" class="btn ghost">Guest Book</button>
+          <button type="button" id="btn-title" class="btn ghost" hidden>
+            Title
+          </button>
           <button type="button" id="btn-new" class="btn ghost" hidden>
             New Game
           </button>
@@ -55,9 +58,12 @@
       <div id="game" class="game" hidden>
         <aside id="sheet" class="sheet panel" hidden>
           <div class="sheet-compact">
-            <div class="stat-row compact-row">
-              <span>LV <strong id="sheet-level">1</strong></span>
-              <span class="gold">✦ <strong id="sheet-gold">0</strong></span>
+            <div class="compact-head">
+              <span id="sheet-compact-glyph" class="sheet-glyph sheet-glyph-compact"></span>
+              <div class="stat-row compact-row">
+                <span>LV <strong id="sheet-level">1</strong></span>
+                <span class="gold">✦ <strong id="sheet-gold">0</strong></span>
+              </div>
             </div>
             <label class="bar-label">HP <span id="sheet-hp-text"></span></label>
             <div class="bar hp"><div id="bar-hp" class="bar-fill"></div></div>
@@ -111,6 +117,7 @@
           <div id="choices" class="choices"></div>
           <div id="select-chars" class="select-chars" hidden></div>
           <div id="ending-actions" class="ending-actions" hidden>
+            <p id="tombstone-line" class="tombstone-line" hidden></p>
             <canvas
               id="epitaph-canvas"
               class="epitaph-canvas"
@@ -129,6 +136,9 @@
             <p id="epitaph-status" class="epitaph-status muted" aria-live="polite"></p>
             <button type="button" id="btn-restore-gate" class="btn" hidden>
               Back to the castle gate
+            </button>
+            <button type="button" id="btn-ending-title" class="btn">
+              Title
             </button>
             <button type="button" id="btn-ending-new" class="btn primary">
               New Game

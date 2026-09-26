@@ -61,7 +61,7 @@ These are the beats of the shipped arc. Each one has a painted asset in `images/
 | 4. The Square | `mayor` | `images/beat-square.png` | WITS d20 vs DC 13 |
 | 5. The Churchyard | `churchyard` → `fight_ghoul` → `after_ghoul` | `images/beat-churchyard.png` | SPIRIT d20 vs DC 14 · WITS d20 vs DC 15 · then the ghoul |
 | 6. The Marsh Road | `marsh`, `pox` → `fight_wight` → `after_wight` | `images/beat-marsh.png` | WITS d20 vs DC 13, then the wight |
-| 7. Castle Gate & Foyer | `gate`, `foyer` | `images/beat-castle.png` | WITS d20 vs DC 14 · MIGHT d20 vs DC 16 (or the ledge) |
+| 7. Castle Gate & Foyer | `gate`, `foyer` | `images/beat-castle.png` | WITS d20 vs DC 14 · MIGHT d20 vs DC 16 (tunnel the wall) |
 | 8. The Throne Room | `ledger`, `throne` → `fight_count` | `images/beat-throne.png` | WITS d20 vs DC 12 · SPIRIT d20 vs DC 13/11 · WITS d20 vs DC 15/16, then Count Merlin (AC 14) |
 
 Four endings resolve here — The Stake, The Correction, The Board, Flight — plus `death` (An Epitaph). **All branches resolve; no loose threads.**
@@ -137,6 +137,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-26** — Pass 11, from an independent QA review (`.qa/qa-pass4.md`): a Title button returns to the splash so the Daily Curse stays reachable once a save exists; tombstones name the place you actually died, including the five causes that used to read as a throne-room death plus the three the QA did not list; the Count's review counts every jab once and stops repeating its overheard clause; stale dice are cleared and the killing blow is shown; a death line and a share link on every ending; the portrait and shop-frame pass for phones.
 - **2026-09-26** — Pass 10: a failed check in The Last Signal of Oronath now ends on a road the success check does not take (roadmap 2.8).
 - **2026-09-26** — Follow-up: marsh jab site added to 1.6, so the Count's review names the place the spec example asks for ("in the marsh, where you thought I couldn't hear") instead of defaulting to the village gate.
 - **2026-09-26** — Pass 9: The Last Signal of Oronath shipped as the default Oronath arc (roadmap 2.8); v2.0 complete.

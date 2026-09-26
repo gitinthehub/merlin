@@ -6,6 +6,9 @@ var path = require("path");
 var os = require("os");
 var Arc = require("../arc.js");
 var Build = require("../tools/build-arc.js");
+var Dice = require("../dice.js");
+var Cast = require("../characters.js");
+var Loop = require("../loop.js");
 
 var fails = 0;
 
@@ -191,6 +194,21 @@ for (ch = 0; ch < tree.choices.length; ch++) {
 }
 assert(treeById["joel-climbs"].roll.die === "2d6", "joel-climbs die 2d6");
 assert(treeById["joel-climbs"].roll.dc === 9, "joel-climbs dc 9");
+var joel = Cast.pregen("joel");
+var joelCheck = Cast.resolveCheck(joel, treeById["joel-climbs"].roll);
+assert(joelCheck.modifier === -2, "joel strength mod -2");
+assert(
+  Dice.effectiveDc(joelCheck.dc, joelCheck.modifier) === 7,
+  "joel-climbs effective DC 7"
+);
+var joelRun = Loop.createRun(arc, { seed: 1 });
+Loop.choose(joelRun, "joel-climbs", { rng: Dice.sequence([3, 4, 1, 2]) });
+assert(joelRun.outcome.result.dc === 7, "joel-climbs rolled vs DC 7");
+var joelView = Loop.view(joelRun);
+assert(
+  joelView.outcome.equation.indexOf("vs DC 7") !== -1,
+  "joel equation vs DC 7"
+);
 assert(treeById["john-climbs"].roll.die === "d20", "john-climbs die d20");
 assert(
   treeById["john-climbs"].roll.tier === "medium",
