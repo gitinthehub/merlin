@@ -1,0 +1,56 @@
+MERLIN — PASS 4B PLANNING BRIEF (the owner's top 4 ideas, gaps only). PLAN ONLY: do not modify any file, do not run any command, do not create anything. Your entire final message must be the plan.
+
+## Context
+
+This repository is a shipped, live, static game — vanilla HTML/CSS/JS, no build step, no dependencies, no runtime network requests. `data.js` (content, `window.MERLIN`), `engine.js` (pure logic, `window.MerlinEngine`), `ui.js` (render), `style.css`, `index.html`, `README.md`, `ROADMAP.md`, plus painted art in `images/`.
+
+**READ `ROADMAP.md` FIRST** — it is the source of truth. Read the current `data.js`, `engine.js` and `ui.js` too; an earlier pass already shipped a lot of this area and you must build on it, not around it.
+
+**Already shipped and live (ROADMAP items 1.3–1.6) — do not regress any of it:**
+- an **Epitaph Card**: an 800×1000 `<canvas>` drawn on every ending *and* every death, with the hero, the ending title, run stats, a Count line and the URL, plus a working "Copy / Save image" button (download + clipboard);
+- a **Fates Ledger** screen listing found vs locked endings with a snide hint per locked ending, stored in its own `localStorage` slot (`merlin.fates.v1`) so New Game cannot wipe it;
+- **cross-run memory** (`memoryLines` in `data.js`): the last character / death / ending, brought up by the Count at the castle gate and the throne room;
+- **"Call him a wizard"** jabs with a hidden counter, fluster/fury mood on the Count, and a secret ending;
+- run stats `{nat20, nat1, goldWasted}` in the run save (`merlin.save.v1`, now `v: 2`) with a v1→v2 migration.
+
+The owner's authoritative top 4 (quoted in ROADMAP.md) are: **1 Shareable tombstones, 2 The Daily Curse, 3 The Guest Book, 4 The Count reviews your visit.** The roadmap's mapping table says exactly what is already covered and what the real gap is. **Plan only the gaps — items 1.8, 1.9, 1.10, 1.11. Nothing else.**
+
+## Task
+
+**1.10 Tombstone line, as specified (S).** The card's death line must read like the owner's example: *"Pip, clerk. Lectured to death in the throne room. Owed 3 gold."* — i.e. hero (short name/role), **what killed them and where** (cause + the location it happened in, not the ending's title), and **gold owed**. Plan how each part is derived from real state, and how the existing per-cause epitaph writing is kept.
+
+**1.9 The Count reviews your visit (M).** A **per-run** review in the Count's voice, built from what that run actually did — the owner's example: *"Paid the toll. Did not tip the bat. Called me the other thing once, in the marsh, where you thought I couldn't hear. Two stars."* It must be assembled from flags and counts the engine already tracks (audit `data.js`/`engine.js` for them), shown on every ending, and printed on the share card. Additive to the existing cross-run memory, which is a different feature.
+
+**1.11 Oswald's guest book + the castle-gate checkpoint (S–M).** Reframe the Fates Ledger as **Oswald's guest book**: unfound entries as blank lines with a hint in **Oswald's** voice (the owner's example: *"A guest who was polite to the bat. We have not had one."*), plus a couple of secret entries. Separately: **a checkpoint at the castle gate** so a death costs a minute instead of the whole run — plan what is snapshotted, when, where the restore is offered, and how it interacts with the death still being recorded in the guest book.
+
+**1.8 The Daily Curse (M).** A once-a-day run: the **same hero and the same dice for everyone that day**. Plan:
+- a **seed** derived from the calendar date, exposed to the player, and a deterministic RNG (injectable, e.g. mulberry32) replacing direct `Math.random()` at every roll site so a seed reproduces a run exactly;
+- the day's hero chosen by the seed, with the normal free character select still available outside Daily Curse mode;
+- a Wordle-style share line in exactly this shape: `MERLIN #41 🧛 Pip · 🎲 20 · 7 · 2 · 17 · Ending: The Correction` — plus one line from the Count;
+- how the run number ("#41") is derived and what happens when the same player replays the day.
+
+**1.12 Portraits must be prominent (S).** On the character-select screen each hero's painted portrait is currently a 40px thumbnail, which does not answer "what does this character look like". Plan each hero as a proper card image — full width of its card, roughly 160–240px tall on desktop and 96–120px on mobile — with name, role, stats and voice line beneath it, and fix the card text collapsing into a ragged narrow column at ~800px. In the character sheet head the portrait should read clearly at about 72px, keeping the glyph fallback.
+
+## Hard constraints — violating any of these fails the pass
+
+- Vanilla HTML/CSS/JS only. No framework, no build step, no `package.json`, no new dependency, no external asset, **no runtime network request**. Must work via `file://` and on Netlify.
+- **No ES modules** (`type="module"` is blocked on `file://`) — follow the existing IIFE → `window.*` → plain `<script>` pattern.
+- Do not regress anything already shipped: the epitaph card, the ledger/guest book, the memory lines, the wizard jabs, autosave/resume mid-scene and mid-fight, or any of the five endings plus death.
+- Save changes must migrate, not break: existing `merlin.save.v1` blobs and the existing `merlin.fates.v1` blob must keep loading.
+- Do not add seeded determinism to normal runs — only Daily Curse is seeded.
+- Mobile-usable at 375px; teen-safe; keep the gothic candlelight aesthetic and the comic register.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, the `.brief-pass*.txt` files, `.git/`, or anything in `images/`.
+
+## Output contract
+
+Begin your final message with the literal first line `MERLIN PASS 4B PLAN`, then:
+
+1. **Per item (1.8, 1.9, 1.10, 1.11)** — the exact `data.js` additions (shapes, with the real flag/counter names you found in the code), the `engine.js` changes (named functions and what they read/write), and the `ui.js`/`index.html`/`style.css` changes.
+2. **Determinism** — the RNG design, every `Math.random()` call site to replace, how the seed becomes "MERLIN #N", and the proof that two runs on the same seed produce identical dice.
+3. **The Count's review** — the fragment/template tables, the flag→sentence mapping, how the star rating is computed, and where the review is surfaced.
+4. **The checkpoint** — what is snapshotted at the gate, its storage key, how the restore is offered after a death, and how the death is still recorded.
+5. **Save layout** — every key, its shape, and the migration path from what is on disk today.
+6. **Step order** for implementation.
+7. **Manual QA checklist** — a seeded run reproduced twice with identical dice, the share line's exact format, the tombstone line on a death, the review reflecting a specific run's actions, the guest book's blank lines and secrets, the checkpoint after a death, refresh-resume, 375px, and every existing ending still reachable.
+
+Decide any open design question yourself and write the decision down. An incomplete-but-concrete plan is required; never silence.

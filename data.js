@@ -6,7 +6,9 @@
     bram: {
       id: "bram",
       name: "Bram Hollow",
+      shortName: "Bram",
       role: "Gravedigger",
+      epithet: "gravedigger",
       voice: "Short, literal, treats monsters as a workplace hazard.",
       might: 3,
       wits: 1,
@@ -19,7 +21,9 @@
     vellum: {
       id: "vellum",
       name: "Sister Vellum",
+      shortName: "Vellum",
       role: "Defrocked nun",
+      epithet: "nun",
       voice: "Liturgical cadence, mercenary content.",
       might: 0,
       wits: 2,
@@ -32,7 +36,9 @@
     pip: {
       id: "pip",
       name: "Pip Ledger",
+      shortName: "Pip",
       role: "Failed accountant",
+      epithet: "clerk",
       voice: "Apologetic precision. Invoices the monster.",
       might: 0,
       wits: 3,
@@ -1827,6 +1833,10 @@
     xpThresholds: [0, 20, 50],
     saveKey: "merlin.save.v1",
     fatesKey: "merlin.fates.v1",
+    checkpointKey: "merlin.gate.v1",
+    dailyKey: "merlin.daily.v1",
+    dailyEpoch: "2026-01-01",
+    dailyHeroes: ["bram", "vellum", "pip"],
     siteUrl: "https://merlin-dnd.netlify.app",
     wizardUnlockAt: 3,
     wizardMoodDelta: { fluster: -2, fury: 2 },
@@ -1850,6 +1860,62 @@
         "Many nights end with a name and two dates. The churchyard, the marsh, the wall, and I are all hiring.",
       end_wizard:
         "Call me the other profession three times in one night, and say it to my face. I keep count."
+    },
+    guestBook: {
+      order: [
+        "end_stake",
+        "end_clause",
+        "end_board",
+        "end_fled",
+        "ghoul",
+        "wight",
+        "count",
+        "fall",
+        "end_wizard",
+        "polite_bat"
+      ],
+      hints: {
+        end_stake:
+          "A guest who brought a weapon, or worse, stationery. We have not buried him for it.",
+        end_clause:
+          "A guest who struck the lie on the sign, in his presence. The coat still holds the sign.",
+        end_board:
+          "A guest who took the seat and the salary of not being eaten. The chair is empty.",
+        end_fled: "A guest who ran. I held the door. The log has a gap.",
+        ghoul: "A guest the churchyard kept. The wreath has a vacancy.",
+        wight: "A guest the marsh filed under paid. No receipt.",
+        count:
+          "A guest he lectured until the dates were written. The drafts are blank.",
+        fall: "A guest the wall declined. I have not written declined again.",
+        end_wizard:
+          "A guest who used the other noun three times, and once to his face. I am not allowed to say which noun.",
+        polite_bat: "A guest who was polite to the bat. We have not had one."
+      },
+      titles: {
+        ghoul: "The Churchyard",
+        wight: "The Marsh",
+        count: "The Throne",
+        fall: "The Wall",
+        polite_bat: "Polite to the bat"
+      },
+      foundLines: {
+        polite_bat: "Clarence did not charge extra. Oswald noted the boots."
+      }
+    },
+    tombstone: {
+      ghoul: { how: "Mauled to death", where: "the churchyard" },
+      wight: { how: "Drowned by the toll", where: "the marsh" },
+      fall: { how: "Dropped to death", where: "the castle gate" },
+      count: {
+        where: "the throne room",
+        blows: {
+          lecture: "Lectured to death",
+          backhand: "Backhanded to death",
+          drain: "Drained to death",
+          mesmer: "Stilled to death",
+          default: "Corrected to death"
+        }
+      }
     },
     epitaphs: {
       end_stake: "You put me down. Write vampire. I will haunt the kerning.",

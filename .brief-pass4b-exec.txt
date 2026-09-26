@@ -1,0 +1,31 @@
+IMPLEMENTATION PHASE — MERLIN PASS 4B. You are authorized to create and edit files in this workspace. Build exactly the four gap items you planned in this chat (ROADMAP.md items 1.8, 1.9, 1.10, 1.11):
+
+1.10 **Tombstone line, as specified** — the share card's death line must read like "Pip, clerk. Lectured to death in the throne room. Owed 3 gold.": hero short name/role, what killed them and where, and gold owed, all derived from real state.
+1.9 **The Count reviews your visit** — a per-run review in the Count's voice assembled from that run's own flags and counts ("Paid the toll. Did not tip the bat. Called me the other thing once, in the marsh, where you thought I couldn't hear. Two stars."), shown on every ending and printed on the share card.
+1.11 **Oswald's guest book + the castle-gate checkpoint** — reframe the Fates Ledger as Oswald's guest book (blank lines and Oswald-voiced hints for unfound entries, plus secret entries), and add a checkpoint at the castle gate so a death costs a minute instead of the whole run.
+1.8 **The Daily Curse** — a date-seeded daily run: same hero, same dice for everyone that day, seed exposed and reproducible, ending in a Wordle-style share line in exactly the shape `MERLIN #41 🧛 Pip · 🎲 20 · 7 · 2 · 17 · Ending: The Correction` plus one line from the Count.
+
+1.12 **Portraits must be prominent (extra item, small).** Right now each painted portrait renders as a 40px thumbnail, which does not answer "what does this character look like". On the character-select screen each hero's portrait must be a real card image — full width of its card, roughly 160–240px tall on desktop and 96–120px on mobile — with name, role, stats and voice line beneath it, and the card text must not collapse into a ragged one-character-per-line column at ~800px width. In the character sheet head the portrait should read clearly at about 72px. Keep the glyph fallback when a portrait file is missing.
+
+Constraints (unchanged from the plan):
+- Vanilla HTML/CSS/JS. No framework, no build step, no `package.json`, no new dependency, no external asset, no runtime network request. Works via `file://` and on Netlify.
+- **No ES modules** — keep the existing IIFE → `window.*` → plain `<script>` pattern.
+- Do not regress anything already shipped: the epitaph card, the ledger/guest book, the memory lines, the wizard jabs, autosave and mid-scene/mid-fight resume, and every existing ending plus death.
+- Save changes must migrate, not break: existing `merlin.save.v1` and `merlin.fates.v1` blobs must keep loading.
+- Seeded determinism applies to Daily Curse only; normal runs stay random.
+- Mobile-usable at 375px; teen-safe; keep the gothic candlelight aesthetic and the comic register.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, the `.brief-pass*.txt` files, `.git/`, or anything in `images/`.
+
+Also required:
+- Update `ROADMAP.md` in the same change set: mark 1.8, 1.9, 1.10, 1.11, 1.12 with their real status (✅ only if built and verified, otherwise 🔨) and add a Changelog line for this pass. Do not touch other rows.
+- **Sync the roadmap page in the same commit.** `roadmap.js` carries its own baked-in copy of the milestone list and it is currently STALE — it stops at 1.7 and is missing 1.8 through 1.12. `roadmap.html` is the public view of `ROADMAP.md`, so the two must never disagree: whatever you mark in `ROADMAP.md`, mark identically in that data (including the new items and their real statuses).
+- Run the plan's manual QA checklist as far as you can statically — including running the same seed twice through the engine and showing the dice are identical — and fix what you find.
+- Do not weaken or delete an existing test, check, or shipped line to make something pass.
+
+Boundaries: do NOT run any git command. Do NOT commit, push, branch, or deploy. Stop at working-tree changes.
+
+FINAL REPORT (your last message must be):
+1. Files created/modified, with line counts.
+2. The seed-reproducibility evidence: the exact two-run comparison you ran and its output.
+3. Deviations from the plan and why.
+4. Anything left unverified that needs a browser pass.

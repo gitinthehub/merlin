@@ -18,7 +18,7 @@
           <span class="brand-sub">Not That One</span>
         </div>
         <div class="topbar-actions">
-          <button type="button" id="btn-fates" class="btn ghost">Fates</button>
+          <button type="button" id="btn-fates" class="btn ghost">Guest Book</button>
           <button type="button" id="btn-new" class="btn ghost" hidden>
             New Game
           </button>
@@ -39,12 +39,14 @@
           <button type="button" id="btn-start" class="btn primary">
             New Game
           </button>
+          <button type="button" id="btn-daily" class="btn">Daily Curse</button>
           <a class="btn" href="roadmap.html">Roadmap</a>
         </div>
+        <p id="daily-blurb" class="daily-blurb muted" hidden></p>
       </section>
 
       <section id="fates" class="panel fates" hidden>
-        <h2 class="scene-title">Fates Ledger</h2>
+        <h2 class="scene-title">Oswald's Guest Book</h2>
         <ul id="fates-list" class="fates-list"></ul>
         <button type="button" id="btn-fates-back" class="btn">Back</button>
       </section>
@@ -115,10 +117,18 @@
               height="1000"
               aria-hidden="true"
             ></canvas>
+            <p id="visit-review" class="visit-review"></p>
+            <p id="share-line" class="share-line" hidden></p>
             <button type="button" id="btn-epitaph" class="btn">
               Copy / Save image
             </button>
+            <button type="button" id="btn-share" class="btn" hidden>
+              Copy share line
+            </button>
             <p id="epitaph-status" class="epitaph-status muted" aria-live="polite"></p>
+            <button type="button" id="btn-restore-gate" class="btn" hidden>
+              Back to the castle gate
+            </button>
             <button type="button" id="btn-ending-new" class="btn primary">
               New Game
             </button>

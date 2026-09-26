@@ -26,7 +26,7 @@ This file is the **source of truth**. Every push that completes or changes a roa
 
 ---
 
-## v1.1 — Make the night land 🔨
+## v1.1 — Make the night land ✅
 
 The polish pass: the dice have to *look* like dice, the heroes have to have faces, and the four best ideas from Grok Bot's Ideas Guy go in.
 
@@ -39,11 +39,11 @@ The polish pass: the dice have to *look* like dice, the heroes have to have face
 | 1.5 | **He Remembers You** — carry a little memory between runs (last character, how you died, which ending) and have the Count and Clarence bring it up. | M | 1.4 | ✅ |
 | 1.6 | **Call Him a Wizard** — optional dialogue choices that make you deliberately call him a wizard, with a hidden counter: each jab makes him flustered (next telegraphed move weaker) or furious (hits harder), and enough jabs unlock a secret ending or special epitaph. | S–M | — | ✅ |
 | 1.7 | **Visual roadmap page.** `roadmap.html` — every plot point below as a card with its art, the check it demands, and a live dice animation for that check; every roadmap phase as a milestone chip with an animated die badge. Linked from the splash screen. Plain HTML/CSS/JS at the repo root, same zero-dependency contract as the game. | M | 1.1, 1.2 | ✅ |
-| 1.8 | **The Daily Curse.** A date-seeded run: same hero, same dice for everyone that day, with the seed shown and the run reproducible from it; at the end a Wordle-style share line (`MERLIN #N 🧛 Pip · 🎲 20 · 7 · 2 · 17 · Ending: The Correction`) plus one line from the Count. Reuses the pass-4 share plumbing. | M | 1.3 | ⬜ |
-| 1.9 | **The Count reviews your visit.** A per-run review written in the Count's voice from that run's own flags ("Paid the toll. Did not tip the bat. Called me the other thing once, in the marsh, where you thought I couldn't hear. Two stars."), shown on every ending and on the share card. Additive to 1.5, which only carries memory *between* runs. | M | 1.3, 1.5 | ⬜ |
-| 1.10 | **Tombstone line, as specified.** The card's death line must say **what killed them and where** and **gold owed** ("Pip, clerk. Lectured to death in the throne room. Owed 3 gold."), not the current stat-box wording. | S | 1.3 | ⬜ |
-| 1.11 | **Oswald's guest book + the castle-gate checkpoint.** Reframe the Fates Ledger as Oswald's guest book (blank lines for unfound entries, Oswald's voice, the secret entries), and add a checkpoint at the castle gate so a death costs a minute instead of the whole run. | S–M | 1.4 | ⬜ |
-| 1.12 | **Portraits must be prominent.** The painted portraits are currently 40px thumbnails, too small to answer "what does this character look like". On the character-select screen each hero's portrait must be a real card image (full-width of the card, ~160–240px tall on desktop, ~96–120px on mobile) with the name, role, stats and voice line under it; in the character sheet head it should read clearly at ~72px. Text must not wrap into a ragged single column at 800px. | S | 1.2 | ⬜ |
+| 1.8 | **The Daily Curse.** A date-seeded run: same hero, same dice for everyone that day, with the seed shown and the run reproducible from it; at the end a Wordle-style share line (`MERLIN #N 🧛 Pip · 🎲 20 · 7 · 2 · 17 · Ending: The Correction`) plus one line from the Count. Reuses the pass-4 share plumbing. | M | 1.3 | ✅ |
+| 1.9 | **The Count reviews your visit.** A per-run review written in the Count's voice from that run's own flags ("Paid the toll. Did not tip the bat. Called me the other thing once, in the marsh, where you thought I couldn't hear. Two stars."), shown on every ending and on the share card. Additive to 1.5, which only carries memory *between* runs. | M | 1.3, 1.5 | ✅ |
+| 1.10 | **Tombstone line, as specified.** The card's death line must say **what killed them and where** and **gold owed** ("Pip, clerk. Lectured to death in the throne room. Owed 3 gold."), not the current stat-box wording. | S | 1.3 | ✅ |
+| 1.11 | **Oswald's guest book + the castle-gate checkpoint.** Reframe the Fates Ledger as Oswald's guest book (blank lines for unfound entries, Oswald's voice, the secret entries), and add a checkpoint at the castle gate so a death costs a minute instead of the whole run. | S–M | 1.4 | ✅ |
+| 1.12 | **Portraits must be prominent.** The painted portraits are currently 40px thumbnails, too small to answer "what does this character look like". On the character-select screen each hero's portrait must be a real card image (full-width of the card, ~160–240px tall on desktop, ~96–120px on mobile) with the name, role, stats and voice line under it; in the character sheet head it should read clearly at ~72px. Text must not wrap into a ragged single column at 800px. | S | 1.2 | ✅ |
 
 ---
 
@@ -134,6 +134,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-26** — Pass 4B: Daily Curse, Count's visit review, tombstone line, Oswald's guest book + castle-gate checkpoint, prominent portraits (roadmap 1.8–1.12).
 - **2026-09-26** — Pass 5: die you can see, character portraits, visual roadmap page (roadmap 1.1, 1.2, 1.7).
 - **2026-09-26** — Pass 4: Epitaph Card, Fates Ledger, He Remembers You, Call Him a Wizard (roadmap 1.3–1.6).
 - **2026-09-26** — Roadmap created. v1.0 recorded as shipped; v1.1 (dice you can see, character portraits, Ideas Guy's top 4, visual roadmap page) and v2.0 (the Oronath engine) opened.

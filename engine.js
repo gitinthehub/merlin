@@ -8,6 +8,7 @@
   var lastRoll = null;
   var pendingLevelUps = 0;
   var levelPickQueue = [];
+  var rng = null;
 
   function emptyStats() {
     return { nat20: 0, nat1: 0, goldWasted: 0 };
@@ -46,8 +47,57 @@
     };
   }
 
+  function emptyDeaths() {
+    return { ghoul: false, wight: false, count: false, fall: false };
+  }
+
+  function emptySecrets() {
+    return { polite_bat: false };
+  }
+
   function emptyFates() {
-    return { v: 1, found: emptyFound(), memory: null };
+    return {
+      v: 2,
+      found: emptyFound(),
+      memory: null,
+      deaths: emptyDeaths(),
+      secrets: emptySecrets()
+    };
+  }
+
+  function migrateFates(blob) {
+    var found = emptyFound();
+    if (blob.found) {
+      var keys = Object.keys(found);
+      for (var i = 0; i < keys.length; i++) {
+        if (blob.found[keys[i]]) found[keys[i]] = true;
+      }
+    }
+    var deaths = emptyDeaths();
+    if (blob.deaths) {
+      var dKeys = Object.keys(deaths);
+      for (var di = 0; di < dKeys.length; di++) {
+        if (blob.deaths[dKeys[di]]) deaths[dKeys[di]] = true;
+      }
+    } else if (
+      found.death &&
+      blob.memory &&
+      blob.memory.deathCause &&
+      deaths[blob.memory.deathCause] !== undefined
+    ) {
+      deaths[blob.memory.deathCause] = true;
+    }
+    var secrets = emptySecrets();
+    if (blob.secrets) {
+      if (blob.secrets.polite_bat) secrets.polite_bat = true;
+    }
+    return {
+      v: 2,
+      found: found,
+      memory: blob.memory || null,
+      deaths: deaths,
+      secrets: secrets
+    };
   }
 
   function readFates() {
@@ -55,19 +105,8 @@
       var raw = localStorage.getItem(data().fatesKey);
       if (!raw) return emptyFates();
       var blob = JSON.parse(raw);
-      if (!blob || blob.v !== 1) return emptyFates();
-      var found = emptyFound();
-      if (blob.found) {
-        var keys = Object.keys(found);
-        for (var i = 0; i < keys.length; i++) {
-          if (blob.found[keys[i]]) found[keys[i]] = true;
-        }
-      }
-      return {
-        v: 1,
-        found: found,
-        memory: blob.memory || null
-      };
+      if (!blob || (blob.v !== 1 && blob.v !== 2)) return emptyFates();
+      return migrateFates(blob);
     } catch (err) {
       return emptyFates();
     }
@@ -85,6 +124,14 @@
     if (!state || !endingId) return;
     var fates = readFates();
     if (fates.found[endingId] !== undefined) fates.found[endingId] = true;
+    if (endingId === "death" && state.deathCause && fates.deaths) {
+      if (fates.deaths[state.deathCause] !== undefined) {
+        fates.deaths[state.deathCause] = true;
+      }
+    }
+    if (state.flags && state.flags.politeEntry) {
+      fates.secrets.polite_bat = true;
+    }
     fates.memory = {
       characterId: state.characterId,
       endingId: endingId,
@@ -92,6 +139,9 @@
       wizardJabs: state.wizardJabs || 0
     };
     writeFates(fates);
+    if (state.daily) {
+      writeDailyRecord(endingId);
+    }
   }
 
   function fillMemory(template, memory) {
@@ -144,23 +194,149 @@
     return epi[nodeId] || "";
   }
 
+  function tombstoneLine() {
+    if (!state || !state.characterId) return "";
+    var char = data().characters[state.characterId];
+    if (!char) return "";
+    var shortName = char.shortName || char.name;
+    var epithet = char.epithet || (char.role || "").toLowerCase();
+    var cause = state.deathCause || "count";
+    var tomb = data().tombstone || {};
+    var how = "Corrected to death";
+    var where = "the night";
+    if (cause === "count") {
+      var countT = tomb.count || {};
+      where = countT.where || "the throne room";
+      var blows = countT.blows || {};
+      how = blows[state.killingBlow] || blows.default || how;
+    } else if (tomb[cause]) {
+      how = tomb[cause].how || how;
+      where = tomb[cause].where || where;
+    }
+    return (
+      shortName +
+      ", " +
+      epithet +
+      ". " +
+      how +
+      " in " +
+      where +
+      ". Owed " +
+      (state.gold || 0) +
+      " gold."
+    );
+  }
+
+  function starWords(n) {
+    if (n <= 1) return "One star.";
+    if (n === 2) return "Two stars.";
+    if (n === 3) return "Three stars.";
+    if (n === 4) return "Four stars.";
+    return "Five stars.";
+  }
+
+  function visitReview(endingId) {
+    if (!state) return "A short visit. Two stars.";
+    var flags = state.flags || {};
+    var parts = [];
+    var eid = endingId || state.nodeId;
+
+    if (flags.wightPaid) parts.push("Paid the toll.");
+    else if (flags.wightDead) parts.push("Killed the toll.");
+    else if (flags.wightSnuck) parts.push("Did not pay the toll.");
+    else if (flags.wightAngry) parts.push("Fled the toll.");
+
+    if (flags.politeEntry) parts.push("Tipped the bat.");
+    else if (flags.rudeEntry || flags.viaRampart || flags.jabGate) {
+      parts.push("Did not tip the bat.");
+    }
+
+    var jabs = state.wizardJabs || 0;
+    if (jabs > 0) {
+      var places = [];
+      if (flags.jabArrival) {
+        places.push("at the village gate, where you thought I couldn't hear");
+      }
+      if (flags.jabGate) places.push("at the castle gate");
+      if (flags.jabThrone) places.push("in the throne room, to my face");
+      if (places.length === 0) places.push("somewhere I overheard");
+      if (jabs === 1) {
+        parts.push("Called me the other thing once, " + places[0] + ".");
+      } else if (jabs === 2) {
+        parts.push(
+          "Called me the other thing twice, " + places.join(" and ") + "."
+        );
+      } else {
+        parts.push(
+          "Called me the other thing three times, " + places.join(", ") + "."
+        );
+      }
+    }
+
+    var stars = 2;
+    if (flags.wightPaid) stars += 1;
+    if (flags.politeEntry) stars += 1;
+    if (flags.announced) stars += 1;
+    if (eid === "end_clause") stars += 1;
+    if (flags.rudeEntry) stars -= 1;
+    stars -= jabs;
+    if (flags.stoleSilver) stars -= 1;
+    if (flags.wightSnuck) stars -= 1;
+    if (eid === "death") stars -= 1;
+    if (eid === "end_stake") stars -= 1;
+    if (eid === "end_fled") stars -= 1;
+    if (stars < 1) stars = 1;
+    if (stars > 5) stars = 5;
+
+    if (parts.length === 0) {
+      return "A short visit. " + starWords(stars);
+    }
+    return parts.join(" ") + " " + starWords(stars);
+  }
+
   function fatesView() {
     var fates = readFates();
-    var order = data().fateOrder || [];
-    var hints = data().fateHints || {};
+    var book = data().guestBook || {};
+    var order = book.order || data().fateOrder || [];
+    var hints = book.hints || data().fateHints || {};
+    var titles = book.titles || {};
+    var foundLines = book.foundLines || {};
     var rows = [];
     for (var i = 0; i < order.length; i++) {
       var id = order[i];
-      var found = !!(fates.found && fates.found[id]);
-      var node = data().nodes[id];
-      var deathCause =
-        id === "death" && fates.memory ? fates.memory.deathCause : null;
+      var found = false;
+      var title = "—";
+      var line = null;
+      var hint = hints[id] || "";
+
+      if (id === "polite_bat") {
+        found = !!(fates.secrets && fates.secrets.polite_bat);
+        title = found ? titles.polite_bat || "Polite to the bat" : "—";
+        line = found ? foundLines.polite_bat || null : null;
+      } else if (
+        id === "ghoul" ||
+        id === "wight" ||
+        id === "count" ||
+        id === "fall"
+      ) {
+        found = !!(fates.deaths && fates.deaths[id]);
+        title = found ? titles[id] || id : "—";
+        line = found ? epitaphLine("death", id) : null;
+      } else {
+        found = !!(fates.found && fates.found[id]);
+        var node = data().nodes[id];
+        title = found && node ? node.title : "—";
+        var deathCause =
+          id === "death" && fates.memory ? fates.memory.deathCause : null;
+        line = found ? epitaphLine(id, deathCause) : null;
+      }
+
       rows.push({
         id: id,
-        title: found && node ? node.title : "Locked",
+        title: title,
         found: found,
-        hint: found ? null : hints[id] || "",
-        line: found ? epitaphLine(id, deathCause) : null
+        hint: found ? null : hint,
+        line: line
       });
     }
     var mem = fates.memory;
@@ -215,28 +391,78 @@
     return JSON.parse(JSON.stringify(o));
   }
 
+  function mulberry32(a) {
+    return function () {
+      a |= 0;
+      a = (a + 0x6d2b79f5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function installRng(seedOrState) {
+    if (seedOrState == null) {
+      rng = null;
+      return;
+    }
+    var stateA;
+    if (typeof seedOrState === "object" && seedOrState.a != null) {
+      stateA = seedOrState.a >>> 0;
+    } else {
+      stateA = seedOrState >>> 0;
+    }
+    rng = {
+      get a() {
+        return stateA >>> 0;
+      },
+      next: function () {
+        stateA |= 0;
+        stateA = (stateA + 0x6d2b79f5) | 0;
+        var t = Math.imul(stateA ^ (stateA >>> 15), 1 | stateA);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      }
+    };
+  }
+
+  function random() {
+    if (rng) return rng.next();
+    return Math.random();
+  }
+
   function rollDie(sides) {
-    return 1 + Math.floor(Math.random() * sides);
+    return 1 + Math.floor(random() * sides);
+  }
+
+  function noteD20(roll) {
+    if (!state || !roll) return;
+    if (!state.diceLog) state.diceLog = [];
+    state.diceLog.push(roll.kept);
   }
 
   function rollD20(advantage) {
     var a = rollDie(20);
     if (!advantage) {
-      return {
+      var single = {
         kept: a,
         dice: [a],
         critFail: a === 1,
         critSuccess: a === 20
       };
+      noteD20(single);
+      return single;
     }
     var b = rollDie(20);
     var kept = Math.max(a, b);
-    return {
+    var dual = {
       kept: kept,
       dice: [a, b],
       critSuccess: kept === 20,
       critFail: a === 1 && b === 1
     };
+    noteD20(dual);
+    return dual;
   }
 
   function rollPool(sides, count) {
@@ -249,6 +475,130 @@
       sum += f;
     }
     return { faces: faces, sum: sum };
+  }
+
+  function fnv1a(str) {
+    var h = 0x811c9dc5;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    return h >>> 0;
+  }
+
+  function utcDateParts(now) {
+    var d = now || new Date();
+    return {
+      y: d.getUTCFullYear(),
+      m: d.getUTCMonth(),
+      day: d.getUTCDate()
+    };
+  }
+
+  function dateStringUTC(now) {
+    var p = utcDateParts(now);
+    var mm = p.m + 1;
+    var dd = p.day;
+    return (
+      p.y +
+      "-" +
+      (mm < 10 ? "0" : "") +
+      mm +
+      "-" +
+      (dd < 10 ? "0" : "") +
+      dd
+    );
+  }
+
+  function dailyNumber(dateStr) {
+    var parts = dateStr.split("-");
+    var y = parseInt(parts[0], 10);
+    var m = parseInt(parts[1], 10) - 1;
+    var d = parseInt(parts[2], 10);
+    var epoch = data().dailyEpoch || "2026-01-01";
+    var ep = epoch.split("-");
+    var ey = parseInt(ep[0], 10);
+    var em = parseInt(ep[1], 10) - 1;
+    var ed = parseInt(ep[2], 10);
+    var ms =
+      Date.UTC(y, m, d) - Date.UTC(ey, em, ed);
+    return Math.floor(ms / 86400000) + 1;
+  }
+
+  function dailySpec(now) {
+    var date = dateStringUTC(now);
+    var seed = fnv1a(date);
+    var heroes = data().dailyHeroes || ["bram", "vellum", "pip"];
+    var heroId = heroes[seed % heroes.length];
+    return {
+      date: date,
+      number: dailyNumber(date),
+      seed: seed,
+      heroId: heroId
+    };
+  }
+
+  function readDailyRecord() {
+    try {
+      var raw = localStorage.getItem(data().dailyKey);
+      if (!raw) return null;
+      var blob = JSON.parse(raw);
+      if (!blob || blob.v !== 1) return null;
+      return blob;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function writeDailyRecord(endingId) {
+    if (!state || !state.daily) return;
+    try {
+      var node = data().nodes[endingId || state.nodeId];
+      var blob = {
+        v: 1,
+        date: state.daily.date,
+        number: state.daily.number,
+        heroId: state.characterId,
+        endingId: endingId || state.nodeId,
+        shareLine: shareLine(endingId),
+        review: visitReview(endingId)
+      };
+      localStorage.setItem(data().dailyKey, JSON.stringify(blob));
+    } catch (err) {}
+  }
+
+  function shareLine(endingId) {
+    if (!state || !state.daily) return "";
+    var char = data().characters[state.characterId];
+    var shortName = char ? char.shortName || char.name : "?";
+    var node = data().nodes[endingId || state.nodeId];
+    var title = node ? node.title : "Unknown";
+    var faces = state.diceLog && state.diceLog.length ? state.diceLog.join(" · ") : "—";
+    return (
+      "MERLIN #" +
+      state.daily.number +
+      " 🧛 " +
+      shortName +
+      " · 🎲 " +
+      faces +
+      " · Ending: " +
+      title
+    );
+  }
+
+  function startDaily(now) {
+    var spec = dailySpec(now);
+    clearSave();
+    newGame();
+    installRng(spec.seed);
+    state.daily = {
+      date: spec.date,
+      number: spec.number,
+      seed: spec.seed
+    };
+    state.diceLog = [];
+    selectCharacter(spec.heroId);
+    return { spec: spec, state: state };
   }
 
   function packCheck(roll, stat, mod, total, dc) {
@@ -596,7 +946,7 @@
   function save() {
     try {
       var blob = {
-        v: 2,
+        v: 3,
         nodeId: state.nodeId,
         characterId: state.characterId,
         might: state.might,
@@ -614,6 +964,7 @@
         pardonArmed: state.pardonArmed,
         combat: state.combat,
         deathCause: state.deathCause,
+        killingBlow: state.killingBlow || null,
         lineIndex: state.lineIndex || 0,
         lastRoll: lastRoll
           ? {
@@ -626,7 +977,10 @@
         pendingVictory: state.pendingVictory || null,
         stats: ensureStats(),
         wizardJabs: state.wizardJabs || 0,
-        wizardNext: state.wizardNext || null
+        wizardNext: state.wizardNext || null,
+        diceLog: state.diceLog || [],
+        daily: state.daily || null,
+        rng: rng ? { a: rng.a } : null
       };
       localStorage.setItem(data().saveKey, JSON.stringify(blob));
     } catch (err) {
@@ -641,6 +995,10 @@
     if (blob.stats.goldWasted == null) blob.stats.goldWasted = 0;
     if (blob.wizardJabs == null) blob.wizardJabs = 0;
     if (blob.wizardNext === undefined) blob.wizardNext = null;
+    if (blob.killingBlow === undefined) blob.killingBlow = null;
+    if (!blob.diceLog) blob.diceLog = [];
+    if (blob.daily === undefined) blob.daily = null;
+    if (blob.rng === undefined) blob.rng = null;
     return blob;
   }
 
@@ -649,7 +1007,11 @@
       var raw = localStorage.getItem(data().saveKey);
       if (!raw) return null;
       var blob = JSON.parse(raw);
-      if (!blob || (blob.v !== 1 && blob.v !== 2) || !blob.characterId) {
+      if (
+        !blob ||
+        (blob.v !== 1 && blob.v !== 2 && blob.v !== 3) ||
+        !blob.characterId
+      ) {
         return null;
       }
       blob = migrateRun(blob);
@@ -671,11 +1033,14 @@
         pardonArmed: !!blob.pardonArmed,
         combat: blob.combat || null,
         deathCause: blob.deathCause || null,
+        killingBlow: blob.killingBlow || null,
         lineIndex: blob.lineIndex || 0,
         pendingVictory: blob.pendingVictory || null,
         stats: blob.stats,
         wizardJabs: blob.wizardJabs || 0,
-        wizardNext: blob.wizardNext || null
+        wizardNext: blob.wizardNext || null,
+        diceLog: blob.diceLog || [],
+        daily: blob.daily || null
       };
       pendingLevelUps = blob.pendingLevelUps || 0;
       pendingCombat = null;
@@ -686,20 +1051,35 @@
             rolls: blob.lastRoll.rolls || null
           }
         : null;
+      if (blob.daily && blob.rng) {
+        installRng(blob.rng);
+      } else if (blob.daily && blob.daily.seed != null && !blob.rng) {
+        installRng(blob.daily.seed);
+      } else {
+        installRng(null);
+      }
       return state;
     } catch (err) {
       return null;
     }
   }
 
+  function clearCheckpoint() {
+    try {
+      localStorage.removeItem(data().checkpointKey);
+    } catch (err) {}
+  }
+
   function clearSave() {
     try {
       localStorage.removeItem(data().saveKey);
     } catch (err) {}
+    clearCheckpoint();
     state = null;
     pendingCombat = null;
     lastRoll = null;
     pendingLevelUps = 0;
+    installRng(null);
   }
 
   function hasSave() {
@@ -730,12 +1110,16 @@
       pardonArmed: false,
       combat: null,
       deathCause: null,
+      killingBlow: null,
       lineIndex: 0,
       pendingVictory: null,
       stats: emptyStats(),
       wizardJabs: 0,
-      wizardNext: null
+      wizardNext: null,
+      diceLog: [],
+      daily: null
     };
+    installRng(null);
     save();
     return state;
   }
@@ -743,6 +1127,8 @@
   function selectCharacter(id) {
     var c = data().characters[id];
     if (!c) return null;
+    var keepDaily = state.daily || null;
+    var keepDice = state.diceLog || [];
     state.characterId = id;
     state.might = c.might;
     state.wits = c.wits;
@@ -759,9 +1145,12 @@
     state.pardonArmed = false;
     state.combat = null;
     state.deathCause = null;
+    state.killingBlow = null;
     state.stats = emptyStats();
     state.wizardJabs = 0;
     state.wizardNext = null;
+    state.daily = keepDaily;
+    state.diceLog = keepDaily ? keepDice : [];
     goTo("arrival");
     return state;
   }
@@ -776,6 +1165,10 @@
 
     if (node.type !== "combat") {
       state.combat = null;
+    }
+
+    if (nodeId === "gate") {
+      writeCheckpoint();
     }
 
     if (node.onEnter) {
@@ -797,7 +1190,116 @@
     save();
   }
 
+  function runBlobFromState(overrides) {
+    overrides = overrides || {};
+    return {
+      v: 3,
+      nodeId: overrides.nodeId != null ? overrides.nodeId : state.nodeId,
+      characterId: state.characterId,
+      might: state.might,
+      wits: state.wits,
+      spirit: state.spirit,
+      hp: state.hp,
+      baseMaxHp: state.baseMaxHp,
+      xp: state.xp,
+      level: state.level,
+      gold: state.gold,
+      inventory: clone(state.inventory),
+      equipped: clone(state.equipped),
+      flags: clone(state.flags),
+      coinReady: state.coinReady,
+      pardonArmed: state.pardonArmed,
+      combat: overrides.combat !== undefined ? overrides.combat : state.combat,
+      deathCause: state.deathCause,
+      killingBlow: state.killingBlow || null,
+      lineIndex: overrides.lineIndex != null ? overrides.lineIndex : state.lineIndex || 0,
+      lastRoll: null,
+      pendingLevelUps: 0,
+      pendingVictory: null,
+      stats: clone(ensureStats()),
+      wizardJabs: state.wizardJabs || 0,
+      wizardNext: state.wizardNext || null,
+      diceLog: (state.diceLog || []).slice(),
+      daily: state.daily ? clone(state.daily) : null,
+      rng: rng ? { a: rng.a } : null
+    };
+  }
+
+  function writeCheckpoint() {
+    if (!state || !state.characterId) return;
+    try {
+      var blob = runBlobFromState({
+        nodeId: "gate",
+        lineIndex: 0,
+        combat: null
+      });
+      localStorage.setItem(data().checkpointKey, JSON.stringify(blob));
+    } catch (err) {}
+  }
+
+  function hasCheckpoint() {
+    try {
+      return !!localStorage.getItem(data().checkpointKey);
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function restoreGate() {
+    try {
+      var raw = localStorage.getItem(data().checkpointKey);
+      if (!raw) return false;
+      var blob = JSON.parse(raw);
+      if (!blob || !blob.characterId) return false;
+      blob = migrateRun(blob);
+      state = {
+        nodeId: "gate",
+        characterId: blob.characterId,
+        might: blob.might,
+        wits: blob.wits,
+        spirit: blob.spirit,
+        hp: blob.hp,
+        baseMaxHp: blob.baseMaxHp,
+        xp: blob.xp,
+        level: blob.level,
+        gold: blob.gold,
+        inventory: blob.inventory || {},
+        equipped: blob.equipped || { weapon: null, armor: null },
+        flags: blob.flags || {},
+        coinReady: blob.coinReady !== false,
+        pardonArmed: !!blob.pardonArmed,
+        combat: null,
+        deathCause: null,
+        killingBlow: null,
+        lineIndex: 0,
+        pendingVictory: null,
+        stats: blob.stats,
+        wizardJabs: blob.wizardJabs || 0,
+        wizardNext: blob.wizardNext || null,
+        diceLog: blob.diceLog || [],
+        daily: blob.daily || null
+      };
+      pendingLevelUps = 0;
+      pendingCombat = null;
+      lastRoll = null;
+      if (blob.daily && blob.rng) {
+        installRng(blob.rng);
+      } else if (blob.daily && blob.daily.seed != null) {
+        installRng(blob.daily.seed);
+      } else {
+        installRng(null);
+      }
+      save();
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
   function die(cause) {
+    if (state.combat && state.combat.moveId) {
+      state.killingBlow = state.combat.moveId;
+    }
     state.deathCause = cause || state.deathCause || "count";
     state.combat = null;
     state.hp = 0;
@@ -880,7 +1382,7 @@
       return m.id !== prevId;
     });
     if (pool.length === 0) pool = moves;
-    return pool[Math.floor(Math.random() * pool.length)].id;
+    return pool[Math.floor(random() * pool.length)].id;
   }
 
   function getMove(enc, moveId) {
@@ -1720,6 +2222,8 @@
           ? {
               title: node.title,
               line: epitaphLine(node.id),
+              tombstone: node.id === "death" ? tombstoneLine() : null,
+              review: visitReview(node.id),
               glyph: char.glyph,
               name: char.name,
               role: char.role,
@@ -1729,7 +2233,10 @@
               wizardJabs: state.wizardJabs || 0,
               url: data().siteUrl
             }
-          : null
+          : null,
+      hasCheckpoint: hasCheckpoint(),
+      daily: state.daily || null,
+      shareLine: state.daily ? shareLine(node && node.id) : null
     };
   }
 
@@ -1846,6 +2353,22 @@
     finishVictory: finishVictory,
     setLineIndex: setLineIndex,
     fatesView: fatesView,
-    epitaphLine: epitaphLine
+    epitaphLine: epitaphLine,
+    tombstoneLine: tombstoneLine,
+    visitReview: visitReview,
+    dailySpec: dailySpec,
+    startDaily: startDaily,
+    shareLine: shareLine,
+    readDailyRecord: readDailyRecord,
+    hasCheckpoint: hasCheckpoint,
+    restoreGate: restoreGate,
+    writeCheckpoint: writeCheckpoint,
+    installRng: installRng,
+    rollDie: rollDie,
+    /* test helpers for seed reproducibility */
+    _testRandom: random,
+    _testGetRngA: function () {
+      return rng ? rng.a : null;
+    }
   };
 })();

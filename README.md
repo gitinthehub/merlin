@@ -20,4 +20,4 @@ Open [`index.html`](index.html) directly in a browser (`file://`), or drop this 
 | `engine.js` | Dice, combat, economy, `localStorage` |
 | `ui.js` | Typewriter, sheet, shops, combat UI |
 
-Progress autosaves to `localStorage` under `merlin.save.v1` on every scene change, shop purchase, level-up, and combat turn. Refresh resumes mid-scene (and mid-fight). Use **New Game** to erase the save.
+Progress autosaves to `localStorage` under `merlin.save.v1` on every scene change, shop purchase, level-up, and combat turn. Refresh resumes mid-scene (and mid-fight). Use **New Game** to erase the save. The guest book lives in `merlin.fates.v1`; the castle-gate checkpoint in `merlin.gate.v1`; today's Daily Curse record in `merlin.daily.v1`.

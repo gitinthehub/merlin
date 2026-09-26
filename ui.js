@@ -45,6 +45,8 @@
     els.sheet = $("sheet");
     els.btnContinue = $("btn-continue");
     els.btnStart = $("btn-start");
+    els.btnDaily = $("btn-daily");
+    els.dailyBlurb = $("daily-blurb");
     els.btnNew = $("btn-new");
     els.sheetGlyph = $("sheet-glyph");
     els.sheetName = $("sheet-name");
@@ -84,6 +86,10 @@
     els.epitaphCanvas = $("epitaph-canvas");
     els.btnEpitaph = $("btn-epitaph");
     els.epitaphStatus = $("epitaph-status");
+    els.visitReview = $("visit-review");
+    els.shareLine = $("share-line");
+    els.btnShare = $("btn-share");
+    els.btnRestoreGate = $("btn-restore-gate");
     els.modal = $("modal");
     els.modalText = $("modal-text");
     els.modalActions = $("modal-actions");
@@ -174,11 +180,32 @@
     ctx.fillText("The Count", cx, 430);
     ctx.fillStyle = candle;
     ctx.font = "italic 24px " + font;
-    var quoteLines = wrapCanvasText(ctx, epitaph.line || "", W - pad * 2);
+    var mainQuote = epitaph.tombstone || epitaph.line || "";
+    var quoteLines = wrapCanvasText(ctx, mainQuote, W - pad * 2);
     var qy = 470;
-    for (var qi = 0; qi < quoteLines.length; qi++) {
+    for (var qi = 0; qi < quoteLines.length && qi < 4; qi++) {
       ctx.fillText(quoteLines[qi], cx, qy);
       qy += 32;
+    }
+    if (epitaph.tombstone && epitaph.line) {
+      ctx.fillStyle = parchmentDim;
+      ctx.font = "italic 18px " + font;
+      var subLines = wrapCanvasText(ctx, epitaph.line, W - pad * 2);
+      for (var si2 = 0; si2 < subLines.length && si2 < 2; si2++) {
+        ctx.fillText(subLines[si2], cx, qy);
+        qy += 24;
+      }
+    }
+
+    if (epitaph.review) {
+      ctx.fillStyle = parchmentDim;
+      ctx.font = "italic 16px " + font;
+      var revLines = wrapCanvasText(ctx, epitaph.review, W - pad * 2);
+      var ry = Math.min(qy + 16, 640);
+      for (var ri = 0; ri < revLines.length && ri < 4; ri++) {
+        ctx.fillText(revLines[ri], cx, ry);
+        ry += 22;
+      }
     }
 
     var statsY = 700;
@@ -280,10 +307,12 @@
     clear(els.fatesList);
     (view.rows || []).forEach(function (row) {
       var li = document.createElement("li");
-      li.className = "fate " + (row.found ? "fate-found" : "fate-locked");
+      li.className =
+        "fate " +
+        (row.found ? "fate-found" : "fate-locked fate-blank");
       var title = document.createElement("div");
       title.className = "fate-title";
-      title.textContent = row.title;
+      title.textContent = row.found ? row.title : "————————";
       li.appendChild(title);
       if (row.found && row.line) {
         var line = document.createElement("p");
@@ -463,7 +492,7 @@
   }
 
   function confirmNewGame(then) {
-    openModal("Burn the guest book? This erases your saved night.", [
+    openModal("Start a new night? Your guest book stays. This erases the saved run.", [
       { label: "Cancel", className: "btn", onClick: null },
       {
         label: "New Game",
@@ -718,6 +747,35 @@
     var has = E.hasSave();
     show(els.btnContinue, has);
     els.btnStart.textContent = has ? "New Game" : "Begin";
+    updateDailyBlurb();
+  }
+
+  function updateDailyBlurb() {
+    if (!els.dailyBlurb || !els.btnDaily) return;
+    var spec = E.dailySpec();
+    var char = D.characters[spec.heroId];
+    var name = char ? char.name : spec.heroId;
+    var text =
+      "MERLIN #" + spec.number + " · " + spec.date + " · " + name;
+    var rec = E.readDailyRecord();
+    if (rec && rec.date === spec.date && rec.endingId) {
+      var endNode = D.nodes[rec.endingId];
+      var endTitle = endNode ? endNode.title : rec.endingId;
+      text += " · Last: " + endTitle;
+      els.btnDaily.textContent = "Replay today's curse";
+    } else {
+      els.btnDaily.textContent = "Daily Curse";
+    }
+    els.dailyBlurb.textContent = text;
+    show(els.dailyBlurb, true);
+  }
+
+  function startDaily() {
+    E.startDaily();
+    show(els.splash, false);
+    show(els.fates, false);
+    show(els.game, true);
+    renderScene();
   }
 
   function showSelect() {
@@ -760,6 +818,10 @@
     useCoinNext = false;
 
     var node = snap.node;
+    if (els.game) {
+      if (node.type === "select") els.game.classList.add("is-select");
+      else els.game.classList.remove("is-select");
+    }
     els.sceneTitle.textContent = node.title || "";
 
     var savedRoll = E.getLastRoll();
@@ -791,6 +853,26 @@
         show(els.endingActions, true);
         if (els.epitaphStatus) els.epitaphStatus.textContent = "";
         if (snap.epitaph) drawEpitaph(snap.epitaph);
+        if (els.visitReview) {
+          els.visitReview.textContent =
+            (snap.epitaph && snap.epitaph.review) || "";
+        }
+        if (els.shareLine && els.btnShare) {
+          if (snap.shareLine) {
+            els.shareLine.textContent = snap.shareLine;
+            show(els.shareLine, true);
+            show(els.btnShare, true);
+          } else {
+            show(els.shareLine, false);
+            show(els.btnShare, false);
+          }
+        }
+        if (els.btnRestoreGate) {
+          show(
+            els.btnRestoreGate,
+            node.id === "death" && snap.hasCheckpoint
+          );
+        }
       } else if (node.type === "shop") renderShop(E.snapshot());
       else if (node.type === "combat") {
         var s = E.snapshot();
@@ -1161,6 +1243,18 @@
       resumeGame();
     });
 
+    if (els.btnDaily) {
+      els.btnDaily.addEventListener("click", function () {
+        if (E.hasSave()) {
+          confirmNewGame(function () {
+            startDaily();
+          });
+        } else {
+          startDaily();
+        }
+      });
+    }
+
     els.btnNew.addEventListener("click", function () {
       confirmNewGame(function () {
         showSelect();
@@ -1176,6 +1270,39 @@
     if (els.btnEpitaph) {
       els.btnEpitaph.addEventListener("click", function () {
         copyOrSaveEpitaph();
+      });
+    }
+
+    if (els.btnShare) {
+      els.btnShare.addEventListener("click", function () {
+        var snap = E.snapshot();
+        var text = snap.shareLine || "";
+        if (snap.epitaph && snap.epitaph.review) {
+          text = text + "\n" + snap.epitaph.review;
+        }
+        if (!text) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(
+            function () {
+              if (els.epitaphStatus) {
+                els.epitaphStatus.textContent = "Share line copied.";
+              }
+            },
+            function () {
+              if (els.epitaphStatus) {
+                els.epitaphStatus.textContent = "Could not copy.";
+              }
+            }
+          );
+        } else if (els.epitaphStatus) {
+          els.epitaphStatus.textContent = text;
+        }
+      });
+    }
+
+    if (els.btnRestoreGate) {
+      els.btnRestoreGate.addEventListener("click", function () {
+        if (E.restoreGate()) renderScene();
       });
     }
 

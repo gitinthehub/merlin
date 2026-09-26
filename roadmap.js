@@ -101,7 +101,12 @@
         { id: "1.4", name: "Fates Ledger", status: "done" },
         { id: "1.5", name: "He Remembers You", status: "done" },
         { id: "1.6", name: "Call Him a Wizard", status: "done" },
-        { id: "1.7", name: "Visual roadmap page", status: "done" }
+        { id: "1.7", name: "Visual roadmap page", status: "done" },
+        { id: "1.8", name: "The Daily Curse", status: "done" },
+        { id: "1.9", name: "The Count reviews your visit", status: "done" },
+        { id: "1.10", name: "Tombstone line, as specified", status: "done" },
+        { id: "1.11", name: "Oswald's guest book + checkpoint", status: "done" },
+        { id: "1.12", name: "Portraits must be prominent", status: "done" }
       ]
     },
     {
