@@ -112,7 +112,7 @@
     {
       id: "v2.0",
       name: "ORONATH engine",
-      status: "in progress",
+      status: "done",
       items: [
         { id: "2.1", name: "Core dice engine", status: "done", special: "d10" },
         { id: "2.2", name: "Arc schema + validator", status: "done" },
@@ -121,7 +121,7 @@
         { id: "2.5", name: "Persistence", status: "done" },
         { id: "2.6", name: "Arc pre-generation", status: "done" },
         { id: "2.7", name: "Deployment", status: "done" },
-        { id: "2.8", name: "First arc: Oronath", status: "not started" }
+        { id: "2.8", name: "First arc: Oronath", status: "done" }
       ]
     }
   ];

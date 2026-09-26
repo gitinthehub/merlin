@@ -22,28 +22,28 @@ Open [`index.html`](index.html) directly in a browser (`file://`), or drop this 
 
 Progress autosaves to `localStorage` under `merlin.save.v1` on every scene change, shop purchase, level-up, and combat turn. Refresh resumes mid-scene (and mid-fight). Use **New Game** to erase the save. The guest book lives in `merlin.fates.v1`; the castle-gate checkpoint in `merlin.gate.v1`; today's Daily Curse record in `merlin.daily.v1`.
 
-## The Oronath engine (v2, in progress)
+## The Oronath engine (v2)
 
-`dice.js`, `arc.js` and `characters.js` are the reusable engine for the **"The Last Signal of Oronath"** arc — a real dice system (d20/d10/2d6 with difficulty tiers and complications that branch rather than let you retry), an arc schema with a validator that rejects a broken arc *before* play, and a character system whose traits shift difficulty and grant advantage. They expose `window.OronathDice`, `window.OronathArc` and `window.OronathCast`; the shipped v1 game does not load them yet.
+`dice.js`, `arc.js` and `characters.js` are the reusable engine for **"The Last Signal of Oronath"** — a real dice system (d20/d10/2d6 with difficulty tiers and complications that branch rather than let you retry), an arc schema with a validator that rejects a broken arc *before* play, and a character system whose traits shift difficulty and grant advantage. They expose `window.OronathDice`, `window.OronathArc` and `window.OronathCast`; the shipped v1 game does not load them.
 
-**Play the sample arc:** open [`oronath.html`](oronath.html) (`file://` or via [The Last Wick](oronath.html) on the splash screen). `loop.js` + `persist.js` drive chapter → choice → real roll → branch (no retries); saves live under `oronath.save.v1` (separate from the v1 MERLIN save). The sample content is `sample-arc.js` ("The Last Wick") — a proof fixture until roadmap 2.8 ships the real arc.
+**Play the first arc:** open [`oronath.html`](oronath.html) (`file://` or via [The Last Signal of Oronath](oronath.html) on the splash screen). It loads the validated bundle `arcs/last-signal.js` (`window.OronathArcBundle`). `loop.js` + `persist.js` drive chapter → choice → real roll → branch (no retries); saves live under `oronath.save.v1` (separate from the v1 MERLIN save). `sample-arc.js` ("The Last Wick") remains loadable as the fallback and as the suite fixture if the bundle script is absent.
 
 Run the tests with no framework, no build and no dependencies:
 
 ```bash
-node tests/dice.test.js && node tests/arc.test.js && node tests/characters.test.js && node tests/loop.test.js && node tests/persist.test.js && node tests/build-arc.test.js
+node tests/dice.test.js && node tests/arc.test.js && node tests/characters.test.js && node tests/loop.test.js && node tests/persist.test.js && node tests/build-arc.test.js && node tests/last-signal.test.js
 ```
 
-Each prints one `ok` line on success and a failure list otherwise. [`tests/harness.html`](tests/harness.html) runs the five engine suites in a browser — open it from `file://` and read the console. `tests/build-arc.test.js` is Node-only (it exercises `fs` and the local generator).
+Each prints one `ok` line on success and a failure list otherwise. [`tests/harness.html`](tests/harness.html) runs the five engine suites in a browser — open it from `file://` and read the console. `tests/build-arc.test.js` and `tests/last-signal.test.js` are Node-only (they exercise `fs` and the local generator).
 
 ## Arc pre-generation (roadmap 2.6)
 
 Arcs are built **before** play, on your machine. The browser only loads a finished IIFE script; there is no API key and no runtime network request on the site.
 
-**Validate and bundle a file (keyless — how 2.8 will ship):**
+**Rebuild the shipped arc (keyless — how 2.8 ships):**
 
 ```bash
-node tools/build-arc.js --from arcs/your-arc.json --out arcs/your-arc.js
+node tools/build-arc.js --from arcs/last-signal.json --out arcs/last-signal.js
 ```
 
 **Generate via a provider** (key from the environment only; never commit it):
@@ -54,7 +54,6 @@ node tools/build-arc.js --provider grok --out arcs/your-arc.js
 # optional: --spec brief.txt  --model <name>
 ```
 
-A missing key prints a clear message and exits 2. Validation always runs before write; an invalid arc prints every rule violation by path and writes nothing. Load the artefact in [`oronath.html`](oronath.html) with `<script src="arcs/your-arc.js"></script>` after `sample-arc.js` — it assigns `window.OronathArcBundle`. Until that tag is present, the page plays `sample-arc.js` (`window.OronathSample`).
+A missing key prints a clear message and exits 2. Validation always runs before write; an invalid arc prints every rule violation by path and writes nothing. [`oronath.html`](oronath.html) loads `<script src="arcs/last-signal.js"></script>` after `sample-arc.js` — it assigns `window.OronathArcBundle`. Without that tag, the page plays `sample-arc.js` (`window.OronathSample`).
 
 **Deploy (roadmap 2.7):** Netlify still publishes `.` with no build command (`netlify.toml` unchanged). Commit the generated `.js`, push `main`, and verify https://merlin-dnd.netlify.app/oronath.html.
-

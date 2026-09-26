@@ -101,13 +101,22 @@
   function renderTitle(errors) {
     clear(app);
     var panel = el("section", "panel oronath-panel");
-    panel.appendChild(el("p", "oronath-kicker", "ORONATH ENGINE · SAMPLE"));
+    var isSample = Story && Story.id === "sample-wick";
+    panel.appendChild(
+      el(
+        "p",
+        "oronath-kicker",
+        isSample ? "ORONATH ENGINE · SAMPLE" : "ORONATH"
+      )
+    );
     panel.appendChild(el("h1", "splash-title", Story.title));
     panel.appendChild(
       el(
         "p",
         "splash-pitch",
-        "Three heroes. One candle. Every choice is a real roll — failure opens a new road, never a retry."
+        isSample
+          ? "Three heroes. One candle. Every choice is a real roll — failure opens a new road, never a retry."
+          : "Three travellers. A signal that should have died. Every choice is a real roll — failure opens a new road, never a retry."
       )
     );
 

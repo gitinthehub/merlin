@@ -104,7 +104,7 @@ _Asked directly for "top 4 ideas for MERLIN" on 2026-09-26 12:56 AM ET; its four
 
 ---
 
-## v2.0 — MERLIN becomes the ORONATH engine 🔨
+## v2.0 — MERLIN becomes the ORONATH engine ✅
 
 The product brief: turn the shipped arc into a **reusable, data-driven dice-narrative engine**, with *The Last Signal of Oronath* as the first arc it proves itself on. Mechanics are real logic, never prompted behaviour. Arcs are **pre-generated in full before gameplay**, validated against a schema, and every character arc resolves.
 
@@ -119,7 +119,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 | 2.5 | **Persistence** | Save/resume an in-progress run (extends the existing `localStorage` save with an arc-run envelope and a version field for migration). | S | 2.4 | ✅ |
 | 2.6 | **Arc pre-generation** | Local Node script `tools/build-arc.js` (built-ins only): `--provider grok|openai` with key from env, or keyless `--from <arc.json>`; always validates via 2.2 before write; emits an IIFE assigning `window.OronathArcBundle` for `oronath.html`. | L | 2.2 | ✅ |
 | 2.7 | **Deployment** | Client stays on Netlify (publish `.`, no build). New arcs: generate/bundle locally, commit the `.js`, push — no build step. Deploy verified against the live URL, not just a green CLI exit. | S | 2.6 | ✅ |
-| 2.8 | **First arc: The Last Signal of Oronath** | Chapters 1–4 (The Signal Tree · The Echo Field · The Axe Lock · The Signal Core); John (memory/identity), Joel (legacy, the carved axe), Rafe (speed, alien origin, return-home); the three pre-written end states. Written as data, validated by 2.2, played through 2.4. | L | 2.1–2.4 | ⬜ |
+| 2.8 | **First arc: The Last Signal of Oronath** | Chapters 1–4 (The Signal Tree · The Echo Field · The Axe Lock · The Signal Core); John (memory/identity), Joel (legacy, the carved axe), Rafe (speed, alien origin, return-home); the three pre-written end states. Written as data, validated by 2.2, played through 2.4. | L | 2.1–2.4 | ✅ |
 
 **Mechanics that must be real logic, not prompt text** (from the brief): difficulty scaling, crit outcomes, and "every meaningful action requires a roll; failure creates a new consequence, never a retry".
 
@@ -137,6 +137,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-26** — Pass 9: The Last Signal of Oronath shipped as the default Oronath arc (roadmap 2.8); v2.0 complete.
 - **2026-09-26** — Pass 8: local arc pre-generation (provider call plus keyless file) and static Netlify deploy of the bundled script (roadmap 2.6–2.7).
 - **2026-09-26** — Pass 7: gameplay loop and persistence for the built-in sample arc (roadmap 2.4–2.5).
 - **2026-09-26** — Pass 6: Oronath engine core — `dice.js`, arc schema + validator, character system with John/Joel/Rafe pregens, zero-dependency Node/browser tests (roadmap 2.1–2.3).

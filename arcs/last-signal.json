@@ -1,0 +1,457 @@
+{
+  "id": "last-signal",
+  "version": 1,
+  "title": "The Last Signal of Oronath",
+  "characters": ["john", "joel", "rafe"],
+  "threads": [
+    { "id": "john-memory", "characterId": "john", "label": "memory/identity" },
+    { "id": "joel-legacy", "characterId": "joel", "label": "legacy" },
+    { "id": "rafe-return", "characterId": "rafe", "label": "return-home" }
+  ],
+  "chapters": [
+    {
+      "id": "signal-tree",
+      "title": "The Signal Tree",
+      "setting": "An eighty-foot dead tree stands alone on a plain of ash. Blue veins glow under the bark. Near the top a crystal pulses in a rhythm that is not a heartbeat. The ash is knee-deep and prints every step.",
+      "objective": "Get the crystal down intact.",
+      "choices": [
+        {
+          "id": "joel-climbs",
+          "label": "Joel climbs for the crystal",
+          "actor": "joel",
+          "roll": { "die": "2d6", "dc": 9, "tags": ["strength"] },
+          "consequences": {
+            "success": {
+              "text": "Joel plants the axe, hauls himself up the glowing seams, and lifts the crystal out of its socket. The pulse stays in his hand. The tree stays up. The plain does not answer.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The bark sheets off under his weight. He gets the crystal, and every vein in the trunk flares. The pulse leaves the tree shouting across the ash.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The trunk splits on the climb. The tree falls, roots tearing open a stair of packed ash, and the three drop with the crystal into a door under the plain.",
+              "next": "axe-lock",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "One clean ascent. Where the axe bites, a carving on the head answers a vein in the bark with the same curve. He notes it and still pockets the crystal whole. The map is not read yet.",
+              "next": "echo-field",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "john-climbs",
+          "label": "John stealth-climbs",
+          "actor": "john",
+          "roll": {
+            "die": "d20",
+            "tier": "medium",
+            "tags": ["stealth", "night-vision"]
+          },
+          "consequences": {
+            "success": {
+              "text": "John climbs in the bark's shadow, night vision picking the holds the blue light skips. He palms the crystal and the tree never brightens.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "failure": {
+              "text": "A hold crumbles. He catches the crystal on the way down and the impact rings the trunk. The signal runs out over the ash ahead of them.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The seam he trusts is rotten through. He and the crystal go through the trunk, and the tree folds into the hole it was rooted over. They hit the vault door in the dark.",
+              "next": "axe-lock",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "He sees the socket before he touches it, lifts the crystal on the quiet beat between pulses, and leaves the tree looking dead.",
+              "next": "echo-field",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "rafe-shoots",
+          "label": "Rafe shoots the crystal down",
+          "actor": "rafe",
+          "roll": { "die": "d10", "dc": 8, "tags": ["sniper"] },
+          "consequences": {
+            "success": {
+              "text": "One shot, the stem. The crystal drops into the ash and the trunk's light dies back to a thread. The report is the only sound they add.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The shot clips the housing. The crystal falls intact and the tree answers with a pulse loud enough to lift ash off the ground.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The round takes the heartwood. The eighty feet of tree come down at once and the roots open the vault. They climb out of the branches onto the door, crystal in the wreck, still whole.",
+              "next": "axe-lock",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "He calls the shot on the stem's narrow neck. The crystal lands in Joel's hands. The plain stays quiet.",
+              "next": "echo-field",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "team-climb",
+          "label": "John scouts the route, Joel climbs, Rafe covers",
+          "actor": "joel",
+          "roll": { "die": "2d6", "dc": 7, "tags": ["strength"] },
+          "consequences": {
+            "success": {
+              "text": "John marks the holds in the blue shadow. Joel climbs the marked line. Rafe's covering shot ticks the crystal free into Joel's hand. The tree stays up and dark.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The route is right and the climb is heavy. Bark rains the whole way. They have the crystal, and the signal is already walking out across the waste ahead of them.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "complication": {
+              "text": "Rafe's cover shot, meant for the stem, takes the trunk. The tree falls, the scouted route falls with it, and the three ride the wreck down to the vault door.",
+              "next": "axe-lock",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The marked climb is short. The axe's carving flares once against the bark, the same curve, and the crystal comes down quiet. Joel keeps the question for the door below.",
+              "next": "echo-field",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "echo-field",
+      "title": "The Echo Field",
+      "setting": "A flat white waste beyond the ash. Sound arrives before the thing that made it: their footsteps, then the footsteps. The field builds pictures out of what each of them remembers, and the pictures it builds of John are sharp enough to have weather.",
+      "objective": "Cross it, and keep hold of the difference between what happened and what the field wants them to think happened.",
+      "choices": [
+        {
+          "id": "john-names-it",
+          "label": "John names what is real",
+          "actor": "john",
+          "roll": { "die": "d20", "tier": "hard", "tags": ["endurance"] },
+          "consequences": {
+            "success": {
+              "text": "He walks until the white offers the winter, the cellar, the thieves. He refuses the thieves. The figures have his people's hands. One wears his mother's ring. They are what the village became. He keeps that and the white lets him through.",
+              "next": "axe-lock",
+              "resolves": ["john-memory"]
+            },
+            "failure": {
+              "text": "The winter seats itself as memory. He can smell the cellar. He believes grey figures came from the tree and took the names off the doors, and every detail agrees with every other detail. He crosses believing it.",
+              "next": "axe-lock",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The waste splits under the false winter. There is no far edge. They fall through white into a chamber where a machine is already running, the lock still shut above them.",
+              "next": "signal-core",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "He sees the change itself: neighbours standing in the signal's light until their voices lose the old names. The ring is his mother's. He says so, and the field cannot rebuild the thieves.",
+              "next": "axe-lock",
+              "resolves": ["john-memory"]
+            }
+          }
+        },
+        {
+          "id": "joel-cuts",
+          "label": "Joel cuts a way across",
+          "actor": "joel",
+          "roll": { "die": "2d6", "dc": 8, "tags": ["strength"] },
+          "consequences": {
+            "success": {
+              "text": "The axe opens a lane in the white. In that lane John sees a guardian's hand and the ring, and the lane holds. He knows the figures are his people. They walk out on the cut.",
+              "next": "axe-lock",
+              "resolves": ["john-memory"]
+            },
+            "failure": {
+              "text": "The cut closes. The winter rushes in to fill it, consistent and kind, and John takes it. They reach the far ash believing the guardians are the raiders who emptied the lane.",
+              "next": "axe-lock",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The axe bites something solid under the illusion. The waste collapses and they drop into the machine chamber with the door unopened above.",
+              "next": "signal-core",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The carving on the axe matches a line in the illusion for one heartbeat, long enough for John to see the ring and the village hands. He keeps the true picture. They cross.",
+              "next": "axe-lock",
+              "resolves": ["john-memory"]
+            }
+          }
+        },
+        {
+          "id": "rafe-horizon",
+          "label": "Rafe shoots the false horizon",
+          "actor": "rafe",
+          "roll": { "die": "d10", "dc": 7, "tags": ["sniper"] },
+          "consequences": {
+            "success": {
+              "text": "He puts a round into the white where the field pretends the plain ends. The horizon tears and shows the guardians with village faces. John sees the ring. The lie cannot reassemble before they are across.",
+              "next": "axe-lock",
+              "resolves": ["john-memory"]
+            },
+            "failure": {
+              "text": "The shot lands in picture, not in ground. The winter finishes itself around John, cellar and thieves and all, and he trusts it because it does not contradict itself. They leave the field with that winter intact.",
+              "next": "axe-lock",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The round punches through the floor of the waste. They fall with the echo of a shot that has not happened yet, and come down beside the running machine.",
+              "next": "signal-core",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "He marks the one edge that throws a real shadow. Beyond it the guardians stand as people John can name. He names them. The field goes thin, and they walk onto ash.",
+              "next": "axe-lock",
+              "resolves": ["john-memory"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "axe-lock",
+      "title": "The Axe Lock",
+      "setting": "A vault door under the ash. The lock is cut in the same curves as the axe. There is no keyhole. The door is shut against being understood. The blue from the crystal crawls along the grooves when the axe comes near.",
+      "objective": "Decode the carvings and align them.",
+      "choices": [
+        {
+          "id": "align-axe",
+          "label": "Joel aligns the axe to the lock",
+          "actor": "joel",
+          "roll": {
+            "die": "2d6",
+            "dc": 11,
+            "tags": ["strength", "carved-axe"]
+          },
+          "consequences": {
+            "success": {
+              "text": "The head seats. The grooves run in order: village well, ash ridge, the dead tree, this door. It is a map his line cut so a descendant could finish the walk. The door opens. The figures beyond do not move. He keeps the axe.",
+              "next": "signal-core",
+              "resolves": ["joel-legacy"]
+            },
+            "failure": {
+              "text": "The fit is a fraction off. The door takes it as force. Eyes open in the ring beyond, village eyes, and the guardians push them through. The map is still only curves. He does not know them yet.",
+              "next": "signal-core",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The lowest turn wakes them early. They put their hands to the door and the seam knits. In the last blue line he sees the route, well to ridge to tree to vault, and there is no room left to carry it anywhere.",
+              "next": "end-sealed",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The carving and the lock meet on the first try. The map names itself in the order of the walk. The door swings without a sound. He knows what he is holding.",
+              "next": "signal-core",
+              "resolves": ["joel-legacy"]
+            }
+          }
+        },
+        {
+          "id": "john-traces",
+          "label": "John traces the grooves in the dark",
+          "actor": "john",
+          "roll": {
+            "die": "d20",
+            "tier": "medium",
+            "tags": ["night-vision", "stealth"]
+          },
+          "consequences": {
+            "success": {
+              "text": "Night vision follows the cut. He reads the route aloud, well, ridge, tree, vault. Joel hears his own axe answered. The door accepts the reading and opens. The ring beyond is still.",
+              "next": "signal-core",
+              "resolves": ["joel-legacy"]
+            },
+            "failure": {
+              "text": "He misreads a curve. The door grinds, the guardians wake, and they are herded into the chamber with the map unspoken.",
+              "next": "signal-core",
+              "resolves": []
+            },
+            "complication": {
+              "text": "A bad trace and the guardians close on the door itself. The seam seals with the axe still outside the meaning of its own carving. The route flares once in the gap and goes out.",
+              "next": "end-sealed",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "He sees the whole route in one pass and speaks it. Joel sets the axe where the words land. The lock yields. The map is his to carry.",
+              "next": "signal-core",
+              "resolves": ["joel-legacy"]
+            }
+          }
+        },
+        {
+          "id": "rafe-pins",
+          "label": "Rafe pins the moving plates",
+          "actor": "rafe",
+          "roll": { "die": "d10", "dc": 8, "tags": ["sniper"] },
+          "consequences": {
+            "success": {
+              "text": "Three plates are walking out of alignment. He pins each with a shot that does not scar the cut. Joel reads the stilled route, well to vault, and the door opens on a quiet ring.",
+              "next": "signal-core",
+              "resolves": ["joel-legacy"]
+            },
+            "failure": {
+              "text": "A plate jumps. The shot wakes the ring. Guardians come off the wall and force them through the half-open door, the map unaligned and unread.",
+              "next": "signal-core",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The round skips into the seam. The guardians treat the door as a wound and close it with their bodies. The chamber beyond is not entered. The map shows in the spark and is shut in with the dark.",
+              "next": "end-sealed",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "He pins all three plates before they drift. The route sits still long enough for Joel to know it. The door opens. Nothing in the ring has moved.",
+              "next": "signal-core",
+              "resolves": ["joel-legacy"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "signal-core",
+      "title": "The Signal Core",
+      "setting": "The chamber the vault was holding. An alien device still running, the same make as the craft that died on this plain, the same cadence as the tree. The crystal fits a socket and the socket is live. A ring of guardians stands facing the machine, ash-skinned, with village hands. One wears a ring John knows. They are still unless the door was forced. The pulse in the housing is the signal the tree has been repeating.",
+      "objective": "Decide what happens to it.",
+      "choices": [
+        {
+          "id": "destroy",
+          "label": "Destroy the core",
+          "actor": "joel",
+          "roll": { "die": "2d6", "dc": 9, "tags": ["strength"] },
+          "consequences": {
+            "success": {
+              "text": "Joel drives the axe through the housing. The cadence stops. The blue in the socket goes out. The guardians remain standing and do not step.",
+              "next": "end-destroy",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The housing takes blow after blow. The scream wakes every figure in the ring. They watch it die. The signal ends ugly, and it does end.",
+              "next": "end-destroy",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The axe rings, the head jumps back, and the machine comes apart on its own before the blow lands. There is no clean kill and no door.",
+              "next": "end-collapse",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "One stroke. The cadence ceases on his people's rhythm between beats. The map on the axe stays lit. The ring does not move.",
+              "next": "end-destroy",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "activate",
+          "label": "Activate the signal",
+          "actor": "rafe",
+          "roll": { "die": "d10", "dc": 8, "tags": ["alien-origin"] },
+          "consequences": {
+            "success": {
+              "text": "He sets the crystal in the socket and speaks the cadence he was born knowing. The beacon goes out in that rhythm, aimed at the sky he came from, and he keeps his feet on the ash.",
+              "next": "end-activate",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The cadence catches halfway. The beacon still leaves, rough and loud, guardians flinching in the ring, and it is still his call, not an accident.",
+              "next": "end-activate",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The socket rejects the voice. The housing splits along old crash-seams and the signal dies between syllables.",
+              "next": "end-collapse",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The machine answers in the same cadence, clear. Home can hear him. He does not ask it for a door.",
+              "next": "end-activate",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "portal",
+          "label": "Use it as a portal",
+          "actor": "rafe",
+          "roll": {
+            "die": "d20",
+            "tier": "hard",
+            "tags": ["alien-origin"]
+          },
+          "consequences": {
+            "success": {
+              "text": "The socket opens on a sky that is not this one. The frame fits one body. He goes through with the cadence loud behind him and the rifle left on the ash.",
+              "next": "end-portal",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The door opens on a broken shore of that same sky, wreckage and a mean light. He goes anyway. The frame still fits only him.",
+              "next": "end-portal",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The frame forms and collapses in the same breath. The machine unravels. No one crosses.",
+              "next": "end-collapse",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The door opens clean, his people's stars in it, and he steps through on the first try, one body, rifle left behind.",
+              "next": "end-portal",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "endings": [
+    {
+      "id": "end-destroy",
+      "title": "The Signal Goes Dark",
+      "text": "Joel has the map, from the lock or from the core's light finishing the curves the lock withheld: well, ridge, tree, vault. He carries the axe out. The core is dead by his blow, so the axe is the copy that still walks. John looks at the ring on the still guardian's hand. The winter of grey thieves at the doors was the field's lie. These are his people, changed by the signal, and they do not answer when he says a name they used to have. That silence is how he knows. Rafe chooses the new world. He had the cadence that would open home, he let Joel cut it, and he leaves the rifle slung, not offered to the sky.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-activate",
+      "title": "The Beacon Answers",
+      "text": "The map is confirmed when the beacon lights the same four points the carvings name. Joel carries it, and he carries the others back by that route rather than laying the axe down as a relic. John hears the old language in the outgoing pulse name the figures in the ring as the village, made into guardians. The thieves of the false winter do not survive that sound. He knows what they are. Rafe chooses to call home and not to go. One message, in his cadence: he is alive on this plain, he is not coming. He stays on the ash while the beacon runs.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-portal",
+      "title": "The Door Home",
+      "text": "Joel knows the carvings are the ancestral map and he will not take the axe through a sky that is not the route's. He stays, axe in hand, the walk still his to finish on this side. John stays with the ring and the ring of guardians. The cellar story breaks: the figures were not raiders, they were the people the names fell off of, and he will not follow Rafe into a door built for someone else's stars. Rafe chooses home. The frame takes one body. He goes through, rifle left on the ash where the other two can find it, and he does not reach back.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-sealed",
+      "title": "The Vault Seals",
+      "text": "They never touch the choice. The seam knits. In that last line of blue Joel reads the map whole, well to ridge to tree to vault, and he refuses it: he wedges the axe into the closing cut so the next bearer can find the door, and he does not keep it. John sees the faces at the seam, his mother's ring among them, and the false winter dies against that. They are his people, and he was spared because he was not standing in the light when the signal changed the lane. Rafe chooses the new world in the only form left: the door is shut, home was inside it, and he sits down on this side of the seam instead of clawing it open.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    },
+    {
+      "id": "end-collapse",
+      "title": "The Core Unravels",
+      "text": "The decision is stolen by the minimum roll. The housing comes apart along the crash-seams and the cadence stops without a blow, a beacon, or a door. Joel still has the map, read at the lock or finished in the dying light, and he carries the axe because it is the only intact route left. The guardians slump mid-step. Their hands are village hands, the ring is his mother's, and the winter of thieves cannot stand next to those hands. John knows. Rafe chooses the new world as an aftermath he claims: home was in the machine, the machine is gone, and he stays to walk the map out with them rather than dig through the wreck for a door.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    }
+  ]
+}
