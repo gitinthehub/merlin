@@ -1,0 +1,58 @@
+MERLIN — PASS 6 (v2.0 "ORONATH ENGINE", CORE) PLANNING BRIEF. PLAN ONLY: do not modify any file, do not run any command, do not create anything. Your entire final message must be the plan.
+
+## Context
+
+`ROADMAP.md` is the source of truth — READ IT FIRST, especially the v2.0 table (items 2.1–2.8). This repository is MERLIN: a shipped, live, **static** gothic dice-adventure (vanilla HTML/CSS/JS, no build step, no dependencies, no runtime network requests) at https://merlin-dnd.netlify.app, with `data.js` (content), `engine.js` (pure logic), `ui.js` (render), `style.css`.
+
+The owner has decided that **MERLIN becomes the v2 engine, and "The Last Signal of Oronath" becomes its first arc**. This pass plans **only the engine core: roadmap items 2.1, 2.2 and 2.3, plus tests**. The gameplay-loop UI (2.4), run persistence (2.5), LLM arc pre-generation (2.6), deployment (2.7) and the first arc's content (2.8) are **later passes** — plan them only to the extent that this pass's interfaces must not block them.
+
+## The product spec these modules must satisfy (verbatim requirements)
+
+**Dice system — mandatory, must be implemented as real logic, not prompted behaviour:**
+- **d20** → main skill checks, difficulty-scaled: Easy 8+, Medium 11+, Hard 14+, Very Hard 16+.
+- **d10** (0–9, or 00 = 10) → reaction speed, precision timing, chaos checks.
+- **2d6** → strength, teamwork, physical force, damage.
+- Critical outcomes: natural 1 / lowest roll → **major complication, not a simple failure**; max roll → bonus success or story advantage.
+- Every meaningful action requires a roll. **Failure must create a new consequence/branch, never a "try again".**
+
+**Story structure:**
+- Complete story arcs are **pre-generated before gameplay begins** (not improvised turn by turn).
+- Each arc is 3–5 chapters. Each chapter has: a setting description, a core objective, 2–4 branching choices, and clear success/failure consequences for each.
+- **All character arcs must resolve by the end of the story — no loose threads.**
+- Tone: cinematic, vivid, specific, visual; clear cause → effect → consequence; no vague resolutions.
+
+**Characters:** stats/traits tied to arcs, and a character's traits modify roll difficulty (the "advantage due to build" pattern).
+
+## Task — plan these three deliverables
+
+**2.1 `dice.js` — core dice engine.** d20 / d10 / 2d6 as standalone, testable functions; the four difficulty tiers; crit rules including "lowest roll is a major complication rather than a plain failure"; advantage and per-character advantage. Zero UI coupling and zero LLM coupling. RNG must be injectable so tests are deterministic (and so 2.6 can seed a run later).
+
+**2.2 Arc schema + validator.** The data shape `arc → chapters(3–5) → choices(2–4) → consequences`, plus a validator that **rejects** an arc with: a dangling/unreachable branch, a missing success or failure consequence, a chapter count outside 3–5, a choice count outside 2–4, or a character thread left unresolved at the end. Validation happens **before** play.
+
+**2.3 Character system.** Stats/traits attached to arcs; traits that modify roll difficulty and can grant advantage ("advantage due to build"); per-character arc threads that the validator requires to resolve by the final chapter. Include the three Oronath pregens as the worked example in the schema: **John** (stealth, night vision, endurance; arc: memory/identity), **Joel** (strength, an axe with unknown carvings; arc: legacy), **Rafe** (speed, sniper; alien origin; arc: return-home).
+
+**Tests.** A zero-dependency test harness for 2.1–2.3, runnable with a plain `node tests/<file>.js` (no `package.json`, no packages) and also loadable in a browser. Table-driven cases for the dice engine (every tier boundary, every crit boundary, advantage keep-best with injected RNG, d10's 0/00=10 case, 2d6 distribution shape) and for the validator (one valid arc accepted; one deliberately broken arc per rejection rule).
+
+## Hard constraints — violating any of these fails the pass
+
+- Keep it vanilla and dependency-free: **no `package.json`, no build step, no bundler, no test framework, no new runtime dependency.**
+- **Do not use ES modules.** The game must keep working when `index.html` is opened straight from `file://`, and `type="module"` scripts are blocked there — follow the existing pattern (IIFE assigning to `window.*`, loaded with plain `<script>` tags).
+- The shipped v1 game must stay fully playable and unchanged in behaviour: this pass **adds modules and tests**, it does not rewire the v1 scene graph or `ui.js`. The new engine must not displace `window.MerlinEngine`.
+- No network requests at runtime, no server, no API keys in the client.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, the `.brief-pass*.txt` files, or `.git/`.
+- Do not reword shipped writing and never remove an ending.
+
+## Output contract
+
+Begin your final message with the literal first line `MERLIN PASS 6 PLAN`, then:
+
+1. **`dice.js` API** — exact function signatures, the roll result shape for each die, how difficulty tiers and crits are derived, how RNG injection works, and how a complication (nat 1) is represented so 2.4 can branch on it rather than retry.
+2. **Arc schema** — the literal object shape for an arc, a chapter, a choice, a consequence and a character thread; where each spec requirement lands in the shape; and how "no loose threads" is expressed structurally.
+3. **Validator API** — the function signature, the error-reporting shape, and each rejection rule with the case that triggers it.
+4. **Character system** — how traits become difficulty modifiers and advantage, with the three Oronath pregens expressed in the schema.
+5. **File layout and load order** (including where the tests live and how each is run).
+6. **Interfaces the later passes will consume** — what 2.4 (loop UI), 2.5 (persistence) and 2.6 (LLM arc pre-generation) will need, so this pass's shapes do not have to change.
+7. **Step order** for implementation.
+8. **Verification plan** — the exact commands that prove the tests pass, and the cases that prove each validator rejection rule fires.
+
+Decide any open design question yourself and write the decision down. An incomplete-but-concrete plan is required; never silence.

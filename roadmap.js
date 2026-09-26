@@ -114,9 +114,9 @@
       name: "ORONATH engine",
       status: "not started",
       items: [
-        { id: "2.1", name: "Core dice engine", status: "not started", special: "d10" },
-        { id: "2.2", name: "Arc schema + validator", status: "not started" },
-        { id: "2.3", name: "Character system", status: "not started" },
+        { id: "2.1", name: "Core dice engine", status: "done", special: "d10" },
+        { id: "2.2", name: "Arc schema + validator", status: "done" },
+        { id: "2.3", name: "Character system", status: "done" },
         { id: "2.4", name: "Gameplay loop / UI", status: "not started" },
         { id: "2.5", name: "Persistence", status: "not started" },
         { id: "2.6", name: "Arc pre-generation", status: "not started" },

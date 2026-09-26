@@ -6,6 +6,8 @@ A short gothic horror-comedy dice adventure for the browser. Three pregens, one 
 
 This file is the **source of truth**. Every push that completes or changes a roadmap item updates this file in the same commit.
 
+**`roadmap.html` and `roadmap.js` mirror this file** — `roadmap.js` carries its own copy of the milestone list and the plot-point cards. Any change to an item's status or name here MUST be made there too, in the same commit. The two have drifted apart twice; a public page that contradicts the roadmap it mirrors is worse than no page.
+
 **Status key:** ✅ done · 🔨 in progress · ⬜ not started
 **Size key:** S = hours · M = a day or so · L = days
 
@@ -110,9 +112,9 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 | # | Item | Deliverables | Size | Depends on | Status |
 |---|------|--------------|------|-----------|--------|
-| 2.1 | **Core dice engine** | `dice.js`: d20 / d10 / 2d6 as standalone, testable functions; difficulty tiers (Easy 8+, Medium 11+, Hard 14+, Very Hard 16+); crit rules (lowest roll = major complication, not a plain failure; max roll = bonus/advantage); advantage and per-character "advantage due to build"; zero UI and zero LLM coupling. Table-driven self-test against known cases. | M | — | ⬜ |
-| 2.2 | **Arc schema + validator** | Data shape `arc → chapters(3–5) → choices(2–4) → consequences`; a validator that rejects an arc with a dangling branch, an unresolved character thread, a missing success/failure consequence, or a chapter count outside 3–5. Arcs are pre-generated and validated *before* play. | M | — | ⬜ |
-| 2.3 | **Character system** | Stats/traits tied to arcs; traits modify roll difficulty and can grant advantage ("advantage due to build"); per-character arc threads that the validator requires to resolve by the final chapter. | S | 2.1, 2.2 | ⬜ |
+| 2.1 | **Core dice engine** | `dice.js`: d20 / d10 / 2d6 as standalone, testable functions; difficulty tiers (Easy 8+, Medium 11+, Hard 14+, Very Hard 16+); crit rules (lowest roll = major complication, not a plain failure; max roll = bonus/advantage); advantage and per-character "advantage due to build"; zero UI and zero LLM coupling. Table-driven self-test against known cases. | M | — | ✅ |
+| 2.2 | **Arc schema + validator** | Data shape `arc → chapters(3–5) → choices(2–4) → consequences`; a validator that rejects an arc with a dangling branch, an unresolved character thread, a missing success/failure consequence, or a chapter count outside 3–5. Arcs are pre-generated and validated *before* play. | M | — | ✅ |
+| 2.3 | **Character system** | Stats/traits tied to arcs; traits modify roll difficulty and can grant advantage ("advantage due to build"); per-character arc threads that the validator requires to resolve by the final chapter. | S | 2.1, 2.2 | ✅ |
 | 2.4 | **Gameplay loop / UI** | Chapter state, choices, roll results and dice faces rendered to the player; progress through the arc; per-chapter objective display. Failure always opens a new branch — never a retry of the same roll. | M | 2.1–2.3 | ⬜ |
 | 2.5 | **Persistence** | Save/resume an in-progress run (extends the existing `localStorage` save with an arc-run envelope and a version field for migration). | S | 2.4 | ⬜ |
 | 2.6 | **Arc pre-generation** | Optional Node/Express endpoint that hands the schema contract to an LLM and returns a whole validated arc before gameplay starts; bundled fallback arc so no key and no network are required to play. | L | 2.2 | ⬜ |
@@ -134,6 +136,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-26** — Pass 6: Oronath engine core — `dice.js`, arc schema + validator, character system with John/Joel/Rafe pregens, zero-dependency Node/browser tests (roadmap 2.1–2.3).
 - **2026-09-26** — Pass 4B: Daily Curse, Count's visit review, tombstone line, Oswald's guest book + castle-gate checkpoint, prominent portraits (roadmap 1.8–1.12).
 - **2026-09-26** — Pass 5: die you can see, character portraits, visual roadmap page (roadmap 1.1, 1.2, 1.7).
 - **2026-09-26** — Pass 4: Epitaph Card, Fates Ledger, He Remembers You, Call Him a Wizard (roadmap 1.3–1.6).
