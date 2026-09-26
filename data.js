@@ -942,6 +942,28 @@
       ],
       options: [
         {
+          label: "Call him a wizard. Nobody's here.",
+          hideIf: { flag: "jabMarsh" },
+          check: null,
+          success: {
+            lines: [
+              {
+                speaker: null,
+                text: "You say it to the water, quietly, to nobody in particular."
+              },
+              {
+                speaker: "Toll-Wight",
+                text: "The reeds keep records. I file them. That one is going up to the castle."
+              }
+            ],
+            effects: [
+              { op: "flag", key: "jabMarsh", value: true },
+              { op: "wizardJab", mood: "fury" }
+            ],
+            next: "gate"
+          }
+        },
+        {
           label: "Pay the toll",
           check: null,
           requireToll: true,

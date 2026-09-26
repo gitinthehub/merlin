@@ -257,6 +257,9 @@
       if (flags.jabArrival) {
         places.push("at the village gate, where you thought I couldn't hear");
       }
+      if (flags.jabMarsh) {
+        places.push("in the marsh, where you thought I couldn't hear");
+      }
       if (flags.jabGate) places.push("at the castle gate");
       if (flags.jabThrone) places.push("in the throne room, to my face");
       if (places.length === 0) places.push("somewhere I overheard");

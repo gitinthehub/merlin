@@ -39,7 +39,7 @@ The polish pass: the dice have to *look* like dice, the heroes have to have face
 | 1.3 | **The Count's Epitaph Card** — every ending (deaths included) produces a shareable image card: character, ending title, run stats (nat 20s, nat 1s, gold wasted), one custom line from the Count, and the site URL, with one "Copy / Save image" button. | M | — | ✅ |
 | 1.4 | **Fates Ledger with the Count's hints** — an endings screen showing which endings you have found and which are still locked, with a snide but useful Count hint for each locked one; stored in its own save slot so New Game does not wipe it. | S | — | ✅ |
 | 1.5 | **He Remembers You** — carry a little memory between runs (last character, how you died, which ending) and have the Count and Clarence bring it up. | M | 1.4 | ✅ |
-| 1.6 | **Call Him a Wizard** — optional dialogue choices that make you deliberately call him a wizard, with a hidden counter: each jab makes him flustered (next telegraphed move weaker) or furious (hits harder), and enough jabs unlock a secret ending or special epitaph. | S–M | — | ✅ |
+| 1.6 | **Call Him a Wizard** — optional dialogue choices that make you deliberately call him a wizard, with a hidden counter: each jab makes him flustered (next telegraphed move weaker) or furious (hits harder), and enough jabs unlock a secret ending or special epitaph. Four jab sites, in story order: the village gate, **the marsh** (said quietly, to nobody, and filed by the Toll-Wight), the castle gate, and the throne room to his face. | S–M | — | ✅ |
 | 1.7 | **Visual roadmap page.** `roadmap.html` — every plot point below as a card with its art, the check it demands, and a live dice animation for that check; every roadmap phase as a milestone chip with an animated die badge. Linked from the splash screen. Plain HTML/CSS/JS at the repo root, same zero-dependency contract as the game. | M | 1.1, 1.2 | ✅ |
 | 1.8 | **The Daily Curse.** A date-seeded run: same hero, same dice for everyone that day, with the seed shown and the run reproducible from it; at the end a Wordle-style share line (`MERLIN #N 🧛 Pip · 🎲 20 · 7 · 2 · 17 · Ending: The Correction`) plus one line from the Count. Reuses the pass-4 share plumbing. | M | 1.3 | ✅ |
 | 1.9 | **The Count reviews your visit.** A per-run review written in the Count's voice from that run's own flags ("Paid the toll. Did not tip the bat. Called me the other thing once, in the marsh, where you thought I couldn't hear. Two stars."), shown on every ending and on the share card. Additive to 1.5, which only carries memory *between* runs. | M | 1.3, 1.5 | ✅ |
@@ -137,6 +137,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-26** — Follow-up: marsh jab site added to 1.6, so the Count's review names the place the spec example asks for ("in the marsh, where you thought I couldn't hear") instead of defaulting to the village gate.
 - **2026-09-26** — Pass 9: The Last Signal of Oronath shipped as the default Oronath arc (roadmap 2.8); v2.0 complete.
 - **2026-09-26** — Pass 8: local arc pre-generation (provider call plus keyless file) and static Netlify deploy of the bundled script (roadmap 2.6–2.7).
 - **2026-09-26** — Pass 7: gameplay loop and persistence for the built-in sample arc (roadmap 2.4–2.5).
