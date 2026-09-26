@@ -104,7 +104,7 @@ _Asked directly for "top 4 ideas for MERLIN" on 2026-09-26 12:56 AM ET; its four
 
 ---
 
-## v2.0 — MERLIN becomes the ORONATH engine ⬜
+## v2.0 — MERLIN becomes the ORONATH engine 🔨
 
 The product brief: turn the shipped arc into a **reusable, data-driven dice-narrative engine**, with *The Last Signal of Oronath* as the first arc it proves itself on. Mechanics are real logic, never prompted behaviour. Arcs are **pre-generated in full before gameplay**, validated against a schema, and every character arc resolves.
 
@@ -115,8 +115,8 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 | 2.1 | **Core dice engine** | `dice.js`: d20 / d10 / 2d6 as standalone, testable functions; difficulty tiers (Easy 8+, Medium 11+, Hard 14+, Very Hard 16+); crit rules (lowest roll = major complication, not a plain failure; max roll = bonus/advantage); advantage and per-character "advantage due to build"; zero UI and zero LLM coupling. Table-driven self-test against known cases. | M | — | ✅ |
 | 2.2 | **Arc schema + validator** | Data shape `arc → chapters(3–5) → choices(2–4) → consequences`; a validator that rejects an arc with a dangling branch, an unresolved character thread, a missing success/failure consequence, or a chapter count outside 3–5. Arcs are pre-generated and validated *before* play. | M | — | ✅ |
 | 2.3 | **Character system** | Stats/traits tied to arcs; traits modify roll difficulty and can grant advantage ("advantage due to build"); per-character arc threads that the validator requires to resolve by the final chapter. | S | 2.1, 2.2 | ✅ |
-| 2.4 | **Gameplay loop / UI** | Chapter state, choices, roll results and dice faces rendered to the player; progress through the arc; per-chapter objective display. Failure always opens a new branch — never a retry of the same roll. | M | 2.1–2.3 | ⬜ |
-| 2.5 | **Persistence** | Save/resume an in-progress run (extends the existing `localStorage` save with an arc-run envelope and a version field for migration). | S | 2.4 | ⬜ |
+| 2.4 | **Gameplay loop / UI** | Chapter state, choices, roll results and dice faces rendered to the player; progress through the arc; per-chapter objective display. Failure always opens a new branch — never a retry of the same roll. | M | 2.1–2.3 | ✅ |
+| 2.5 | **Persistence** | Save/resume an in-progress run (extends the existing `localStorage` save with an arc-run envelope and a version field for migration). | S | 2.4 | ✅ |
 | 2.6 | **Arc pre-generation** | Optional Node/Express endpoint that hands the schema contract to an LLM and returns a whole validated arc before gameplay starts; bundled fallback arc so no key and no network are required to play. | L | 2.2 | ⬜ |
 | 2.7 | **Deployment** | Client stays on Netlify (zero build); if 2.6 lands, the arc-builder server deploys to Heroku per the house pattern. Deploy verified against the live URL each time, not just by a green CLI exit. | S | 2.6 | ⬜ |
 | 2.8 | **First arc: The Last Signal of Oronath** | Chapters 1–4 (The Signal Tree · The Echo Field · The Axe Lock · The Signal Core); John (memory/identity), Joel (legacy, the carved axe), Rafe (speed, alien origin, return-home); the three pre-written end states. Written as data, validated by 2.2, played through 2.4. | L | 2.1–2.4 | ⬜ |
@@ -136,6 +136,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-26** — Pass 7: gameplay loop and persistence for the built-in sample arc (roadmap 2.4–2.5).
 - **2026-09-26** — Pass 6: Oronath engine core — `dice.js`, arc schema + validator, character system with John/Joel/Rafe pregens, zero-dependency Node/browser tests (roadmap 2.1–2.3).
 - **2026-09-26** — Pass 4B: Daily Curse, Count's visit review, tombstone line, Oswald's guest book + castle-gate checkpoint, prominent portraits (roadmap 1.8–1.12).
 - **2026-09-26** — Pass 5: die you can see, character portraits, visual roadmap page (roadmap 1.1, 1.2, 1.7).

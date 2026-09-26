@@ -112,13 +112,13 @@
     {
       id: "v2.0",
       name: "ORONATH engine",
-      status: "not started",
+      status: "in progress",
       items: [
         { id: "2.1", name: "Core dice engine", status: "done", special: "d10" },
         { id: "2.2", name: "Arc schema + validator", status: "done" },
         { id: "2.3", name: "Character system", status: "done" },
-        { id: "2.4", name: "Gameplay loop / UI", status: "not started" },
-        { id: "2.5", name: "Persistence", status: "not started" },
+        { id: "2.4", name: "Gameplay loop / UI", status: "done" },
+        { id: "2.5", name: "Persistence", status: "done" },
         { id: "2.6", name: "Arc pre-generation", status: "not started" },
         { id: "2.7", name: "Deployment", status: "not started" },
         { id: "2.8", name: "First arc: Oronath", status: "not started" }

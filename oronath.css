@@ -1,0 +1,165 @@
+/* Oronath sample surface — page layout only. Reuses style.css tokens. */
+.oronath-page #app {
+  max-width: 640px;
+}
+
+.oronath-panel {
+  padding: 1.25rem 1rem 1.5rem;
+}
+
+.oronath-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.oronath-setting {
+  margin: 0.75rem 0;
+  color: var(--parchment);
+}
+
+.oronath-objective {
+  margin: 0 0 1rem;
+  color: var(--candle);
+  font-style: italic;
+}
+
+.oronath-cast,
+.oronath-threads {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+}
+
+.oronath-cast li,
+.oronath-thread {
+  margin: 0.35rem 0;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--panel-edge);
+  font-size: 0.95rem;
+  color: var(--mute);
+}
+
+.oronath-thread.is-closed {
+  color: var(--ok);
+}
+
+.oronath-thread.is-open {
+  color: var(--parchment-dim);
+}
+
+.oronath-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 1rem 0;
+}
+
+.oronath-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+  white-space: normal;
+  padding: 0.75rem 0.9rem;
+}
+
+.oronath-choice-label {
+  font-size: 1.05rem;
+  color: var(--parchment);
+}
+
+.oronath-choice-meta {
+  font-size: 0.8rem;
+  color: var(--mute);
+  letter-spacing: 0.02em;
+}
+
+.oronath-die {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+  min-height: 8rem;
+}
+
+.oronath-equation {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--candle);
+  margin: 0.5rem 0;
+}
+
+.oronath-branch {
+  display: inline-block;
+  margin: 0.25rem 0 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--panel-edge);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.oronath-branch--complication {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+.oronath-branch--bonus {
+  color: var(--candle);
+  border-color: var(--brass);
+}
+
+.oronath-branch--failure {
+  color: var(--parchment-dim);
+}
+
+.oronath-branch--success {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.oronath-consequence {
+  margin: 0 0 1.25rem;
+  font-size: 1.05rem;
+}
+
+.oronath-error {
+  color: var(--bad);
+  margin: 1rem 0;
+}
+
+.oronath-log {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--mute);
+}
+
+.oronath-foot,
+.oronath-nav {
+  margin-top: 1.25rem;
+}
+
+.oronath-nav .btn {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.muted {
+  color: var(--mute);
+}
+
+@media (max-width: 400px) {
+  .oronath-panel {
+    padding: 1rem 0.75rem 1.25rem;
+  }
+
+  .oronath-choice {
+    padding: 0.7rem 0.75rem;
+  }
+}

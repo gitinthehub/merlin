@@ -1,0 +1,49 @@
+MERLIN — PASS 7 (v2.0 ROADMAP 2.4 + 2.5) PLANNING BRIEF. PLAN ONLY: do not modify any file, do not create anything, do not run any command. Your entire final message must be the plan.
+
+RETURN THE PLAN AS TEXT IN YOUR FINAL MESSAGE. An empty reply, a stub, or an acknowledgement is a non-result. Begin your final message with the literal first line `MERLIN PASS 7 PLAN`.
+
+## Context
+
+`ROADMAP.md` is the source of truth — READ IT FIRST, especially the v2.0 table. This repository is MERLIN: a shipped, live, **static** gothic dice-adventure (vanilla HTML/CSS/JS, no build step, no dependencies, no runtime network) at https://merlin-dnd.netlify.app. Files: `data.js` (v1 content), `engine.js` (v1 logic), `ui.js` (v1 render), `style.css`, `dice-view.js` (the shared SVG die renderer, `window.MerlinDice`, already used by the game and the roadmap page), `roadmap.html` + `roadmap.js`, and — added last pass — `dice.js`, `arc.js`, `characters.js` and `tests/` (the Oronath engine core, roadmap 2.1–2.3, with the zero-dependency test harness).
+
+This pass builds **2.4 (gameplay loop / UI)** and **2.5 (persistence)** on top of that engine core. 2.6 (LLM arc pre-generation), 2.7 (deployment) and 2.8 (the real Oronath arc content) are LATER passes — plan only to the extent that this pass must not block them. The arc content for this pass is a small **built-in sample arc** that exists to prove the loop end to end; 2.8 replaces it with the real one.
+
+## The product spec these modules must satisfy
+
+- Complete story arcs are **pre-generated before gameplay begins**, not improvised turn by turn. An arc is 3–5 chapters; each chapter has a setting description, a core objective, 2–4 branching choices, and clear success/failure consequences.
+- **Every meaningful action requires a roll.** Difficulty is d20-scaled (easy 8+, medium 11+, hard 14+, very hard 16+), with d10 for reaction/timing/chaos and 2d6 for force/teamwork/damage.
+- **Failure must create a new consequence or branch — never a "try again".** A natural 1 is a **major complication**, not a plain miss; a max roll is a bonus success or story advantage.
+- Character traits shift roll difficulty and can grant advantage ("advantage due to build"), and **all character arcs must resolve by the end of the story — no loose threads** (the validator already enforces this before play).
+- Tone: cinematic, vivid, specific, visual. Clear cause → effect → consequence.
+
+## Task — plan two deliverables
+
+**2.4 Gameplay loop / UI.** A playable surface that presents the current chapter's setting and objective, its choices, and the roll results, and tracks progress through the arc. It must run an arc that has already passed the validator, resolve every choice through the real dice engine (never a prompted or faked roll), show the player the die that was actually rolled with the face that came up, branch on success/failure/complication rather than offering a retry, and reach a resolution where every character thread has closed.
+
+**2.5 Persistence.** Save and resume an in-progress run: the arc id, the current chapter and choice history, dice log, character state, and enough RNG state that a resumed run continues its dice stream rather than replaying it.
+
+## Hard constraints — violating any of these fails the pass
+
+- Vanilla, dependency-free: **no `package.json`, no build step, no bundler, no test framework, no new runtime dependency, no runtime network request.**
+- **No ES modules.** `type="module"` is blocked on `file://`. Follow the existing IIFE → `window.*` → plain `<script>` pattern.
+- **Do not modify `engine.js`, `ui.js`, `data.js`, `dice-view.js` or `style.css`** — their bytes must be identical after this pass, so the shipped v1 game cannot regress. The Oronath loop gets its own files. (Additive links in `index.html` and `roadmap.html` are allowed; their gameplay behaviour is not.)
+- Reuse `window.MerlinDice` for rendering dice — do not write a second die renderer. The dice must show the face that was actually rolled, and respect `prefers-reduced-motion` as `dice-view.js` already does.
+- The new surface must work from `file://` as well as on Netlify, and must be reachable by the owner from the live site.
+- Mobile-usable at 375px; teen-safe; keep the gothic candlelight aesthetic.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, the `.brief-pass*.txt` files, `images/`, or `.git/`.
+- **`ROADMAP.md` and `roadmap.js` must be updated in the same commit** (see the standing rule at the top of `ROADMAP.md`): mark 2.4 and 2.5 with their real status, add a changelog line, and mirror both in the roadmap page's milestone data.
+
+## Output contract
+
+Begin your final message with the literal first line `MERLIN PASS 7 PLAN`, then:
+
+1. **The loop, step by step** — what the player sees and can do at each stage (chapter presentation, choice selection, the roll, the outcome, the next chapter, resolution), and exactly where the engine's `branch` values (success / failure / complication / bonus) change what happens next.
+2. **How a complication differs from a failure in the loop**, concretely: what the player is offered instead of a retry, and how that is guaranteed structurally rather than by writing.
+3. **File layout and load order** — every new file, what each owns, and the exact `<script>` order, plus how the surface is reached from the live site.
+4. **Persistence shape** — the storage key, the exact blob, what is saved and when, how the RNG position is carried so a resumed run continues its own dice stream, and how a corrupt or older blob is handled.
+5. **The sample arc** — its chapters, choices and consequences in the schema, and why it is a fair proof of the loop (state the chapter count and per-chapter choice count).
+6. **Tests** — what the zero-dependency suites will assert for the loop and for persistence, and how each is run.
+7. **Interfaces the later passes will consume** — what 2.6 (arc pre-generation), 2.7 and 2.8 will need from this pass's shapes.
+8. **Step order for implementation** and a **verification plan** — the exact commands that prove the tests pass, and the browser checks that prove the loop runs.
+
+Decide any open design question yourself and write the decision down. A concrete, incomplete plan beats silence. Never return an empty message.
