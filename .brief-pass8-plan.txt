@@ -1,0 +1,59 @@
+MERLIN — PASS 8 (v2.0 ROADMAP 2.6 + 2.7) PLANNING BRIEF. PLAN ONLY: do not modify any file, do not create anything, do not run any command. Your entire final message must be the plan.
+
+RETURN THE PLAN AS TEXT IN YOUR FINAL MESSAGE. An empty reply, a stub, or an acknowledgement is a non-result. Begin your final message with the literal first line `MERLIN PASS 8 PLAN`.
+
+## Context
+
+`ROADMAP.md` is the source of truth — READ IT FIRST, especially the v2.0 table. This repository is MERLIN: a shipped, live, **static** gothic dice-adventure at https://merlin-dnd.netlify.app (vanilla HTML/CSS/JS, no build step, no dependencies, no runtime network).
+
+Already built in v2.0: **2.1–2.3** (`dice.js`, `arc.js`, `characters.js` — the engine core, with the validator and the pregens) and **2.4–2.5** (`loop.js`, `persist.js`, `oronath.html`, `oronath-ui.js`, `oronath.css`, `sample-arc.js` — a playable surface that runs a validated arc and saves/resumes with its RNG position). Tests are five zero-dependency suites under `tests/`, also runnable from `tests/harness.html`.
+
+This pass builds **2.6 (LLM arc pre-generation)** and **2.7 (deployment)**. **2.8 (the real "The Last Signal of Oronath" arc)** is the NEXT pass and is the consumer of what you build here — its shape is fixed by the brief the owner supplied, which is reproduced below.
+
+## The product spec the arc pipeline must satisfy
+
+- **Complete story arcs are pre-generated BEFORE gameplay begins** — not improvised turn by turn. Generating an arc at runtime, in the browser, per player, is explicitly not what is wanted.
+- An arc is **3–5 chapters**; each chapter has a setting description, a core objective, **2–4 branching choices**, and clear success/failure consequences for each.
+- **All character arcs must resolve by the end — no loose threads.** The validator already enforces this; a generated arc that fails validation must never reach a player.
+- The tone is cinematic, vivid, specific, visual, with clear cause → effect → consequence and no vague resolutions.
+- The seed arc the owner supplied, for reference: **"The Last Signal of Oronath"** — John (stealth, night vision, endurance; arc: memory/identity), Joel (strength, an axe with unknown carvings; arc: legacy), Rafe (speed, sniper, alien origin; arc: return-home). Four chapters: **The Signal Tree** (retrieve a pulsing crystal from an 80-foot dead tree with glowing blue veins), **The Echo Field** (illusions built from memory; John's past is triggered; navigating truth vs illusion), **The Axe Lock** (Joel's axe carvings match a hidden vault; decode and align; failure triggers guardians), **The Signal Core** (an alien device tied to Rafe's origin; final choice: destroy it, activate it, or use it as a portal).
+
+## The constraint that shapes 2.6
+
+The site is **static and keyless**: no server, no API keys in the client, no runtime network requests. So "arc pre-generation" must happen **off the player's machine**, and the built artefact must be a plain JS file the static page loads like any other script.
+
+Decide and write down how the pipeline works, covering at minimum:
+- **A provider call path** for generating an arc: a local Node script that takes an API key from an **environment variable** (never committed, never in the client), sends the schema and the spec above, and receives a whole arc as JSON. Name the provider(s) it supports and how it is configured. Treat a missing key as an expected condition with a clear message, not a crash.
+- **A keyless path that must exist**: the same tool must be able to accept an arc **from a file** — authored by hand or by an agent that already exists in the workflow (Cursor itself, or the owner's Grok Bot app) — and validate, repair-report and bundle it without any API call. This is how 2.8 will actually be produced, so it is not optional.
+- **Validation before bundling, always**: the generated or supplied arc goes through the 2.2 validator; on failure the tool reports every rule violation by path and either retries with the errors fed back or refuses to write an artefact. An invalid arc must never be written into a loadable file.
+- **The bundled artefact**: a plain IIFE JS file assigning to a `window.*` global, loadable by `oronath.html` with a `<script>` tag, that the loop can run exactly as it runs `sample-arc.js`.
+
+## Task — plan two deliverables
+
+**2.6 LLM arc pre-generation.** The pipeline above: the provider script, the keyless file path, validation-before-write, the bundled artefact shape, and how a generated arc is selected and loaded by the loop (including how `sample-arc.js` and the real arc coexist).
+
+**2.7 Deployment.** How this ships: the static publish directory, the file set, whether `netlify.toml` needs anything (it currently sets publish directory `.` with no build command), how `oronath.html` is reached from the live site, and what must be checked after a deploy. Include how a **new arc artefact is added and deployed** without a build step.
+
+## Hard constraints — violating any of these fails the pass
+
+- Vanilla, dependency-free for anything the **browser** loads: no `package.json`, no build step, no bundler, no new runtime dependency, no runtime network request, **no ES modules** (the site must keep working from `file://`). The generator tool is a **local Node script** and may use Node built-ins (`fs`, `path`, `https`/`fetch`) but must add no npm dependency and must not add a `package.json` unless you can justify it and say so explicitly.
+- **`engine.js`, `ui.js`, `data.js`, `dice-view.js` and `style.css` must be byte-identical after this pass.** Likewise `dice.js`, `arc.js`, `characters.js`, `loop.js` and `persist.js` unless a genuine defect requires a change — if so, say so and keep all five suites green.
+- The five existing test suites must keep passing, and the pass must add tests for the new pipeline (schema conformance of the artefact, refusal to write an invalid arc, and the keyless path).
+- Never commit a key, and never put one in the client. No secrets in any file in the repo.
+- Do not touch `netlify.toml` unless the plan justifies it and states exactly what changes; never touch `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, the `.brief-pass*.txt` files, `images/`, or `.git/`.
+- **`ROADMAP.md` and `roadmap.js` must be updated in the same commit** — `ROADMAP.md` states this rule at the top of the file. Mark 2.6 and 2.7 with their real status, add a changelog line, mirror both in the roadmap page's milestone data, and do not touch other rows.
+
+## Output contract
+
+Begin your final message with the literal first line `MERLIN PASS 8 PLAN`, then:
+
+1. **The pipeline, step by step** — from "the owner wants a new arc" to "the arc is live on the site", naming each command.
+2. **The provider script** — its file path, its exact CLI, the environment variables it reads, the request it sends (including the schema and spec it puts in the prompt), how it handles a missing key, a malformed reply, and a reply that fails validation.
+3. **The keyless path** — the exact CLI for validating and bundling an arc supplied as a file, and the input file format.
+4. **The bundled artefact** — the global it assigns, its shape, and how `oronath.html` loads it alongside or instead of `sample-arc.js`.
+5. **Validation-before-write** — where it sits in both paths, the failure output, and the artefact-write guard.
+6. **Tests** — what the new suite(s) assert and how each is run.
+7. **Deployment** — the file set, whether `netlify.toml` changes, the post-deploy checks, and the procedure for adding a future arc.
+8. **Step order for implementation** and a **verification plan** — the exact commands, including one that proves an invalid arc is refused, one that proves the keyless path works with no key present, and the browser checks for the deployed surface.
+
+Decide any open design question yourself and write the decision down. A concrete, incomplete plan beats silence. Never return an empty message.

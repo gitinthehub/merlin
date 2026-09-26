@@ -1,11 +1,11 @@
-/* MERLIN / Oronath — sample-arc play surface. DOM only. */
+/* MERLIN / Oronath — arc play surface. DOM only. Prefers OronathArcBundle, else sample. */
 (function () {
   "use strict";
 
   var Loop = window.OronathLoop;
   var Persist = window.OronathPersist;
   var Arc = window.OronathArc;
-  var Sample = window.OronathSample;
+  var Story = window.OronathArcBundle || window.OronathSample;
   var MerlinDice = window.MerlinDice;
 
   var app = document.getElementById("app");
@@ -25,7 +25,7 @@
 
   function threadList(host, v) {
     var wrap = el("ul", "oronath-threads");
-    var threads = (Sample.threads || []);
+    var threads = (Story.threads || []);
     var i;
     for (i = 0; i < threads.length; i++) {
       var t = threads[i];
@@ -60,8 +60,8 @@
   }
 
   function nextLabel(nextId) {
-    var chapters = Sample.chapters || [];
-    var endings = Sample.endings || [];
+    var chapters = Story.chapters || [];
+    var endings = Story.endings || [];
     var i;
     for (i = 0; i < chapters.length; i++) {
       if (chapters[i].id === nextId) return chapters[i].title;
@@ -79,7 +79,7 @@
   function startFresh() {
     Persist.clear();
     resumeNote = "";
-    run = Loop.createRun(Sample);
+    run = Loop.createRun(Story);
     persist();
     render();
   }
@@ -102,7 +102,7 @@
     clear(app);
     var panel = el("section", "panel oronath-panel");
     panel.appendChild(el("p", "oronath-kicker", "ORONATH ENGINE · SAMPLE"));
-    panel.appendChild(el("h1", "splash-title", Sample.title));
+    panel.appendChild(el("h1", "splash-title", Story.title));
     panel.appendChild(
       el(
         "p",
@@ -113,8 +113,8 @@
 
     var cast = el("ul", "oronath-cast");
     var i;
-    for (i = 0; i < Sample.characters.length; i++) {
-      var c = Sample.characters[i];
+    for (i = 0; i < Story.characters.length; i++) {
+      var c = Story.characters[i];
       var traits = [];
       var t;
       for (t = 0; t < c.traits.length; t++) traits.push(c.traits[t].label);
@@ -329,12 +329,12 @@
   }
 
   function boot() {
-    var validated = Arc.validateArc(Sample);
+    var validated = Arc.validateArc(Story);
     if (!validated.ok) {
       renderTitle(validated.errors);
       return;
     }
-    var loaded = Persist.load(Sample);
+    var loaded = Persist.load(Story);
     if (loaded.ok && loaded.run) {
       run = loaded.run;
       resumeNote = "";

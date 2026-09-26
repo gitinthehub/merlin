@@ -119,8 +119,8 @@
         { id: "2.3", name: "Character system", status: "done" },
         { id: "2.4", name: "Gameplay loop / UI", status: "done" },
         { id: "2.5", name: "Persistence", status: "done" },
-        { id: "2.6", name: "Arc pre-generation", status: "not started" },
-        { id: "2.7", name: "Deployment", status: "not started" },
+        { id: "2.6", name: "Arc pre-generation", status: "done" },
+        { id: "2.7", name: "Deployment", status: "done" },
         { id: "2.8", name: "First arc: Oronath", status: "not started" }
       ]
     }

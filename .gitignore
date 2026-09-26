@@ -3,3 +3,7 @@
 
 # Tool scratch
 .playwright-mcp
+
+# Local secrets — never commit
+.env
+.env.*

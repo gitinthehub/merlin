@@ -1,0 +1,43 @@
+MERLIN — PASS 9 (v2.0 ROADMAP 2.8) PLANNING BRIEF. PLAN ONLY: do not modify any file, do not create anything, do not run any command. Your entire final message must be the plan.
+
+RETURN THE PLAN AS TEXT IN YOUR FINAL MESSAGE. An empty reply, a stub, or an acknowledgement is a non-result. Begin your final message with the literal first line `MERLIN PASS 9 PLAN`.
+
+## Context
+
+`ROADMAP.md` is the source of truth — READ IT FIRST. This repository is MERLIN: a shipped, live, **static** gothic dice-adventure at https://merlin-dnd.netlify.app (vanilla HTML/CSS/JS, no build step, no dependencies, no runtime network, no ES modules).
+
+Built already in v2.0: **2.1–2.3** the engine core (`dice.js`, `arc.js` with `validateArc`, `characters.js` with the pregens); **2.4–2.5** the playable loop and persistence (`loop.js`, `persist.js`, `oronath.html`, `oronath-ui.js`, `oronath.css`, `sample-arc.js`); **2.6–2.7** the arc pipeline and deploy story (`tools/build-arc.js`: an LLM provider path reading a key from the environment, plus a **keyless** `--from <file>` path that validates and bundles without any network call). Five zero-dependency test suites live under `tests/`.
+
+This pass is **2.8 — the real first arc, "The Last Signal of Oronath"** — the item the whole v2.0 phase exists to reach. Everything else in v2.0 is a means to it.
+
+## The content contract
+
+**READ `.oronath-arc-spec.md` IN THIS WORKSPACE FIRST.** It is the owner's design, written down: premise, the three characters and the thread each must close, the four chapters (**The Signal Tree**, **The Echo Field**, **The Axe Lock**, **The Signal Core**) with their objectives and, in chapter 1, the owner's own four choices and thresholds; the "failure triggers guardians" consequence in chapter 3; the final choice in chapter 4 being destroy / activate / portal; and the pre-written end states (Joel learns the axe is an ancestral map, John learns the truth about his people the guardians, Rafe chooses between home and the new world).
+
+Your job is to turn that spec into a real, validated, shipped arc — not a stub. It is the arc the surface runs by default, so it has to be good writing as well as schema-valid.
+
+## Task
+
+**Author the arc, validate it, bundle it, and make it the arc the surface runs.**
+
+Plan:
+1. **The arc source** — where the authored arc lives before bundling, and its format (it must be the format the 2.6/2.7 pipeline's keyless `--from` path accepts).
+2. **The four chapters in the schema** — chapter by chapter: ids, titles, setting, objective, every choice with its actor, die and tier, and every consequence with its `next` and `resolves`. Show the graph is acyclic and that no chapter or ending is unreachable, and say explicitly for each chapter which thread it moves.
+3. **The difficulty mapping** — the owner's thresholds were Joel climbs 2d6 needing 9+, John stealth-climbs d20 needing 11+, Rafe shoots d10 needing 8+, plus the team combo. Map them onto the engine's own tiers and DCs (remember `characters.js` traits shift the DC and can grant advantage), keep each choice's character (force, skill, precision), and **write the mapping decision down** rather than inventing a second difficulty system.
+4. **The endings** — one per final choice at minimum, each resolving all three threads, each landing the specific thing the character now knows or has decided. State the count and which choices reach which endings.
+5. **How it becomes the default** — how `oronath.html` loads the real arc, and what happens to `sample-arc.js` (it must keep working and stay loadable; the real arc is what a new run plays).
+6. **Tests** — what is asserted, including that the shipped arc passes `validateArc` with zero errors, that every ending resolves every thread, that `complication.next !== failure.next` everywhere, and how each suite is run.
+7. **Step order for implementation.**
+8. **Verification plan** — the exact commands (including the keyless bundle run and the validator run), and the browser checks on the deployed surface.
+
+## Hard constraints — violating any of these fails the pass
+
+- Vanilla and dependency-free for anything the browser loads: no `package.json`, no build step, no bundler, no new runtime dependency, no runtime network request, **no ES modules** — `file://` must keep working.
+- **`engine.js`, `ui.js`, `data.js`, `dice-view.js`, `style.css` must be byte-identical after this pass**, and so must `dice.js`, `arc.js`, `characters.js`, `loop.js`, `persist.js` unless a genuine defect forces a change — if so, name it and keep all suites green. The pipeline from 2.6/2.7 may be extended but not broken.
+- The arc must pass the engine's own validator with **zero errors**; the build must be refused otherwise. Never hand-edit a bundled artefact to make it validate.
+- Do not put a key anywhere, do not commit one, and do not make the browser talk to a provider. The keyless path is what ships this arc.
+- Writing quality is part of the deliverable: cinematic, specific, visual, no vague resolutions, and consistent with the register of the shipped game. Do not reword v1 writing.
+- **`ROADMAP.md` and `roadmap.js` must be updated in the same commit** — `ROADMAP.md` states this rule at the top of the file. Mark 2.8 and the v2.0 phase with their real status, add a changelog line, mirror it in the roadmap page's milestone data, and do not touch other rows.
+- Do not touch `netlify.toml`, `.plan-prompt.txt`, `.exec-prompt.txt`, `.fix-prompt.txt`, the `.brief-pass*.txt` files, `images/`, or `.git/`.
+
+Decide any open design question yourself and write the decision down. A concrete, incomplete plan beats silence. Never return an empty message.

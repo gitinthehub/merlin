@@ -31,8 +31,30 @@ Progress autosaves to `localStorage` under `merlin.save.v1` on every scene chang
 Run the tests with no framework, no build and no dependencies:
 
 ```bash
-node tests/dice.test.js && node tests/arc.test.js && node tests/characters.test.js && node tests/loop.test.js && node tests/persist.test.js
+node tests/dice.test.js && node tests/arc.test.js && node tests/characters.test.js && node tests/loop.test.js && node tests/persist.test.js && node tests/build-arc.test.js
 ```
 
-Each prints one `ok` line on success and a failure list otherwise. [`tests/harness.html`](tests/harness.html) runs the same five suites in a browser — open it from `file://` and read the console.
+Each prints one `ok` line on success and a failure list otherwise. [`tests/harness.html`](tests/harness.html) runs the five engine suites in a browser — open it from `file://` and read the console. `tests/build-arc.test.js` is Node-only (it exercises `fs` and the local generator).
+
+## Arc pre-generation (roadmap 2.6)
+
+Arcs are built **before** play, on your machine. The browser only loads a finished IIFE script; there is no API key and no runtime network request on the site.
+
+**Validate and bundle a file (keyless — how 2.8 will ship):**
+
+```bash
+node tools/build-arc.js --from arcs/your-arc.json --out arcs/your-arc.js
+```
+
+**Generate via a provider** (key from the environment only; never commit it):
+
+```bash
+export XAI_API_KEY=…          # or OPENAI_API_KEY for --provider openai
+node tools/build-arc.js --provider grok --out arcs/your-arc.js
+# optional: --spec brief.txt  --model <name>
+```
+
+A missing key prints a clear message and exits 2. Validation always runs before write; an invalid arc prints every rule violation by path and writes nothing. Load the artefact in [`oronath.html`](oronath.html) with `<script src="arcs/your-arc.js"></script>` after `sample-arc.js` — it assigns `window.OronathArcBundle`. Until that tag is present, the page plays `sample-arc.js` (`window.OronathSample`).
+
+**Deploy (roadmap 2.7):** Netlify still publishes `.` with no build command (`netlify.toml` unchanged). Commit the generated `.js`, push `main`, and verify https://merlin-dnd.netlify.app/oronath.html.
 

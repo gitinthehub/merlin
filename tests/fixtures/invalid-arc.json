@@ -1,0 +1,65 @@
+{
+  "id": "fixture-invalid",
+  "version": 1,
+  "title": "Too Short",
+  "characters": ["john", "joel", "rafe"],
+  "threads": [
+    { "id": "john-memory", "characterId": "john", "label": "memory/identity" },
+    { "id": "joel-legacy", "characterId": "joel", "label": "legacy" },
+    { "id": "rafe-return", "characterId": "rafe", "label": "return-home" }
+  ],
+  "chapters": [
+    {
+      "id": "only-one",
+      "title": "Lonely Chapter",
+      "setting": "A room with one door.",
+      "objective": "Leave.",
+      "choices": [
+        {
+          "id": "go",
+          "label": "Walk out",
+          "actor": "john",
+          "roll": { "die": "d20", "tier": "easy", "tags": ["stealth"] },
+          "consequences": {
+            "success": {
+              "text": "They leave.",
+              "next": "end-out",
+              "resolves": []
+            },
+            "failure": {
+              "text": "They leave anyway.",
+              "next": "end-out",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "run",
+          "label": "Run out",
+          "actor": "rafe",
+          "roll": { "die": "d10", "dc": 4, "tags": ["speed"] },
+          "consequences": {
+            "success": {
+              "text": "They sprint.",
+              "next": "end-out",
+              "resolves": []
+            },
+            "failure": {
+              "text": "They stumble out.",
+              "next": "end-out",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "endings": [
+    {
+      "id": "end-out",
+      "title": "Out",
+      "text": "Outside.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    }
+  ]
+}

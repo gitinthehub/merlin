@@ -1,0 +1,153 @@
+{
+  "id": "fixture-valid",
+  "version": 1,
+  "title": "Fixture Valid Arc",
+  "characters": ["john", "joel", "rafe"],
+  "threads": [
+    { "id": "john-memory", "characterId": "john", "label": "memory/identity" },
+    { "id": "joel-legacy", "characterId": "joel", "label": "legacy" },
+    { "id": "rafe-return", "characterId": "rafe", "label": "return-home" }
+  ],
+  "chapters": [
+    {
+      "id": "signal-tree",
+      "title": "The Signal Tree",
+      "setting": "A black lattice above the salt flat.",
+      "objective": "Reach the lamp before the pulse dies.",
+      "choices": [
+        {
+          "id": "climb",
+          "label": "Climb the lattice",
+          "actor": "john",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["stealth"] },
+          "consequences": {
+            "success": {
+              "text": "John clears the spar.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The spar shears.",
+              "next": "echo-field",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "sprint",
+          "label": "Sprint the rung line",
+          "actor": "rafe",
+          "roll": { "die": "d10", "dc": 6, "tags": ["speed"] },
+          "consequences": {
+            "success": {
+              "text": "Rafe beats the blink.",
+              "next": "echo-field",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The pulse skips.",
+              "next": "echo-field",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "echo-field",
+      "title": "The Echo Field",
+      "setting": "Salt wind carries a second heartbeat.",
+      "objective": "Cross without waking the echo.",
+      "choices": [
+        {
+          "id": "axe",
+          "label": "Cut the tether with the carved axe",
+          "actor": "joel",
+          "roll": { "die": "2d6", "dc": 7, "tags": ["strength"] },
+          "consequences": {
+            "success": {
+              "text": "The tether snaps.",
+              "next": "signal-core",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The echo answers.",
+              "next": "signal-core",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "watch",
+          "label": "Read the pulse through the scope",
+          "actor": "rafe",
+          "roll": { "die": "d10", "dc": 5, "tags": ["sniper"] },
+          "consequences": {
+            "success": {
+              "text": "The pattern holds.",
+              "next": "signal-core",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The pattern slips.",
+              "next": "signal-core",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "signal-core",
+      "title": "The Signal Core",
+      "setting": "A chamber of cold light and old metal.",
+      "objective": "Open the core and claim the signal.",
+      "choices": [
+        {
+          "id": "name",
+          "label": "Speak John's true name",
+          "actor": "john",
+          "roll": { "die": "d20", "tier": "hard", "tags": ["endurance"] },
+          "consequences": {
+            "success": {
+              "text": "The core answers in his voice.",
+              "next": "end-core",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The core answers in another's.",
+              "next": "end-core",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "home",
+          "label": "Aim Rafe's star home",
+          "actor": "rafe",
+          "roll": { "die": "d10", "dc": 7, "tags": ["alien-origin"] },
+          "consequences": {
+            "success": {
+              "text": "The star maps a way out.",
+              "next": "end-core",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The star maps a longer road.",
+              "next": "end-core",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "endings": [
+    {
+      "id": "end-core",
+      "title": "The Signal Core",
+      "text": "The core answers in John's voice, Joel's carving, and Rafe's star.",
+      "resolves": ["john-memory", "joel-legacy", "rafe-return"]
+    }
+  ]
+}

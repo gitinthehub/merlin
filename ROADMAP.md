@@ -108,7 +108,7 @@ _Asked directly for "top 4 ideas for MERLIN" on 2026-09-26 12:56 AM ET; its four
 
 The product brief: turn the shipped arc into a **reusable, data-driven dice-narrative engine**, with *The Last Signal of Oronath* as the first arc it proves itself on. Mechanics are real logic, never prompted behaviour. Arcs are **pre-generated in full before gameplay**, validated against a schema, and every character arc resolves.
 
-**Standing decision (reversible, recorded not escalated):** the client stays a zero-dependency static app and keeps working from `file://`; anything that needs a secret key (LLM arc pre-generation) is an *optional* server, and a pre-generated arc ships bundled so the game plays offline with no server present. Netlify keeps hosting the client because the site is already there; if the arc-builder server becomes real it follows the Node/Express-on-Heroku pattern of Lock's other apps. Flag before changing this.
+**Standing decision (reversible, recorded not escalated):** the client stays a zero-dependency static app and keeps working from `file://`; arc pre-generation runs as a **local Node script** (`tools/build-arc.js`) that reads an API key from the environment (or accepts a hand-authored JSON file with no key), validates through the 2.2 schema, and writes a plain IIFE the static page loads. No server, no Heroku, no runtime network from the client. Netlify keeps hosting the site (publish dir `.`, no build). Flag before changing this.
 
 | # | Item | Deliverables | Size | Depends on | Status |
 |---|------|--------------|------|-----------|--------|
@@ -117,8 +117,8 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 | 2.3 | **Character system** | Stats/traits tied to arcs; traits modify roll difficulty and can grant advantage ("advantage due to build"); per-character arc threads that the validator requires to resolve by the final chapter. | S | 2.1, 2.2 | ✅ |
 | 2.4 | **Gameplay loop / UI** | Chapter state, choices, roll results and dice faces rendered to the player; progress through the arc; per-chapter objective display. Failure always opens a new branch — never a retry of the same roll. | M | 2.1–2.3 | ✅ |
 | 2.5 | **Persistence** | Save/resume an in-progress run (extends the existing `localStorage` save with an arc-run envelope and a version field for migration). | S | 2.4 | ✅ |
-| 2.6 | **Arc pre-generation** | Optional Node/Express endpoint that hands the schema contract to an LLM and returns a whole validated arc before gameplay starts; bundled fallback arc so no key and no network are required to play. | L | 2.2 | ⬜ |
-| 2.7 | **Deployment** | Client stays on Netlify (zero build); if 2.6 lands, the arc-builder server deploys to Heroku per the house pattern. Deploy verified against the live URL each time, not just by a green CLI exit. | S | 2.6 | ⬜ |
+| 2.6 | **Arc pre-generation** | Local Node script `tools/build-arc.js` (built-ins only): `--provider grok|openai` with key from env, or keyless `--from <arc.json>`; always validates via 2.2 before write; emits an IIFE assigning `window.OronathArcBundle` for `oronath.html`. | L | 2.2 | ✅ |
+| 2.7 | **Deployment** | Client stays on Netlify (publish `.`, no build). New arcs: generate/bundle locally, commit the `.js`, push — no build step. Deploy verified against the live URL, not just a green CLI exit. | S | 2.6 | ✅ |
 | 2.8 | **First arc: The Last Signal of Oronath** | Chapters 1–4 (The Signal Tree · The Echo Field · The Axe Lock · The Signal Core); John (memory/identity), Joel (legacy, the carved axe), Rafe (speed, alien origin, return-home); the three pre-written end states. Written as data, validated by 2.2, played through 2.4. | L | 2.1–2.4 | ⬜ |
 
 **Mechanics that must be real logic, not prompt text** (from the brief): difficulty scaling, crit outcomes, and "every meaningful action requires a roll; failure creates a new consequence, never a retry".
@@ -131,11 +131,13 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 |------|------|----------|------|
 | 2026-09-26 | Where the Oronath engine lives | **Inside this repo** — MERLIN becomes the v2 engine and Oronath becomes its first arc (owner's call) | Recorded rather than escalated |
 | 2026-09-26 | Client architecture in v2 | Static, zero-dependency client + optional arc-builder server | Reversible; see v2.0 note |
+| 2026-09-26 | Arc pre-generation host | **Local Node script** (`tools/build-arc.js`), not Express/Heroku; keyless `--from` path for hand/agent-authored arcs | Replaces earlier optional-server sketch; see v2.0 standing decision |
 
 ---
 
 ## Changelog
 
+- **2026-09-26** — Pass 8: local arc pre-generation (provider call plus keyless file) and static Netlify deploy of the bundled script (roadmap 2.6–2.7).
 - **2026-09-26** — Pass 7: gameplay loop and persistence for the built-in sample arc (roadmap 2.4–2.5).
 - **2026-09-26** — Pass 6: Oronath engine core — `dice.js`, arc schema + validator, character system with John/Joel/Rafe pregens, zero-dependency Node/browser tests (roadmap 2.1–2.3).
 - **2026-09-26** — Pass 4B: Daily Curse, Count's visit review, tombstone line, Oswald's guest book + castle-gate checkpoint, prominent portraits (roadmap 1.8–1.12).
