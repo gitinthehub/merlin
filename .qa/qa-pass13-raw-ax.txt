@@ -1,0 +1,105 @@
+    30    307  MERLIN
+    30    307  MERLIN
+    30    307  MERLIN
+    30    308  On it. I'll confirm that commit
+    30    308  is the version being served, then rerun the four strings, the squares, the attempt count, and the three guest-book causes, followed by the sweep. Today's live curse is #270 (Bram), so I'll check the live output in your format and set the page clock back to reproduce your #269 strings byte for byte.
+    30    308  The rerun is going now. I'll send the results as soon as it finishes.
+    30    308  The share-line fix is live, and your #269 strings match byte for byte on screen and on the clipboard. The squares, the attempt count and the three guest-book causes all work. The one defect is that a checkpoint restore adds an attempt, which contradicts what you said it should do. Only
+    30    311  1.
+    30    313  /tests/engine.test.js
+    30    313  8c61bbd
+    30    328  BUILD: stop counting a checkpoint restore as an attempt.
+    30    328  . Repro on #269 with a fresh profile: play to the throne room and die. Choose "Back to the castle gate" and play on to The Board. You get:
+    30    333  state.daily.attempts += 1
+    30    333  MERLIN #269 🧛 Vellum · 🎲 🟩🟩🟥🟥🟩 · Ending: The Board · Attempt 2 · https://merlin-dnd.netlify.app
+    30    370  engine.js
+    30    372  , so I matched the version by file contents instead.
+    30    446  and
+    30    482  data.js
+    30    482  passes under node (
+    30    505  8c61bbd
+    30    542  changed since pass 12. The served test at
+    30    623  engine ok
+    30    635  You
+    30    636  QA pass 13 on the MERLIN game (
+    30    636  Your pass-12 reply landed while the fix was still deploying, so you were reading the old file. It is live now, commit 8c61bbd. Please re-run your four exact strings and the regression sweep.
+    30    636  1. The shareLine fix is deployed. Re-check: first-attempt daily death, second attempt on the same day, a normal daily ending, and a non-daily death unchanged.
+    30    636  2. You asked what a square stands for before building it. It means that roll succeeded. You were right that the log holds attacks, specials and flee rolls too, not just checks, so I verified the premise rather than assuming it: every roll the engine records is marked where the outcome is known, and a real daily run's log comes out fully marked (7 rolls, 7 marks), so a live line renders as solid squares. A save written before squares existed interleaves the square and the face. Please confirm the live squares.
+    30    636  3. The attempt count is live too.
+    30    636  4. Your item 6 was right and it was my bug. The three causes I added (village gate, square, churchyard) had tombstones but no guest-book entry, no book title, no hint, no epitaph and no death scene, so those deaths recorded nothing and showed the generic line. Fixed: the cause list had been copied into four places and now derives from one, every cause is filled in, and a test fails if a new cause misses any of them. Please check the guest book lists those three, and that each death shows its own scene line.
+    30    636  5. Items 5, 7 and 9 are decisions, not defects, so nothing changed: a checkpoint restore is the same attempt, every change since pass 4 was deliberate (passes 5 to 12), and the on-screen versus clipboard share-line difference stands at your request.
+    30    636  Reply with BUILD, REJECT or DEFER per item, capped at 10, with the exact string for anything you find wrong. Standing constraints: static site, no build step, no framework, no new dependency.
+    30    699  ). No served file mentions
+    30    722  restoreGate()
+    30    737  Today 9:00 AM
+    30    829  does
+    30    856  https://merlin-dnd.netlify.app/
+    30   1050  ).
+    30   1214  9:00 AM
+    30   1214  9:00 AM
+    30   1214  9:01 AM
+    40    724  2
+    43    328  Then Title, "Replay today's curse", and die in the churchyard. That shows
+    51    765  MERLIN
+    64    484  after only two real plays.
+    66    377  · Attempt 3 ·
+    88    311  2.
+    89    328  BUILD: update the test along with item 1.
+    89    328  currently expects "two gate restores make attempt 3", so it locks the bug in.
+    91    610  engine.test.js
+   133    311  3.
+   134    328  DEFER: a daily run that was in progress when this deploy went out renders numbers and squares mixed together.
+   154    328  A save that's all numbers still shows the old list correctly. But a run started under the old format and finished under the new one gives:
+   176    333  MERLIN #269 🧛 Vellum · 🎲 10 · 🟥 · 🟩 · 🟥 · 🟩 · Ending: An Epitaph · Vellum, nun. Mauled to death in the churchyard. Owed 12 gold. · https://merlin-dnd.netlify.app
+   237    328  This matches your description of old saves. It only affects runs that were in flight today, so I'd leave it unless you'd rather render any mixed log as all numbers.
+   281    311  4.
+   282    328  DEFER: runs abandoned before an ending don't count.
+   282    328  The count is only written when you reach an ending, so quitting to Title and restarting doesn't raise it. That's probably fine, but it's worth deciding on purpose, because a player could reset quietly and still share "Attempt 1."
+   365    311  5.
+   366    328  DEFER: The Stake may be unreachable on #269 with Vellum.
+   366    328  In real play I couldn't reach your four-square Stake example. I also ran an offline simulation of that day's seed, with about 11,000 runs across 36 opening routes using random combat moves, and none of them won. Only The Board was reachable. Random moves aren't proof, but a daily with no win is worth checking, because a player who can't win is less likely to finish or share.
+   469    311  6.
+   470    328  DEFER: the two churchyard-check deaths share one guest-book entry and one scene line.
+   490    328  The sneak death ("You trip on a root…") and the plot death both end on "The spade is honest work…" under "The Long Way Round."
+   518   1214  9:09 AM
+   533    311  7.
+   534    328  DEFER: at 360px the on-screen squares wrap mid-run
+   534    691  , splitting into
+   534    833  and
+   536    788  🎲 🟩
+   536    870  🟩🟥
+   555    328  on two lines.
+   578    311  8.
+   579    328  REJECT: the on-screen and clipboard lines still differ.
+   579    328  I'm noting it as a fact only, since it's your call.
+   629    308  Everything else came back clean:
+   658    311  •
+   659    328  On #269, the first death, the second attempt (
+   659    328  ) and the third attempt all match your strings. The count resets on the next UTC day.
+   661    632  · Attempt 2 ·
+   703    311  •
+   704    328  The squares check out across 7 real runs. There was one square per roll with nothing unmarked, and every color matched the on-screen result. That covered checks landing exactly on the DC, a natural 1, a natural-20 mesmer save, hits and misses, and fleeing both ways. An empty log still shows
+   764    546  .
+   766    533  —
+   788    311  •
+   789    328  Live #270 renders solid squares, for example
+   791    333  MERLIN #270 🧛 Bram · 🎲 🟩🟩🟩🟥🟥🟩🟩 · Ending: The Stake · https://merlin-dnd.netlify.app
+   810    769  .
+   834    311  •
+   835    328  The non-daily line is unchanged:
+   837    333  Vellum, nun. Mauled to death in the churchyard. Owed 9 gold. · https://merlin-dnd.netlify.app
+   856    690  .
+   880    311  •
+   881    328  The guest book now lists The Village Gate, The Square and The Long Way Round. Each of those deaths records correctly and shows its own scene line, and the other 11 causes still do too.
+   944    311  •
+   945    328  All 14 tombstones are unchanged from pass 12.
+   968    311  •
+   969    328  "Replay today's curse" works.
+   992    311  •
+   993    328  The game,
+   993    328  have no console errors and no sideways scroll at 360, 375 or 1280px.
+   993    504  and
+   995    405  roadmap.html
+   995    541  oronath.html
+  1129    752  +3
+  1301    341  Message MERLIN
