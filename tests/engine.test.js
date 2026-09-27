@@ -410,16 +410,29 @@
 
   resetStore();
   (function () {
+    /* A checkpoint restore is the SAME attempt, not a new one: "Back to the
+       castle gate" rewinds the run, so it must not advance the count — and it
+       must not quietly reset a later attempt back to 1 either. */
     E.startDaily(new Date(Date.UTC(2026, 8, 26, 12)));
     E.goTo("gate");
     assert(E.restoreGate(), "daily restore 1");
     assert(E.restoreGate(), "daily restore 2");
     var st = E.getState();
-    eq(st.daily.attempts, 3, "two gate restores make attempt 3");
+    eq(st.daily.attempts, 1, "two gate restores leave the first attempt at attempt 1");
     st.diceLog = checks([false, true, false]);
     st.deathCause = "ghoul";
     st.nodeId = "death";
-    contains(E.shareLine("death"), "Attempt 3", "restored daily death shows attempt 3");
+    notContains(
+      E.shareLine("death"),
+      "Attempt",
+      "a restored first-attempt death carries no attempt count"
+    );
+
+    /* the other half of the rule: a restore on attempt 2 stays attempt 2 */
+    st.daily.attempts = 2;
+    E.writeCheckpoint();
+    assert(E.restoreGate(), "daily restore on attempt 2");
+    eq(E.getState().daily.attempts, 2, "a restore keeps attempt 2, it does not reset it");
   })();
 
   (function () {

@@ -1380,7 +1380,11 @@
         installRng(null);
       }
       if (state.daily) {
-        state.daily.attempts = (state.daily.attempts || 1) + 1;
+        /* A checkpoint restore is the SAME attempt, not a new one. "Back to the
+           castle gate" rewinds the run to the checkpoint, so it must neither
+           advance the count nor reset it: only starting the curse again is a new
+           attempt. Normalise a checkpoint that predates the counter. */
+        state.daily.attempts = state.daily.attempts || 1;
         writeCheckpoint();
       }
       save();
