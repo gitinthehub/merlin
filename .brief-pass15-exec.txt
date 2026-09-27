@@ -1,0 +1,64 @@
+PASS 15 — EXECUTION BRIEF. Implement the plan you produced in this chat, already saved in the
+workspace as `.brief-pass15-plan-out.md`, against the contract `.qa/qa-pass14-triage.md`.
+
+One wave per the plan's own section 6 build order, in that order: 1 (the save/UI work), 2 (the prose
+and the thread label), 3 (the chapter ceiling), 4 (the split ford). Do not stop between waves; stop at
+working-tree changes.
+
+== DECISIONS ON TOP OF THE PLAN ==
+
+1. **The chapter ceiling is authorized.** `arc.js` may change, and only in the two string literals you
+   named: `chapters.length > 5` to `chapters.length > 6`, and the message `outside 3–5` to
+   `outside 3–6`. Nothing else in that file. Your reasoning is accepted: the sixth chapter cannot be
+   expressed any other way, and a five-chapter arc still validates, so nothing shipped can regress.
+   Confirm in your report that `git diff -- arc.js` contains those two changes and no third.
+2. **B12 is dropped.** I verified it myself: every href in `index.html` and `roadmap.html` is already
+   relative and no absolute `href="/…"` exists in the repo, so the reviewer's link claim has no
+   premise. The triage file is updated to a REJECT. Keep the from-`file://` navigation walk in your
+   verification as a check only; change no href.
+3. **Your two corrections to my brief are accepted**, and they are the reason this plan was worth
+   running: the outcome-screen kicker is `history.length` and not `length + 1`, and `jin-smoke-bomb`'s
+   success and failure roads also spend the only bomb and therefore need the saddlebag line.
+
+== WHAT I WILL CHECK MYSELF, SO MAKE IT CHECKABLE ==
+
+- The whole suite green, and each new assertion demonstrably biting: keep every tamper in your report
+  as an exact edit, the rebuild, and the assertion that failed — a suite that prints `ok` proves
+  nothing by itself.
+- `git diff` empty for `dice.js characters.js loop.js persist.js dice-view.js sample-arc.js engine.js
+  ui.js data.js style.css`, and exactly two changes in `arc.js`.
+- `arcs/pale-hand.js` re-derived from `arcs/pale-hand.json` byte-identical to the committed bundle,
+  and the same for `last-signal`, which must not have moved.
+- No key material in either bundle.
+- `validateArc` ok for both arcs, with Pale Hand at six chapters.
+- The split ford really is split: every consequence that `next`s a ford satisfies "informed ford iff
+  it resolves jin-ledger", every ending is reachable from both fords, and the blind ford's second
+  option reads DC 17 with no advantage while `jin-show-ledger` still reads DC 11 with advantage.
+- The two prose rules: no offered option is illegal on any road (no option needs an item a failure
+  already took), and every ending sentence survives a road that never met Wren and a road that never
+  read the page.
+
+== FLAT PROHIBITIONS — verify each is absent from the diff before you finish ==
+
+Do not modify `dice.js`, `characters.js`, `loop.js`, `persist.js`, `dice-view.js`, `sample-arc.js`,
+`engine.js`, `ui.js`, `data.js`, `style.css`, or any file outside the plan's section 2 change list
+(plus `arc.js` as authorized above). Do not add a dependency, a package.json, a build step, a bundler,
+an ES module, a fetch, a second save key, or a new localStorage key. Do not touch `.brief-pass12-*`,
+`.qa/qa-pass14*.md`, `.qa/qa-pass14-raw-ax.txt` or `.brief-pass15-plan*.md`. Do not implement a REJECT
+or DEFER item. Do not invent a character, ending, thread, mechanic or chapter beyond the split the
+plan describes. Do not rewrite prose that no BUILD item names. **Do not commit, push, deploy, or run
+any git command that writes** — the owner is rationing Netlify builds, so a push from this pass is a
+defect, not a shortcut.
+
+Your final message must begin with the literal line
+
+PASS 15 EXEC REPORT
+
+and then these six numbered sections:
+
+  1. WHAT CHANGED, FILE BY FILE
+  2. THE SPLIT FORD, AS BUILT
+  3. TESTS AND THEIR TAMPERS — each assertion, the exact tamper, what failed
+  4. THE VERIFICATION COMMANDS, WITH THEIR OUTPUT
+  5. WHAT I DID NOT DO, AND WHY
+  6. WHAT I AM LEAST SURE OF

@@ -60,10 +60,12 @@ cost S) Fix the Thornwood complication's text.
 **B11 — The pitch names Aldric before the story introduces him.** (review B, cost S)
 Say the Pale Hand.
 
-**B12 — Absolute links break under `file://`.** (review B, cost S)
-`index.html` links to `/oronath` and `/roadmap`; `roadmap.html` links to `/` and `/oronath`. The
-owner opens these from disk, so make them relative. The new link added in pass 14 is the one to fix
-first.
+**B12 — Absolute links break under `file://`.** — REJECT, premise false. The reviewer read `/oronath`
+out of the address bar it was served at; the source is already relative. Verified 18:35 ET:
+`index.html` has `href="oronath.html"` and `href="roadmap.html"`, `roadmap.html` has
+`href="index.html"` and `href="oronath.html"`, and `grep -rn 'href="/' --include='*.html'` returns
+nothing. Nothing to fix. (The file:// navigation check stays in the pass-15 verification list, as a
+check rather than a fix.)
 
 **B13 — The hosting badge covers part of Resume at 360px.** (review B, cost S)
 Give the picker's action row bottom room at narrow widths; the badge is Netlify's, not ours.
