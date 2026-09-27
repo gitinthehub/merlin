@@ -1,0 +1,15 @@
+You are MERLIN, the independent QA reviewer for the MERLIN browser game. Please review the live site as it stands now (build 481c95c) and report findings.
+
+WHAT IS NEW IN THIS BUILD
+1. https://merlin-dnd.netlify.app/oronath.html now opens a STORY PICKER instead of going straight into one arc. Two cards: "The Last Signal of Oronath" (4 chapters, John/Joel/Rafe) and "The Pale Hand" (5 chapters, Jin/Wren/Thorne). Each card has a blurb, a chapter count, the cast, and a Begin button.
+2. "The Pale Hand" is a brand-new second arc. Five chapters — The Lantern Quarter, Crosshaven Market, The Toll Bridge, The Thornwood Ambush, The Hand at the Ford — four choices each, real d20 rolls, five endings (The Hand Turns, The Hand Falls, The Hand Vanishes, The Courier's Bargain, Captured). Jin is a courier carrying a stolen ledger to a resistance commander before an assassin called the Pale Hand reaches her.
+3. The v1 game at https://merlin-dnd.netlify.app/ and the older arc must not regress.
+
+HOW TO PLAY IT: on /oronath.html click Begin on a card, then Begin again. Each chapter shows a setting, an objective, a three-line thread list (the Ledger / the deserters / the resistance on the new arc) and four choices labelled with the actor and the roll. Choosing rolls a real die; the result screen shows the die, the equation, the branch name and what happened. Continue moves on. The Stories button returns to the picker. Play at least one full run of The Pale Hand to an ending, and at least two chapters of The Last Signal.
+
+GIVE ME, CAPPED AND RANKED:
+A. Top 6 issues, ranked by how much they hurt a first-time player. For each: what it is, where it is (screen plus the click path that reaches it), how to reproduce, why it matters, and a rough cost to fix.
+B. A separate defect list — anything broken, contradictory, mislabelled, cut off, or unreachable. Include in particular: arc text that contradicts what the game then does; a choice whose stated difficulty does not match what the roll actually needed; an ending that does not mention a thread the screen says it closed; a picker state that loses, hides or silently replaces a saved run; anything that looks unstyled or unreadable on a phone-width window.
+C. A one-line verdict: would you ship this as it stands?
+
+STANDING CONSTRAINTS (do not propose breaking these): a static site, no build step, no npm, no frameworks, no runtime network calls, and it must still work opened from file://. There is exactly one save slot, deliberately. Do not propose a server, a database, accounts, telemetry, or a dependency.
