@@ -123,7 +123,11 @@ function renderBundle(arc) {
     "(function (root, factory) {\n" +
     "  var api = factory();\n" +
     '  if (typeof module === "object" && module.exports) module.exports = api;\n' +
-    "  if (root) root.OronathArcBundle = api;\n" +
+    "  if (root) {\n" +
+    "    root.OronathArcBundle = api;\n" +
+    "    root.OronathArcBundles = root.OronathArcBundles || {};\n" +
+    "    if (api && api.id) root.OronathArcBundles[api.id] = api;\n" +
+    "  }\n" +
     '})(typeof window !== "undefined" ? window : globalThis, function () {\n' +
     '  "use strict";\n' +
     "  return " +

@@ -154,6 +154,50 @@
   color: var(--mute);
 }
 
+.oronath-stories {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 1rem 0 0.25rem;
+}
+
+.oronath-story-card {
+  border: 1px solid var(--panel-edge);
+  padding: 0.9rem 0.85rem 1rem;
+}
+
+.oronath-story-card .scene-title {
+  margin: 0 0 0.35rem;
+}
+
+.oronath-story-blurb {
+  margin: 0 0 0.45rem;
+  color: var(--parchment);
+}
+
+.oronath-story-meta {
+  margin: 0;
+  color: var(--mute);
+  font-size: 0.85rem;
+}
+
+.oronath-story-warn {
+  margin: 0.75rem 0 0;
+}
+
+.oronath-story-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.oronath-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 @media (max-width: 400px) {
   .oronath-panel {
     padding: 1rem 0.75rem 1.25rem;

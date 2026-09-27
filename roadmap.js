@@ -123,6 +123,16 @@
         { id: "2.7", name: "Deployment", status: "done" },
         { id: "2.8", name: "First arc: Oronath", status: "done" }
       ]
+    },
+    {
+      id: "v2.1",
+      name: "A second story",
+      status: "done",
+      items: [
+        { id: "2.9", name: "Second arc: The Pale Hand", status: "done" },
+        { id: "2.10", name: "Story picker", status: "done" },
+        { id: "2.11", name: "Tests and docs", status: "done" }
+      ]
     }
   ];
 

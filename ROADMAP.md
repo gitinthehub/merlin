@@ -125,6 +125,30 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ---
 
+## v2.1 — A second story ✅
+
+A second validated arc, and a picker so `oronath.html` is no longer one hard-wired bundle. One save slot remains (`oronath.save.v1`). A resumable run still opens straight into its chapter.
+
+| # | Item | Deliverables | Size | Depends on | Status |
+|---|------|--------------|------|-----------|--------|
+| 2.9 | **Second arc: The Pale Hand** | `arcs/pale-hand.json` and the keyless bundle `arcs/pale-hand.js`. Five chapters, five endings, Jin / Wren / Thorne. `validateArc` clean. | L | 2.1–2.8 | ✅ |
+| 2.10 | **Story picker** | `stories.js` lists every registered bundle. `oronath.html` asks which story when two or more are loaded, and still assigns `window.OronathArcBundle`. | M | 2.9 | ✅ |
+| 2.11 | **Tests and docs** | `tests/pale-hand.test.js`, `tests/stories.test.js`, plus this file and `roadmap.js` in the same commit. | S | 2.9, 2.10 | ✅ |
+
+### The Pale Hand
+
+| Beat | Chapter | The roll it demands |
+|------|---------|---------------------|
+| 1. The Lantern Quarter | `lantern-quarter` | d20 hard clumsy-hands eff 15; medium sharp-mind eff 9; medium steady-voice eff 11; medium sharp-mind eff 9 |
+| 2. Crosshaven Market | `crosshaven` | medium steady-voice eff 11; hard sharp-mind eff 12; medium sharp-mind eff 9; medium clumsy-hands eff 12 |
+| 3. The Toll Bridge | `toll-bridge` | easy steady-voice eff 8; hard steady-voice eff 14; hard clumsy-hands eff 15; veryHard fighting eff 15. Success and bonus close the Ledger. |
+| 4. The Thornwood Ambush | `thornwood` | medium sharp-mind eff 9; hard steady-voice eff 14 (closes the deserters and the Ledger); veryHard fighting eff 15; easy clumsy-hands eff 9 |
+| 5. The Hand at the Ford | `the-ford` | veryHard fighting eff 15; medium steady-voice eff 11; easy steady-voice eff 8; medium clumsy-hands eff 12. Then one of the five endings. |
+
+Five endings — The Hand Turns, The Hand Falls, The Hand Vanishes, The Courier's Bargain, Captured. **Every path resolves the Ledger, the deserters, and the resistance.**
+
+---
+
 ## Escalations, defaults and open questions
 
 | Date | Item | Decision | Note |
@@ -137,6 +161,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-27** — Pass 14: The Pale Hand is the second arc, and `oronath.html` lets the player choose a story before the splash. One save slot remains. A resumable run still opens straight into its chapter.
 - **2026-09-27** — Follow-up, from the QA pass-13 review (`.qa/qa-pass13.md`): "Back to the castle gate" was counting as a new attempt, so a daily death after a restore shared "· Attempt 2 ·" even though a restore is the same attempt. `restoreGate()` advanced `state.daily.attempts`; it now keeps the count as recorded (normalising a checkpoint written before the counter existed), and the test pins both halves of the rule — two restores leave a first attempt at attempt 1, and a restore on attempt 2 stays attempt 2.
 - **2026-09-26** — Pass 12: a Daily Curse death no longer loses its identity. `shareLine()` returned the tombstone line before it reached the daily branch, so a daily death was byte-identical to a non-daily one; the daily line now comes first and the tombstone follows the ending title. The dice in a daily share line are the checks themselves — a green square for a pass, a red one for a fail — and a second play on the same day says "Attempt N" before the URL. A save from before this change still renders its old number list, and a non-daily run's line is unchanged.
 - **2026-09-26** — Follow-up, from the QA pass-12 review: the three death causes added for 1.10 were only half-wired — they had tombstones but no guest-book entry, no book title or hint, no epitaph and no death scene, so those deaths recorded nothing and fell back to the generic line. The cause list had been copied into four places; it now derives from the tombstone map, and a test fails if a new cause misses any of them.

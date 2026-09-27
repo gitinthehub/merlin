@@ -2,13 +2,19 @@
 (function (root, factory) {
   var api = factory();
   if (typeof module === "object" && module.exports) module.exports = api;
-  if (root) root.OronathArcBundle = api;
+  if (root) {
+    root.OronathArcBundle = api;
+    root.OronathArcBundles = root.OronathArcBundles || {};
+    if (api && api.id) root.OronathArcBundles[api.id] = api;
+  }
 })(typeof window !== "undefined" ? window : globalThis, function () {
   "use strict";
   return {
   "id": "last-signal",
   "version": 1,
   "title": "The Last Signal of Oronath",
+  "blurb": "Three travellers. A signal that should have died.",
+  "pitch": "Three travellers. A signal that should have died. Every choice is a real roll — failure opens a new road, never a retry.",
   "characters": [
     {
       "id": "john",

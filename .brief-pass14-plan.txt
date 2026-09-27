@@ -1,0 +1,151 @@
+PASS 14 — PLAN BRIEF (read-only). Do not edit any file. Do not run git commands that write.
+
+# What this pass is
+
+MERLIN (repo `~/Developer/merlin`, live at https://merlin-dnd.netlify.app, GitHub
+`gitinthehub/merlin`, Netlify publish dir `.`, no build step) gets **a second playable story** and
+**a story picker at the start**. Two new roadmap items in a new `v2.1` section (numbers are yours to
+confirm, but use 2.9 = the second arc, 2.10 = the story picker, 2.11 = tests + docs):
+
+- **2.9 — Second arc: "The Pale Hand"**. The owner's own choose-your-own-adventure prompt, committed
+  verbatim as `.pale-hand-source.txt`, becomes a validated Oronath arc: `arcs/pale-hand.json`
+  (source) bundled keylessly into `arcs/pale-hand.js` by the existing `tools/build-arc.js`.
+- **2.10 — A story picker at the start.** The Oronath surface (`oronath.html`) currently plays one
+  hard-wired bundle. It must list every registered arc and let the player choose one at the start.
+- **2.11 — Tests + docs** for both, plus the roadmap mirror (`ROADMAP.md` and `roadmap.js` in the
+  same commit — they have drifted before; `roadmap.js` carries its own copy of the item list).
+
+# The documents to read, in this order
+
+1. `.pale-hand-arc-spec.md` — **the content contract for 2.9.** It is authoritative for ids,
+   chapter titles, every choice's label, actor, roll (die/tier/tags) and its four consequence
+   targets, the five endings, the thread rules, and the item-by-item record of what the engine
+   cannot carry. The story must not be re-invented, softened or re-plotted.
+2. `.pale-hand-source.txt` — the owner's prompt, verbatim. The spec is a faithful compression of it;
+   where the two disagree, say so as a finding rather than choosing silently.
+3. `.oronath-arc-spec.md` — the same shape of contract for the first arc, for tone and convention.
+4. `arc.js` (validator + every rule it enforces), `loop.js` (run/choose/continue/view + what run
+   state actually exists), `characters.js` (traits, `resolveCheck`, `effectiveDc`), `dice.js`
+   (tiers DCs `easy 8 / medium 11 / hard 14 / veryHard 16`, `complication` = natural minimum,
+   `bonus` = natural maximum), `persist.js` (the single save slot `oronath.save.v1` and its
+   validation), `tools/build-arc.js` (`renderBundle`, `bundleFromFile`, `commitArc`), `sample-arc.js`
+   (the fallback arc), `oronath-ui.js` (the surface, boot flow, render functions), `oronath.html`,
+   `oronath.css`, `tests/last-signal.test.js` (the test convention to copy), `tests/loop.test.js`,
+   `tests/persist.test.js`, `README.md`, `ROADMAP.md` and `roadmap.js`.
+
+# Frozen this pass — byte-identical, no edits
+
+`dice.js`, `arc.js`, `characters.js`, `loop.js`, `persist.js`, `dice-view.js`, `sample-arc.js`,
+`engine.js`, `ui.js`, `data.js`, `style.css`. The shipped v1 game and the shipped engine core must
+not move at all. If your plan believes one of them *must* change, stop and report it as a blocker
+with the reason — do not plan the edit.
+
+# 2.9 — the arc (what the plan must cover)
+
+- Author `arcs/pale-hand.json` from the spec's tables: 5 chapters, 4 choices each, 4 consequences
+  per choice, 5 endings, 3 characters (`jin`, `wren`, `thorne`) with their traits and threads, and
+  the arc-level `blurb` + `pitch` fields the picker shows.
+- Ship `arcs/pale-hand.js` through the **keyless** path:
+  `node tools/build-arc.js --from arcs/pale-hand.json --out arcs/pale-hand.js`.
+- Prose: the spec's tone rules (second person, cinematic, 3–6 sentences per consequence text, short
+  punchy lines, no rambling), the source's load-bearing lines **verbatim**, and the rule that an
+  ending text is one string shared by every path that reaches it.
+- The graph must be checked against `arc.js` for real: no cycle, no dangling `next`, no self-next,
+  every chapter and ending reachable, every chapter able to reach an ending, every thread resolved on
+  every path, and `complication.next !== failure.next` on **every** choice. `arcs/pale-hand.json`
+  must validate with zero errors after `expandCharacters`, and so must the built bundle.
+
+# 2.10 — the story picker (what the plan must cover)
+
+The requirement in the owner's words: *"let the user choose between different stories at the
+beginning."* The engine and the page need these properties; propose the cleanest implementation,
+but keep every one of them:
+
+- **A registry, not a hard-wired bundle.** `arcs/last-signal.js` and `arcs/pale-hand.js` are both
+  built by `tools/build-arc.js`, and `renderBundle` currently assigns `root.OronathArcBundle = api`,
+  so loading two bundles silently overwrites the first. The build must additionally register each
+  arc under its own id (`root.OronathArcBundles[api.id] = api`) **while keeping the existing
+  `OronathArcBundle` assignment** — `tests/last-signal.test.js` asserts that literal string and the
+  single-arc fallback path depends on it. Any change to `renderBundle` means both committed bundles
+  must be re-derived by the tool in the same pass, and the committed `.js` must be byte-identical to
+  a fresh `bundleFromFile` of its `.json` (that will become a test assertion).
+- **A small registry module** (`stories.js`, new; plain IIFE, `window.OronathStories`, and the same
+  UMD tail as `dice.js`/`arc.js` so a Node test can `require` it) that lists the registered arcs
+  with `{id, title, blurb, pitch, chapterCount, cast, arc}` and can report the arc that the single
+  save slot belongs to. It must read the save **through `OronathPersist.SAVE_KEY`** and must never
+  clear or rewrite it — `persist.js` is frozen, so the save's arc id has to be peeked, not
+  fetched through a changed API. Report what `persist.js` does today when the save belongs to a
+  different arc (`blob.arcId !== arc.id` → reject + `clear()`), and make sure the picker's flow
+  cannot silently destroy a resumable run of the other story.
+- **The surface** `oronath-ui.js`: when two or more stories are registered, the first screen is the
+  picker (each story: title, one-line blurb, chapter count, cast names, a `Begin` button, and
+  `Resume — Chapter N` when the save belongs to that arc); picking one goes to that story's existing
+  splash (title, pitch, cast with traits, `Begin`). When only one arc is registered (or only the
+  sample fallback), behaviour must stay as it is today. An in-progress save that matches a
+  registered arc still resumes straight into the run, exactly as now (the browser playthrough
+  notes in `.qa/` and the repo's own docs describe that behaviour as correct). Validation errors
+  still block play and are shown per story.
+- **The run must be created from the arc's own cast.** `Loop.createRun(arc)` with no options falls
+  back to `Cast.pregen("john"|"joel"|"rafe")`, which for `pale-hand` would produce characters whose
+  ids are `john`/`joel`/`rafe` and then throw `unknown actor: jin` on the first choice. The surface
+  must pass `{characters: Story.characters}`. Say explicitly in the plan whether that changes
+  anything for `last-signal` (its bundle already carries expanded characters).
+- `oronath.html` loads both bundles plus `stories.js` in a working order; `index.html`'s splash link
+  to `oronath.html` stops naming one story; `oronath.css` may grow story-card styles (`style.css`
+  may not change).
+- No ES modules, no `package.json`, no bundler, no runtime network request: the page must keep
+  working opened from `file://`.
+
+# 2.11 — tests and docs (what the plan must cover)
+
+- `tests/pale-hand.test.js`, following `tests/last-signal.test.js`'s conventions exactly (bare
+  `assert` helper, one `ok` line, keyless bundle into a temp path, source JSON validated after
+  `expandCharacters`), and adding: the committed `arcs/pale-hand.js` is byte-identical to a fresh
+  derive from `arcs/pale-hand.json`; the five chapter ids/titles and five ending ids/titles the spec
+  fixes; every choice's four consequences non-blank; `complication.next !== failure.next` everywhere;
+  no self-next; every ending resolves all three threads; reachability + "can reach an ending" +
+  no cycles; the roll spec of named choices (die/tier/tags and the **effective DC** through
+  `Cast.resolveCheck` with the arc's own characters — e.g. `jin-rooftops` 15, `jin-sewers` 9,
+  `jin-bribe` 8, `jin-fight-hand` 15); the thread wiring (`jin-talk` success/bonus resolves
+  `wren-band` **and** `jin-ledger`; `jin-show-ledger` success → `end-hand-turns`, failure →
+  `end-hand-vanishes`, complication → `end-captured`); the load-bearing source lines present
+  verbatim; no `import `/`export `/API-key strings in the bundle; the bundle registers itself under
+  `pale-hand` in the registry.
+- `tests/stories.test.js` for the registry and the save peek: both bundles registered, ids/titles/
+  blurbs/cast/chapterCount correct, every listed arc validates, the sample fallback still resolves
+  when no bundle is registered, `savedArc()`/equivalent returns the saved arc + chapter for a good
+  blob and `null` for empty/malformed blobs, and a peek never mutates the storage it read.
+- Drive the engine for real, in Node, over at least one road the arc's own evidence does not show:
+  a full run through `Loop.createRun` + `Loop.choose` with `Dice.sequence([...])` to a resolution,
+  asserting `nodeId`, `phase === "resolved"` and `openThreads().length === 0`. Remember
+  `choose` consumes one sequence per call and an advantage roll consumes two faces.
+- Docs: `README.md` (two arcs, the pale-hand build command, the new test files in the test line,
+  the registry/picker), `ROADMAP.md` (**new `v2.1` section with 2.9/2.10/2.11 and a `The Pale Hand`
+  beat table** the way v1's plot points are tabled, plus a changelog entry dated 2026-09-27) and
+  `roadmap.js` (the same three items in the mirrored `PHASES` list — the file says at the top that it
+  carries its own copy).
+- **Prove every new assertion bites**: name, in the plan, which assertion is proven by running the
+  new test file against the *previous* committed modules (the `/tmp/check` + `git show HEAD:...`
+  recipe) and which by tampering in a scratch copy (never in the repo).
+
+# What the plan must return
+
+1. **Findings first** — anything in `.pale-hand-arc-spec.md` that the engine or the validator
+   contradicts (a cycle, a rule, an impossible target, a trait value, a DC mapping), with the rule
+   and the path, and your proposed resolution. Also confirm or correct the claim that
+   `arcs/last-signal.js` today is exactly `bundleFromFile("arcs/last-signal.json")`'s output, since
+   both bundles get re-derived.
+2. **File-by-file change list** — new files and edited files, with a one-line purpose each, and the
+   frozen list confirmed untouched.
+3. **The exact shape of the new registry API and the picker's boot flow** (states, what each state
+   renders, what happens on a stale/foreign/malformed save, what happens with one arc).
+4. **The test list** — file, the specific assertions, and how each new guarantee is made to fail
+   before it passes.
+5. **Verification commands** — the full local suite, the arc validation, the browser playthrough
+   steps (how to check the picker shows both stories and that a run in each reaches an ending), and
+   what to check live after the push.
+6. **Risks and the smallest first tranche** — what could break the shipped arc or the shipped v1
+   game, the order to implement in, and anything you recommend deferring to a later pass.
+
+Read the repository before answering. Do not re-plot the story, do not renumber the roadmap in a way
+that collides with v2.0's items, and do not write any file.

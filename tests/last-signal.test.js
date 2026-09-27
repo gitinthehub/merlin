@@ -338,6 +338,14 @@ var expanded = Build.expandCharacters(raw);
 var v2 = Arc.validateArc(expanded);
 assert(v2.ok && v2.errors.length === 0, "source JSON also validates after expand");
 
+var committedPath = path.join(__dirname, "..", "arcs", "last-signal.js");
+var committedBytes = fs.readFileSync(committedPath, "utf8");
+var builtBytes = fs.readFileSync(outJs, "utf8");
+assert(
+  committedBytes === builtBytes,
+  "committed last-signal.js matches fresh bundle"
+);
+
 try {
   fs.unlinkSync(outJs);
 } catch (e2) {

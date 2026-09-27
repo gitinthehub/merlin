@@ -1,0 +1,82 @@
+PASS 14 — EXEC BRIEF. Implement the plan you produced in this chat (saved in the repo as
+`.brief-pass14-plan-out.md`). One tranche: the plan's own steps 1–5, i.e. the whole pass. Read this
+file from disk before you start; do not re-derive the plan from memory.
+
+# Authorised scope
+
+Implement everything in `.brief-pass14-plan-out.md`, sections 2 and 3, plus the tests in section 4,
+plus the docs in section 2, with **the one addition below**. The plan's own step order (1 → 5) is the
+order to implement in.
+
+**Addition to §3 (the picker must not lose the other story's run without saying so).** When the
+single save slot holds a *ready* run for a **different** registered story, the picker must say so in
+plain words on the cards, not only on the card that owns the slot — e.g. a muted line on the other
+card's foot: `Your run in <that story's title> is saved — beginning this story will replace it.`
+(Begin on a splash already clears it; that is the only clear, and the player has to be told before
+they click it.) Keep the plan's `saveStatus` wording for `foreign` and `unusable` slots as it is.
+
+# Flat prohibitions (verify each is absent from the diff before you report)
+
+- **No edits, at all**, to: `dice.js`, `arc.js`, `characters.js`, `loop.js`, `persist.js`,
+  `dice-view.js`, `sample-arc.js`, `engine.js`, `ui.js`, `data.js`, `style.css`. They are
+  byte-identical after this pass. If the work appears to need one of them, stop and report it.
+- **Do not hand-edit a generated bundle.** `arcs/pale-hand.js` and `arcs/last-signal.js` are produced
+  only by `node tools/build-arc.js --from <json> --out <js>` from the repo root. If the bytes are not
+  what the tool writes, that is the bug.
+- **Do not change the provider half of `tools/build-arc.js`** — `SYSTEM_PROMPT`, `DEFAULT_SPEC`,
+  `bundleFromProvider`, the provider configs. The only change there is the registry lines in
+  `renderBundle`.
+- **Do not send `pale-hand` through `--provider`.** Keyless `--from` only. No API key in any file the
+  browser loads, no `.env`, no network call from the client.
+- **No ES modules, no `package.json`, no bundler, no build step, no runtime network request.**
+  Everything the browser loads stays a plain `<script>` `src` IIFE so `file://` works.
+- **Do not renumber or restate v2.0's items 2.1–2.8** in `ROADMAP.md` or `roadmap.js`; the new items
+  are 2.9, 2.10, 2.11 in a new `v2.1` section, and `ROADMAP.md` and `roadmap.js` change in the same
+  edit.
+- **Leave alone**: the untracked `.brief-pass12-*.txt` files, `.qa/`, `.playwright-mcp/`,
+  `.netlify/`, `images/`, `arcs/last-signal.json`'s chapter prose (the only allowed change there is
+  adding the `blurb` and `pitch` keys after `title`), and the v1 game's `merlin.save.v1` /
+  `merlin.fates.v1` / `merlin.gate.v1` / `merlin.daily.v1` keys.
+- **Do not commit, do not push, do not deploy, do not run `netlify`.** Stop at working-tree changes.
+
+# The arc itself — quality bar
+
+The story is the deliverable, so `arcs/pale-hand.json`'s prose is held to the spec, not to a
+placeholder: second person, cinematic, concrete (weather, sound, smell, one telling detail), 3–6
+sentences per consequence text, 4–6 sentences per ending, short punchy sentences, **no placeholder
+or bracketed text anywhere**, no meta-commentary, no reference to dice/DC/rolls in the narration
+(the surface prints the equation itself). Each ending is one string shared by every path that
+reaches it, and must land the Ledger's fate, Wren's band, and the resistance. The nine load-bearing
+source lines, the bridge notice, the margin note, and Bram's five prices at Crosshaven must appear
+verbatim and in the places §1 of the plan lists. Where the plan's tables and the spec disagree, the
+spec's tables win — report the disagreement rather than choosing silently.
+
+# Tests and evidence (do all of it, and run it)
+
+- Implement `tests/pale-hand.test.js` and `tests/stories.test.js` exactly as §4 describes, including
+  the byte-identity check of both committed bundles against a fresh `bundleFromFile`, the
+  `complication.next !== failure.next` gate, the effective-DC table, the thread wiring, the verbatim
+  strings, the registry assertions, the `savedArc`/`saveStatus` matrix, and the "the peek never
+  mutates the slot" counters.
+- Run the whole local suite (the plan's §5 command line, including `node tests/engine.test.js`) and
+  paste the real output into your report. Every file one `ok` line.
+- Run the scratch proofs in §5 that make the new assertions bite (previous-tree via
+  `git show HEAD:<file>` into `/tmp/check`, and the tamper copies under `/tmp/scratch`), and report
+  the actual failure text you observed for each. If a scratch run does *not* fail where the plan says
+  it must, say so plainly — that is a finding about the test, not a thing to hide.
+- Do the browser pass on `file://` yourself if your environment allows it; if it does not, say so and
+  report exactly which of the plan's §5 browser steps you could not perform. Do not claim a step you
+  did not run.
+
+# What to report back
+
+Your final message, beginning with the literal line `PASS 14 EXEC REPORT`:
+
+1. Files created and files changed, with one line each.
+2. The full test output (all suites) and the build command output.
+3. The scratch/tamper evidence: what you broke, what failed, verbatim.
+4. The one-line answer to: does `Loop.createRun(arc, { char: ... })`-style character passing change
+   anything for Last Signal (it should not)?
+5. Anything in the plan or spec you deviated from, and anything you could not do — plainly, no
+   hedging, no claim of a step you skipped.
+6. `git status --porcelain` output so the change set can be staged by path.
