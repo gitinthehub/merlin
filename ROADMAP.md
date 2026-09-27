@@ -113,7 +113,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 | # | Item | Deliverables | Size | Depends on | Status |
 |---|------|--------------|------|-----------|--------|
 | 2.1 | **Core dice engine** | `dice.js`: d20 / d10 / 2d6 as standalone, testable functions; difficulty tiers (Easy 8+, Medium 11+, Hard 14+, Very Hard 16+); crit rules (lowest roll = major complication, not a plain failure; max roll = bonus/advantage); advantage and per-character "advantage due to build"; zero UI and zero LLM coupling. Table-driven self-test against known cases. | M | — | ✅ |
-| 2.2 | **Arc schema + validator** | Data shape `arc → chapters(3–5) → choices(2–4) → consequences`; a validator that rejects an arc with a dangling branch, an unresolved character thread, a missing success/failure consequence, or a chapter count outside 3–5. Arcs are pre-generated and validated *before* play. | M | — | ✅ |
+| 2.2 | **Arc schema + validator** | Data shape `arc → chapters(3–6) → choices(2–4) → consequences`; a validator that rejects an arc with a dangling branch, an unresolved character thread, a missing success/failure consequence, or a chapter count outside 3–6. Arcs are pre-generated and validated *before* play. | M | — | ✅ |
 | 2.3 | **Character system** | Stats/traits tied to arcs; traits modify roll difficulty and can grant advantage ("advantage due to build"); per-character arc threads that the validator requires to resolve by the final chapter. | S | 2.1, 2.2 | ✅ |
 | 2.4 | **Gameplay loop / UI** | Chapter state, choices, roll results and dice faces rendered to the player; progress through the arc; per-chapter objective display. Failure always opens a new branch — never a retry of the same roll. | M | 2.1–2.3 | ✅ |
 | 2.5 | **Persistence** | Save/resume an in-progress run (extends the existing `localStorage` save with an arc-run envelope and a version field for migration). | S | 2.4 | ✅ |
@@ -127,11 +127,11 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## v2.1 — A second story ✅
 
-A second validated arc, and a picker so `oronath.html` is no longer one hard-wired bundle. One save slot remains (`oronath.save.v1`). A resumable run still opens straight into its chapter.
+A second validated arc, and a picker so `oronath.html` is no longer one hard-wired bundle. One save slot remains (`oronath.save.v1`). A mid-run save still opens straight into its chapter. A finished save returns to the picker.
 
 | # | Item | Deliverables | Size | Depends on | Status |
 |---|------|--------------|------|-----------|--------|
-| 2.9 | **Second arc: The Pale Hand** | `arcs/pale-hand.json` and the keyless bundle `arcs/pale-hand.js`. Five chapters, five endings, Jin / Wren / Thorne. `validateArc` clean. | L | 2.1–2.8 | ✅ |
+| 2.9 | **Second arc: The Pale Hand** | `arcs/pale-hand.json` and the keyless bundle `arcs/pale-hand.js`. Six chapters, five endings, Jin / Wren / Thorne. `validateArc` clean. | L | 2.1–2.8 | ✅ |
 | 2.10 | **Story picker** | `stories.js` lists every registered bundle. `oronath.html` asks which story when two or more are loaded, and still assigns `window.OronathArcBundle`. | M | 2.9 | ✅ |
 | 2.11 | **Tests and docs** | `tests/pale-hand.test.js`, `tests/stories.test.js`, plus this file and `roadmap.js` in the same commit. | S | 2.9, 2.10 | ✅ |
 
@@ -141,9 +141,10 @@ A second validated arc, and a picker so `oronath.html` is no longer one hard-wir
 |------|---------|---------------------|
 | 1. The Lantern Quarter | `lantern-quarter` | d20 hard clumsy-hands eff 15; medium sharp-mind eff 9; medium steady-voice eff 11; medium sharp-mind eff 9 |
 | 2. Crosshaven Market | `crosshaven` | medium steady-voice eff 11; hard sharp-mind eff 12; medium sharp-mind eff 9; medium clumsy-hands eff 12 |
-| 3. The Toll Bridge | `toll-bridge` | easy steady-voice eff 8; hard steady-voice eff 14; hard clumsy-hands eff 15; veryHard fighting eff 15. Success and bonus close the Ledger. |
-| 4. The Thornwood Ambush | `thornwood` | medium sharp-mind eff 9; hard steady-voice eff 14 (closes the deserters and the Ledger); veryHard fighting eff 15; easy clumsy-hands eff 9 |
-| 5. The Hand at the Ford | `the-ford` | veryHard fighting eff 15; medium steady-voice eff 11; easy steady-voice eff 8; medium clumsy-hands eff 12. Then one of the five endings. |
+| 3. The Toll Bridge | `toll-bridge` | easy steady-voice eff 8; hard steady-voice eff 14; hard clumsy-hands eff 15; veryHard fighting eff 15. Success and bonus close the Millbrook page. |
+| 4. The Thornwood Ambush | `thornwood` | medium sharp-mind eff 9; hard steady-voice eff 14 (closes the deserters and the Millbrook page); veryHard fighting eff 15; easy clumsy-hands eff 9 |
+| 5. The Hand at the Ford | `the-ford` | veryHard fighting eff 15; medium steady-voice eff 11; easy steady-voice eff 8; medium clumsy-hands eff 12. The roads that learned the page. Then one of the five endings. |
+| 6. The Hand at the Ford, unread | `the-ford-blind` | veryHard fighting eff 15; veryHard clumsy-hands eff 17; easy steady-voice eff 8; medium clumsy-hands eff 12. The roads that did not learn the page. |
 
 Five endings — The Hand Turns, The Hand Falls, The Hand Vanishes, The Courier's Bargain, Captured. **Every path resolves the Ledger, the deserters, and the resistance.**
 
@@ -161,6 +162,7 @@ Five endings — The Hand Turns, The Hand Falls, The Hand Vanishes, The Courier'
 
 ## Changelog
 
+- **2026-09-27** — Pass 15: a finished save returns to the picker; same-story Begin warns before it replaces a mid-run; The Pale Hand's ford splits on whether Jin learned the Millbrook page.
 - **2026-09-27** — Pass 14: The Pale Hand is the second arc, and `oronath.html` lets the player choose a story before the splash. One save slot remains. A resumable run still opens straight into its chapter.
 - **2026-09-27** — Follow-up, from the QA pass-13 review (`.qa/qa-pass13.md`): "Back to the castle gate" was counting as a new attempt, so a daily death after a restore shared "· Attempt 2 ·" even though a restore is the same attempt. `restoreGate()` advanced `state.daily.attempts`; it now keeps the count as recorded (normalising a checkpoint written before the counter existed), and the test pins both halves of the rule — two restores leave a first attempt at attempt 1, and a restore on attempt 2 stays attempt 2.
 - **2026-09-26** — Pass 12: a Daily Curse death no longer loses its identity. `shareLine()` returned the tombstone line before it reached the daily branch, so a daily death was byte-identical to a non-daily one; the daily line now comes first and the tombstone follows the ending title. The dice in a daily share line are the checks themselves — a green square for a pass, a red one for a fail — and a second play on the same day says "Attempt N" before the URL. A save from before this change still renders its old number list, and a non-daily run's line is unchanged.

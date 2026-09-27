@@ -22,12 +22,34 @@
     return null;
   }
 
+  function actorIds(arc) {
+    var seen = {};
+    var chapters = (arc && arc.chapters) || [];
+    var ci;
+    var ch;
+    for (ci = 0; ci < chapters.length; ci++) {
+      var choices = (chapters[ci] && chapters[ci].choices) || [];
+      for (ch = 0; ch < choices.length; ch++) {
+        var choice = choices[ch];
+        if (choice && choice.actor) seen[choice.actor] = true;
+      }
+    }
+    return seen;
+  }
+
+  function pathChapter(phase, historyLength) {
+    var n = historyLength || 0;
+    if (phase === "outcome") return n < 1 ? 1 : n;
+    return n + 1;
+  }
+
   function entryFor(arc) {
+    var seen = actorIds(arc);
     var cast = [];
     var chars = (arc && arc.characters) || [];
     var i;
     for (i = 0; i < chars.length; i++) {
-      if (chars[i] && chars[i].name) cast.push(chars[i].name);
+      if (chars[i] && chars[i].name && seen[chars[i].id]) cast.push(chars[i].name);
     }
     return {
       id: arc.id,
@@ -168,14 +190,18 @@
       }
     }
 
+    var chapterNumber = where.chapterNumber;
+    if (blob.phase === "resolved") chapterNumber = null;
+    else chapterNumber = pathChapter(blob.phase, blob.history.length);
+
     return {
-      status: "ready",
+      status: blob.phase === "resolved" ? "resolved" : "ready",
       saved: {
         arc: arc,
         arcId: blob.arcId,
         nodeId: blob.nodeId,
         phase: blob.phase,
-        chapterNumber: where.chapterNumber,
+        chapterNumber: chapterNumber,
         chapterTitle: where.chapterTitle
       }
     };
@@ -196,6 +222,7 @@
     get: get,
     fallback: fallback,
     savedArc: savedArc,
-    saveStatus: saveStatus
+    saveStatus: saveStatus,
+    pathChapter: pathChapter
   };
 });

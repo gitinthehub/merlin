@@ -80,11 +80,8 @@ assert(
   "pale-hand blurb"
 );
 assert(list[1] && list[1].pitch && list[1].pitch.length > 0, "pale-hand pitch");
-assert(list[1] && list[1].chapterCount === 5, "pale-hand chapters");
-assert(
-  list[1] && list[1].cast.join(",") === "Jin,Wren,Thorne",
-  "pale-hand cast"
-);
+assert(list[1] && list[1].chapterCount === 6, "pale-hand chapters");
+assert(list[1] && list[1].cast.join(",") === "Jin", "pale-hand cast");
 
 var i;
 for (i = 0; i < list.length; i++) {
@@ -156,9 +153,33 @@ endStore.setItem(
   })
 );
 var endSaved = Stories.savedArc(endStore);
-assert(Stories.saveStatus(endStore) === "ready", "ending status ready");
+assert(Stories.saveStatus(endStore) === "resolved", "ending status resolved");
 assert(endSaved && endSaved.chapterNumber === null, "ending has no chapter number");
 assert(endSaved && endSaved.nodeId === "end-hand-turns", "ending node");
+assert(
+  endSaved && endSaved.chapterTitle === "The Hand Turns",
+  "ending title The Hand Turns"
+);
+assert(endSaved && endSaved.phase === "resolved", "ending phase resolved");
+
+assert(Stories.pathChapter("choose", 0) === 1, "path chapter choose 0");
+assert(Stories.pathChapter("choose", 1) === 2, "path chapter choose 1");
+assert(Stories.pathChapter("outcome", 1) === 1, "path chapter outcome 1");
+assert(Stories.pathChapter("outcome", 2) === 2, "path chapter outcome 2");
+
+var Dice = require("../dice.js");
+var skipRun = Loop.createRun(paleArc, { characters: paleArc.characters, seed: 3 });
+Loop.choose(skipRun, "jin-rooftops", { rng: Dice.sequence([1]) });
+Loop.continueRun(skipRun);
+assert(skipRun.nodeId === "toll-bridge", "skip setup toll-bridge");
+var skipStore = memoryStorage();
+Persist.save(skipRun, skipStore);
+var skipSaved = Stories.savedArc(skipStore);
+assert(skipSaved && skipSaved.chapterNumber === 2, "skip road is path chapter 2");
+assert(
+  skipSaved && skipSaved.chapterTitle === "The Toll Bridge",
+  "skip road title is the toll bridge"
+);
 }
 
 function peekUntouched(raw, status, label) {

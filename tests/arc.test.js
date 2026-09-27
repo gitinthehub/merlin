@@ -264,7 +264,37 @@
   six.chapters[4].choices[0].consequences.failure.next = "extra-2";
   six.chapters[4].choices[1].consequences.success.next = "extra-2";
   six.chapters[4].choices[1].consequences.failure.next = "extra-2";
-  expectRule(six, "chapter-count", "six chapters");
+  var sixResult = Arc.validateArc(six);
+  assert(!hasRule(sixResult, "chapter-count"), "six chapters allowed");
+
+  var seven = deepCopy(six);
+  seven.chapters.push({
+    id: "extra-3",
+    title: "Extra",
+    setting: "More salt.",
+    objective: "Keep walking.",
+    choices: [
+      {
+        id: "a",
+        label: "A",
+        roll: { die: "d20", tier: "easy", tags: [] },
+        consequences: {
+          success: { text: "ok", next: "end-core", resolves: [] },
+          failure: { text: "no", next: "end-core", resolves: [] }
+        }
+      },
+      {
+        id: "b",
+        label: "B",
+        roll: { die: "d20", tier: "easy", tags: [] },
+        consequences: {
+          success: { text: "ok", next: "end-core", resolves: [] },
+          failure: { text: "no", next: "end-core", resolves: [] }
+        }
+      }
+    ]
+  });
+  expectRule(seven, "chapter-count", "seven chapters");
 
   // choice-count: 1
   var oneChoice = deepCopy(baseArc());

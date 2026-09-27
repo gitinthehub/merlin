@@ -14,7 +14,7 @@
   "version": 1,
   "title": "The Pale Hand",
   "blurb": "A stolen ledger, and the Pale Hand already on the north road.",
-  "pitch": "You are Jin, courier for the resistance. The Ledger is in your hands, and you have to reach Commander Thorne before Aldric does.",
+  "pitch": "You are Jin, courier for the resistance. The Ledger is in your hands, and you have to reach Commander Thorne before the Pale Hand does.",
   "characters": [
     {
       "id": "jin",
@@ -90,7 +90,7 @@
     {
       "id": "jin-ledger",
       "characterId": "jin",
-      "label": "the Ledger"
+      "label": "the Millbrook page"
     },
     {
       "id": "wren-band",
@@ -457,7 +457,7 @@
             },
             "failure": {
               "text": "They grab you. You break a wristlock and run the planks with a cut opening on your arm. The checkpoint is behind you, shouting. You are across, bleeding, and the notice on the post is a blur you do not stop to read.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "complication": {
@@ -494,8 +494,8 @@
               ]
             },
             "failure": {
-              "text": "Your hands betray you on the wet beam. You fall into the shallows, swallow the river, and lose a smoke bomb to the current. You crawl out on the far bank, cut and lighter. You are across, and you did not read the post.",
-              "next": "the-ford",
+              "text": "Your hands betray you on the wet beam. You fall into the shallows, swallow the river, and lose the purse to the current. You crawl out on the far bank, cut and lighter. You are across, and you did not read the post.",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "complication": {
@@ -533,7 +533,7 @@
             },
             "failure": {
               "text": "The fight is ugly and short of clean. You take a cut across the ribs and still break through, the checkpoint howling behind you. The Ledger stays in your coat because you never stopped to look. You are across, bleeding, and the post is unread.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "complication": {
@@ -555,7 +555,7 @@
     {
       "id": "thornwood",
       "title": "The Thornwood Ambush",
-      "setting": "Ancient oaks stand strangled by thorn vines, and no birdsong comes through them. An overturned merchant cart blocks the trail, too neat to be an accident. An arrow thunks into a tree an inch from your head. A woman's voice comes down from the branches. \"Horse. Weapon. Walk away.\" Wren leads five Ash Guard deserters in the wood, and the Ledger is still against your ribs.",
+      "setting": "Ancient oaks stand strangled by thorn vines, and no birdsong comes through them. An overturned merchant cart blocks the trail, too neat to be an accident. An arrow thunks into a tree an inch from your head. A woman's voice comes down from the branches. \"Horse. Weapon. Walk away.\" Four Ash Guard deserters wait in the wood, and Wren is the fifth, and the Ledger is still against your ribs.",
       "objective": "Get out of the wood with the Ledger.",
       "choices": [
         {
@@ -572,12 +572,12 @@
           "consequences": {
             "success": {
               "text": "You stay still and count. Four archers, and the fifth is Wren in the branches, already watching you not run. She lets you walk, horse and weapon still yours, because you did not lie with your feet. The Ledger goes with you, and her band does not.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "failure": {
               "text": "You count wrong. An arrow pins your cloak to the cart, and you tear free with a line of blood on your neck. They laugh and let the horse go rather than chase you into the open. You ride out poorer in skin, and still alone.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "complication": {
@@ -587,7 +587,7 @@
             },
             "bonus": {
               "text": "You count four archers and Wren before she finishes the warning, and she sees that you saw them. She nods once, and the arrows stay in the trees. You walk the horse through, untouched, her face kept. The ford is beyond the last oak.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             }
           }
@@ -605,7 +605,7 @@
           },
           "consequences": {
             "success": {
-              "text": "You tell them what the Ledger holds, and Wren's jaw tightens. \"The Hand came through yesterday. Didn't touch us. Asked about Millbrook, of all places.\" She comes down from the branches and takes your side of the road.",
+              "text": "You tell them what the Ledger holds, and Wren's jaw tightens. \"The Hand came through yesterday. Didn't touch us. Asked about Millbrook, of all places.\" You open the Ledger to that name. The margin reads, \"The Hand's mother still lives there. Do NOT inform him.\" She comes down from the branches and takes your side of the road.",
               "next": "the-ford",
               "resolves": [
                 "wren-band",
@@ -614,7 +614,7 @@
             },
             "failure": {
               "text": "You talk, and the branches do not care. Arrows come down, one of them kisses your shoulder, and you ride the gap their reload leaves. Wren does not follow. The Ledger is still yours, and her war is not.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "complication": {
@@ -623,7 +623,7 @@
               "resolves": []
             },
             "bonus": {
-              "text": "Wren's jaw tightens and she comes down saying, \"The Hand came through yesterday. Didn't touch us. Asked about Millbrook, of all places.\" White-fletched arrows fill your hand. \"The Hand will know these. He trained me.\"",
+              "text": "Wren's jaw tightens and she comes down saying, \"The Hand came through yesterday. Didn't touch us. Asked about Millbrook, of all places.\" You open the Ledger to that name. The margin reads, \"The Hand's mother still lives there. Do NOT inform him.\" White-fletched arrows fill your hand. \"The Hand will know these. He trained me.\"",
               "next": "the-ford",
               "resolves": [
                 "wren-band",
@@ -646,22 +646,22 @@
           "consequences": {
             "success": {
               "text": "You fight them in the thorns and they scatter, food and a scatter of silver left in the leaves. Wren is gone up a tree you cannot climb. You take what they dropped and ride. The band has no side in this, and the ford is still ahead.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "failure": {
-              "text": "They are better in these trees than you are with a short sword. You take a cut, and they take the smoke bomb off your belt while you are on a knee. You keep the Ledger by covering it with your body. You ride out hurt, and they keep the wood.",
-              "next": "the-ford",
+              "text": "They are better in these trees than you are with a short sword. You take a cut, and they take the purse off your belt while you are on a knee. You keep the Ledger by covering it with your body. You ride out hurt, and they keep the wood.",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "complication": {
-              "text": "The fight goes wrong in the dark between the oaks. You lose the night, and with it any chance of reaching the ford before the Hand is done there. Wren's people melt into the branches. What waits at the camp is already over.",
+              "text": "The fight goes wrong in the dark between the oaks. You lose the night, and you reach the hollow as his blade is already leaving it. Wren's people melt into the branches. Thorne is alive in the pines, and the Hand is gone into the fog.",
               "next": "end-hand-vanishes",
               "resolves": []
             },
             "bonus": {
               "text": "You break their line in one rush and come away with their food and thirty silver in a purse that is not yours. Wren watches from a branch and does not loose. You ride out faster than you entered. The ford has not heard you yet.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             }
           }
@@ -679,13 +679,13 @@
           },
           "consequences": {
             "success": {
-              "text": "You crack the smoke bomb on the cart wheel and the wood fills with white. The nag bolts, and you stay on it, blind and coughing, until the trees thin. Wren never gets a word, and she cannot join what she cannot see. The ford takes you out of the smoke alone.",
-              "next": "the-ford",
+              "text": "You crack the smoke bomb on the cart wheel and the wood fills with white. The nag bolts, and you stay on it, blind and coughing, until the trees thin. A second charge is still in the saddlebag. Wren never gets a word, and she cannot join what she cannot see. The ford takes you out of the smoke alone.",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "failure": {
-              "text": "The bomb pops late, more cough than cover. Arrows hunt the noise, and one opens your sleeve. You ride through anyway, the band behind you and angry. Wren does not follow a courier who tried to blind her.",
-              "next": "the-ford",
+              "text": "The bomb pops late, more cough than cover. Arrows hunt the noise, and one opens your sleeve. You ride through anyway, the band behind you and angry. A second charge is still in the saddlebag. Wren does not follow a courier who tried to blind her.",
+              "next": "the-ford-blind",
               "resolves": []
             },
             "complication": {
@@ -695,7 +695,7 @@
             },
             "bonus": {
               "text": "The smoke is thick and the nag is fast, and you are through before Wren can nock. A second bomb waits in the saddlebag — her doing, and no kindness in it. She will not ride with you. The ford is close, and you are early into it.",
-              "next": "the-ford",
+              "next": "the-ford-blind",
               "resolves": []
             }
           }
@@ -845,13 +845,157 @@
           }
         }
       ]
+    },
+    {
+      "id": "the-ford-blind",
+      "title": "The Hand at the Ford",
+      "setting": "Thorne's camp sits in a pine hollow above the river ford. Fog comes off the water as the camp dogs start barking. A sentry lies unconscious and unharmed. The Hand is already inside. Thorne is down, and he stands over her with a thin blade out, a white glove gleaming in the firelight. \"Courier. You carry something that belongs to the Magistrate. Set it down and walk away. I don't kill people who aren't on my list.\"",
+      "objective": "Get Thorne and the Ledger out of the ford alive.",
+      "choices": [
+        {
+          "id": "jin-fight-hand-blind",
+          "label": "Draw the short sword and go at him in the fog",
+          "actor": "jin",
+          "roll": {
+            "die": "d20",
+            "tier": "veryHard",
+            "tags": [
+              "fighting"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You draw the short sword and go at him in the fog. Steel rings, short and mean, and Aldric's footing goes on the wet stones. He drops into the ford. The white glove is still on the hand that misses the bank.",
+              "next": "end-hand-falls",
+              "resolves": []
+            },
+            "failure": {
+              "text": "You go at him and he is simply better. The thin blade finds you twice, and nobody in the fog is left to pull you out of the shallows. Thorne shouts your name once. The dark after that is not the camp.",
+              "next": "end-captured",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The fog eats your first cut. Thorne drags you clear by the cloak while the Hand steps back, already leaving. He walks into the white and does not run. You are alive, and so is the man you could not hold.",
+              "next": "end-hand-vanishes",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The fog hides your feet and not his glove. You catch the thin blade, turn it, and put him into the ford in one motion. Aldric goes into the water. The glove stays visible, a pale scrap on the current.",
+              "next": "end-hand-falls",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "jin-name-millbrook",
+          "label": "Name Millbrook, and his mother, with nothing in your hand to show",
+          "actor": "jin",
+          "roll": {
+            "die": "d20",
+            "tier": "veryHard",
+            "tags": [
+              "clumsy-hands"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You say Millbrook, and his mother, with empty hands. He goes still. The glove shifts on his wrist. The blade lowers, and the ford goes quiet.",
+              "next": "end-hand-turns",
+              "resolves": []
+            },
+            "failure": {
+              "text": "A name with nothing behind it makes him go still, not kind. Thorne drags herself clear of the blade. Then he takes the fog.",
+              "next": "end-hand-vanishes",
+              "resolves": []
+            },
+            "complication": {
+              "text": "He hears a trap in the unsupported name. The thin blade moves once. You go down in the pine needles with the book unopened, and the fog fills with his people.",
+              "next": "end-captured",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The name lands clean, clumsy mouth and all. He goes still on Millbrook and on his mother, and he decides before the fog closes.",
+              "next": "end-hand-turns",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "jin-offer-ledger-blind",
+          "label": "Offer the Ledger in exchange for Thorne's life",
+          "actor": "jin",
+          "roll": {
+            "die": "d20",
+            "tier": "easy",
+            "tags": [
+              "steady-voice"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You offer the Ledger for Thorne's life and do not dress it up. He takes the book as if it had always been his to collect. Thorne breathes. He leaves without a thank-you, and the purge list leaves with him.",
+              "next": "end-bargain",
+              "resolves": []
+            },
+            "failure": {
+              "text": "He takes the Ledger, and then he takes the purse. The bargain still holds. Thorne lives, and you are poorer by every coin the road had not already spent. He does not speak, and the book is gone.",
+              "next": "end-bargain",
+              "resolves": []
+            },
+            "complication": {
+              "text": "You offer the book and he hears a trap in the offer. The exchange never starts. His people come out of the fog behind the tent, and the Ledger is taken with your wrists already bound. Thorne's life was not the coin he wanted.",
+              "next": "end-captured",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You set the Ledger down between his blade and Thorne, and he takes it without making you kneel. He leaves the purse, a small mercy and the only one. The book goes into his coat. The camp keeps its commander.",
+              "next": "end-bargain",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "jin-smoke-thorne-blind",
+          "label": "Smoke bomb, then drag Thorne out of the tent",
+          "actor": "jin",
+          "roll": {
+            "die": "d20",
+            "tier": "medium",
+            "tags": [
+              "clumsy-hands"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You crack the smoke bomb in the tent and drag Thorne through the white by the shoulders. The Hand's blade cuts canvas, not flesh. You hit the cold water of the ford and keep going. He does not follow into the smoke, and he is not dead.",
+              "next": "end-hand-vanishes",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The bomb fumbles in your hands and bursts at your own feet. You lose Thorne's wrist in the white. When it clears, the Hand is the one holding you, and the Ledger is already out of your coat. The tent still stands.",
+              "next": "end-captured",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The smoke blows the wrong way, out over the river. You drag Thorne into the shallows after it, and the Hand follows onto wet stones he does not know. Your blade finds him where the fog cannot. He drops into the current, and the white glove goes downstream without him.",
+              "next": "end-hand-falls",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The bomb is clean and the drag is cleaner. Thorne comes out on your shoulder, breathing, and the Hand is only a shape in the smoke. You make the ford. He makes the fog, and the night will call that a kind of win.",
+              "next": "end-hand-vanishes",
+              "resolves": []
+            }
+          }
+        }
+      ]
     }
   ],
   "endings": [
     {
       "id": "end-hand-turns",
       "title": "The Hand Turns",
-      "text": "Aldric reads the Millbrook page twice, and then he pulls the white glove off a hand that will not hold still. \"She's still there. My mother.\" He kneels to Thorne — not surrender, an offer — and the Magistrate's best blade belongs to the resistance before the fog has finished rising. Thorne lives, and her cells have a name to answer to at last. Wren's band comes down out of the Thornwood and takes the resistance's side. The Ledger never goes back to Corvane, and the white glove curls in the campfire with nobody left to pull it out.",
+      "text": "Aldric goes still on the name Millbrook, and on his mother, and then he pulls the white glove off a hand that will not hold still. \"She's still there. My mother.\" He kneels to Thorne — not surrender, an offer — and the Magistrate's best blade belongs to the resistance before the fog has finished rising. Thorne lives, and her cells have a name to answer to at last. Wren's band does not ride for Corvane. The Ledger never goes back to Corvane, and the white glove curls in the campfire with nobody left to pull it out.",
       "resolves": [
         "jin-ledger",
         "wren-band",
@@ -871,7 +1015,7 @@
     {
       "id": "end-hand-vanishes",
       "title": "The Hand Vanishes",
-      "text": "Thorne lives. The Hand melts into the fog off the river, unfinished and uncaught. It is a victory with a bill attached, and your name is on the list. The Ledger stays in your coat. Wren's band is left in the open war, and the resistance keeps only what it could drag clear of his blade.",
+      "text": "Thorne lives. The Hand melts into the fog off the river, unfinished and uncaught. It is a victory with a bill attached, and your name is on the list. The Ledger stays in your coat. The deserters are not Corvane's tonight, and the resistance keeps only what it could drag clear of his blade.",
       "resolves": [
         "jin-ledger",
         "wren-band",
@@ -881,7 +1025,7 @@
     {
       "id": "end-bargain",
       "title": "The Courier's Bargain",
-      "text": "You hand the Ledger over without a word, and the purge list goes home to Corvane. Thorne's hand finds your shoulder. \"We'll get it back.\" Wren's band waits in the Thornwood on a promise the book no longer keeps. The resistance lives, poorer by the pages that named its dead.",
+      "text": "You hand the Ledger over without a word, and the purge list goes home to Corvane. Thorne's hand finds your shoulder. \"We'll get it back.\" The deserters stay deserters, and the book is not theirs. The resistance lives, poorer by the pages that named its dead.",
       "resolves": [
         "jin-ledger",
         "wren-band",
@@ -891,7 +1035,7 @@
     {
       "id": "end-captured",
       "title": "Captured",
-      "text": "You wake in a cell in Bridgeport, straw and river-damp and the smell of cold stone. A white glove lies folded on the floor outside the bars. A voice comes out of the dark. \"You nearly had it, courier.\" The Ledger is back in Corvane's hands, Wren's band cannot pull you out, and the resistance loses the night.",
+      "text": "You wake in a cell in Bridgeport, straw and river-damp and the smell of cold stone. A white glove lies folded on the floor outside the bars. A voice comes out of the dark. \"You nearly had it, courier.\" The Ledger is back in Corvane's hands. The deserters are not at the bars, and the resistance loses the night.",
       "resolves": [
         "jin-ledger",
         "wren-band",

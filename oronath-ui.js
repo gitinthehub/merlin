@@ -13,6 +13,7 @@
   var resumeNote = "";
   var active = null;
   var screen = "splash";
+  var newRunArmed = false;
 
   function el(tag, cls, text) {
     var node = document.createElement(tag);
@@ -102,15 +103,36 @@
   }
 
   function replaceWarning(forArcId) {
-    if (!many() || !Stories) return "";
+    if (!Stories) return "";
     var saved = Stories.savedArc();
-    if (!saved || !saved.arc || saved.arcId === forArcId) return "";
+    if (!saved || !saved.arc) return "";
+    if (saved.phase === "resolved") return "";
+    if (saved.arcId === forArcId) {
+      var n = saved.chapterNumber != null ? saved.chapterNumber : "";
+      var place = saved.chapterTitle || "";
+      return (
+        "This story has a run in progress at Chapter " +
+        n +
+        " — " +
+        place +
+        ". Beginning again replaces it."
+      );
+    }
+    if (!many()) return "";
     var title = saved.arc.title || saved.arcId;
     return (
       "Your run in " +
       title +
       " is saved — beginning this story will replace it."
     );
+  }
+
+  function chapterKicker(v) {
+    var n =
+      Stories && typeof Stories.pathChapter === "function"
+        ? Stories.pathChapter(v.phase, (v.history || []).length)
+        : (v.history || []).length + 1;
+    return "Chapter " + n;
   }
 
   function resumeLabel(saved) {
@@ -121,6 +143,7 @@
   }
 
   function startFresh() {
+    newRunArmed = false;
     Persist.clear();
     resumeNote = "";
     run = Loop.createRun(active, { characters: active.characters });
@@ -130,6 +153,12 @@
   }
 
   function onNewRun() {
+    if (!newRunArmed) {
+      newRunArmed = true;
+      render();
+      return;
+    }
+    newRunArmed = false;
     Persist.clear();
     run = null;
     resumeNote = "";
@@ -144,6 +173,7 @@
   }
 
   function onStories() {
+    newRunArmed = false;
     run = null;
     resumeNote = "";
     screen = "picker";
@@ -151,6 +181,7 @@
   }
 
   function onChoose(choiceId) {
+    newRunArmed = false;
     if (!run || run.phase !== "choose") return;
     Loop.choose(run, choiceId);
     persist();
@@ -158,6 +189,7 @@
   }
 
   function onContinue() {
+    newRunArmed = false;
     if (!run || run.phase !== "outcome") return;
     Loop.continueRun(run);
     persist();
@@ -172,7 +204,11 @@
       storiesBtn.addEventListener("click", onStories);
       foot.appendChild(storiesBtn);
     }
-    var anew = el("button", primaryNew && !many() ? "btn primary" : "btn ghost", "New Run");
+    var anew = el(
+      "button",
+      primaryNew && !many() ? "btn primary" : "btn ghost",
+      newRunArmed ? "Press again to start over" : "New Run"
+    );
     anew.type = "button";
     anew.addEventListener("click", onNewRun);
     foot.appendChild(anew);
@@ -228,6 +264,14 @@
         var warn = replaceWarning(entry.id);
         if (warn) card.appendChild(el("p", "muted oronath-story-warn", warn));
 
+        var ownsResolved =
+          saved && saved.arcId === entry.id && saved.phase === "resolved";
+        if (ownsResolved) {
+          card.appendChild(
+            el("p", "muted", "Ended: " + (saved.chapterTitle || ""))
+          );
+        }
+
         var actions = el("div", "oronath-story-actions");
         var begin = el("button", "btn primary", "Begin");
         begin.type = "button";
@@ -242,7 +286,7 @@
         });
         actions.appendChild(begin);
 
-        if (saved && saved.arcId === entry.id) {
+        if (saved && saved.arcId === entry.id && saved.phase !== "resolved") {
           var resume = el("button", "btn", resumeLabel(saved));
           resume.type = "button";
           resume.disabled = blocked;
@@ -340,7 +384,7 @@
       el(
         "p",
         "oronath-kicker",
-        "Chapter " + v.chapter.number + " of " + v.chapterCount
+        chapterKicker(v)
       )
     );
     panel.appendChild(el("h2", "scene-title", v.chapter.title));
@@ -381,7 +425,7 @@
         el(
           "p",
           "oronath-kicker",
-          "Chapter " + v.chapter.number + " of " + v.chapterCount
+          chapterKicker(v)
         )
       );
       panel.appendChild(el("h2", "scene-title", v.chapter.title));
@@ -479,7 +523,7 @@
       return;
     }
     var loaded = Persist.load(active);
-    if (loaded.ok && loaded.run) {
+    if (loaded.ok && loaded.run && loaded.run.phase !== "resolved") {
       run = loaded.run;
       resumeNote = "";
       screen = "play";
@@ -510,7 +554,7 @@
       return;
     }
     var saved = Stories.savedArc();
-    if (saved && saved.arc) {
+    if (saved && saved.arc && saved.phase !== "resolved") {
       var validated = Arc.validateArc(saved.arc);
       if (validated.ok) {
         var loaded = Persist.load(saved.arc);

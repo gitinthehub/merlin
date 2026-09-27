@@ -199,6 +199,10 @@
 }
 
 @media (max-width: 400px) {
+  .oronath-page #app {
+    padding-bottom: 7rem;
+  }
+
   .oronath-panel {
     padding: 1rem 0.75rem 1.25rem;
   }

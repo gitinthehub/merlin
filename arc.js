@@ -128,12 +128,12 @@
     var byChar = characterIndex(characters);
     var byThread = threadIndex(threads);
 
-    if (chapters.length < 3 || chapters.length > 5) {
+    if (chapters.length < 3 || chapters.length > 6) {
       pushError(
         errors,
         "chapter-count",
         "chapters",
-        "chapter count " + chapters.length + " outside 3–5"
+        "chapter count " + chapters.length + " outside 3–6"
       );
     }
 

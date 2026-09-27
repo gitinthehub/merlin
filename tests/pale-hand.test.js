@@ -51,14 +51,15 @@ var builtBytes = fs.readFileSync(outJs, "utf8");
 assert(committedBytes === builtBytes, "committed pale-hand.js matches fresh bundle");
 
 assert(arc.id === "pale-hand", "id pale-hand");
-assert(arc.chapters && arc.chapters.length === 5, "five chapters");
+assert(arc.chapters && arc.chapters.length === 6, "six chapters");
 
 var chapterExpect = [
   ["lantern-quarter", "The Lantern Quarter"],
   ["crosshaven", "Crosshaven Market"],
   ["toll-bridge", "The Toll Bridge"],
   ["thornwood", "The Thornwood Ambush"],
-  ["the-ford", "The Hand at the Ford"]
+  ["the-ford", "The Hand at the Ford"],
+  ["the-ford-blind", "The Hand at the Ford"]
 ];
 var ci;
 for (ci = 0; ci < chapterExpect.length; ci++) {
@@ -113,7 +114,11 @@ var choiceExpect = [
   ["jin-fight-hand", "Draw the short sword and go at him in the fog"],
   ["jin-show-ledger", "Show him the Millbrook page and tell him about his mother"],
   ["jin-offer-ledger", "Offer the Ledger in exchange for Thorne's life"],
-  ["jin-smoke-thorne", "Smoke bomb, then drag Thorne out of the tent"]
+  ["jin-smoke-thorne", "Smoke bomb, then drag Thorne out of the tent"],
+  ["jin-fight-hand-blind", "Draw the short sword and go at him in the fog"],
+  ["jin-name-millbrook", "Name Millbrook, and his mother, with nothing in your hand to show"],
+  ["jin-offer-ledger-blind", "Offer the Ledger in exchange for Thorne's life"],
+  ["jin-smoke-thorne-blind", "Smoke bomb, then drag Thorne out of the tent"]
 ];
 
 var choiceById = {};
@@ -128,7 +133,7 @@ for (ci = 0; ci < arc.chapters.length; ci++) {
     choiceOrder.push(choices[ch]);
   }
 }
-assert(choiceOrder.length === 20, "twenty choices");
+assert(choiceOrder.length === 24, "twenty-four choices");
 for (ci = 0; ci < choiceExpect.length; ci++) {
   assert(choiceOrder[ci].id === choiceExpect[ci][0], "choice id " + choiceExpect[ci][0]);
   assert(
@@ -233,6 +238,90 @@ assert(
 );
 assert(talk.consequences.success.text.indexOf(wrenLine) !== -1, "talk success Wren line");
 assert(talk.consequences.bonus.text.indexOf(wrenLine) !== -1, "talk bonus Wren line");
+assert(
+  talk.consequences.success.text.indexOf(marginNote) !== -1,
+  "talk success reads the margin"
+);
+assert(
+  talk.consequences.bonus.text.indexOf(marginNote) !== -1,
+  "talk bonus reads the margin"
+);
+assert(
+  choiceById["jin-fortune"].consequences.success.text.indexOf(marginNote) === -1,
+  "fortune success does not read the margin"
+);
+assert(
+  choiceById["jin-watch-patrols"].consequences.success.text.indexOf(marginNote) === -1,
+  "watch success does not read the margin"
+);
+
+var ledgerThread = null;
+for (ci = 0; ci < arc.threads.length; ci++) {
+  if (arc.threads[ci].id === "jin-ledger") ledgerThread = arc.threads[ci];
+}
+assert(
+  ledgerThread && ledgerThread.label === "the Millbrook page",
+  "jin-ledger label is the Millbrook page"
+);
+assert(arc.pitch.indexOf("the Pale Hand") !== -1, "pitch names the Pale Hand");
+assert(arc.pitch.indexOf("Aldric") === -1, "pitch does not name Aldric");
+
+var thorn = null;
+for (ci = 0; ci < arc.chapters.length; ci++) {
+  if (arc.chapters[ci].id === "thornwood") thorn = arc.chapters[ci];
+}
+assert(thorn && thorn.setting.indexOf("Wren is the fifth") !== -1, "thornwood setting counts Wren as the fifth");
+assert(thorn && thorn.setting.indexOf("leads five") === -1, "thornwood setting does not say leads five");
+assert(
+  choiceById["jin-still"].consequences.success.text.indexOf(
+    "Four archers, and the fifth is Wren"
+  ) !== -1,
+  "stay-still success still counts four archers"
+);
+
+var fightFail = choiceById["jin-fight-band"].consequences.failure.text;
+var climbFail = choiceById["jin-under-bridge"].consequences.failure.text;
+assert(fightFail.indexOf("smoke bomb") === -1, "fight failure does not take the smoke bomb");
+assert(climbFail.indexOf("smoke bomb") === -1, "climb failure does not lose the smoke bomb");
+assert(
+  choiceById["jin-smoke-bomb"].consequences.success.text.indexOf("saddlebag") !== -1,
+  "smoke success keeps a saddlebag charge"
+);
+assert(
+  choiceById["jin-smoke-bomb"].consequences.failure.text.indexOf("saddlebag") !== -1,
+  "smoke failure keeps a saddlebag charge"
+);
+assert(
+  choiceById["jin-fight-band"].consequences.complication.text.indexOf("already over") === -1,
+  "fight complication does not say the camp is already over"
+);
+assert(
+  choiceById["jin-fight-band"].consequences.complication.text.indexOf("alive") !== -1,
+  "fight complication says Thorne is alive"
+);
+assert(
+  choiceById["jin-fight-band"].consequences.complication.next === "end-hand-vanishes",
+  "fight complication still ends on the Hand vanishes"
+);
+
+var turns = null;
+var falls = null;
+var vanishes = null;
+var bargain = null;
+var captured = null;
+for (ei = 0; ei < arc.endings.length; ei++) {
+  if (arc.endings[ei].id === "end-hand-turns") turns = arc.endings[ei];
+  if (arc.endings[ei].id === "end-hand-falls") falls = arc.endings[ei];
+  if (arc.endings[ei].id === "end-hand-vanishes") vanishes = arc.endings[ei];
+  if (arc.endings[ei].id === "end-bargain") bargain = arc.endings[ei];
+  if (arc.endings[ei].id === "end-captured") captured = arc.endings[ei];
+}
+assert(turns.text.indexOf("takes the resistance's side") === -1, "hand turns does not claim Wren joined");
+assert(turns.text.indexOf("does not ride for Corvane") !== -1, "hand turns deserters stay deserters");
+assert(falls.text.indexOf("does not march for Corvane") !== -1, "hand falls deserters sentence stays");
+assert(vanishes.text.indexOf("left in the open war") === -1, "hand vanishes does not leave the band in the war");
+assert(bargain.text.indexOf("promise") === -1, "bargain does not presuppose a promise");
+assert(captured.text.indexOf("cannot pull you out") === -1, "captured does not claim the band would rescue Jin");
 
 var show = choiceById["jin-show-ledger"];
 assert(show.consequences.success.next === "end-hand-turns", "show success → end-hand-turns");
@@ -298,6 +387,94 @@ assert(fightHand.check.tags[0] === "fighting", "jin-fight-hand tag");
 assert(fightHand.check.modifier === -1, "jin-fight-hand modifier");
 assert(fightHand.check.advantage === false, "jin-fight-hand no advantage");
 assert(fightHand.dc === 15, "jin-fight-hand eff 15");
+
+var showLedger = effOf("jin-show-ledger");
+assert(showLedger.dc === 11, "jin-show-ledger eff 11");
+assert(showLedger.check.advantage === true, "jin-show-ledger advantage");
+var nameMill = effOf("jin-name-millbrook");
+assert(nameMill.check.tier === "veryHard", "jin-name-millbrook tier");
+assert(nameMill.check.tags[0] === "clumsy-hands", "jin-name-millbrook tag");
+assert(nameMill.check.advantage === false, "jin-name-millbrook no advantage");
+assert(nameMill.dc === 17, "jin-name-millbrook eff 17");
+
+var fordIds = { "the-ford": true, "the-ford-blind": true };
+var endingIds = {
+  "end-hand-turns": true,
+  "end-hand-falls": true,
+  "end-hand-vanishes": true,
+  "end-bargain": true,
+  "end-captured": true
+};
+var fordReached = { "the-ford": {}, "the-ford-blind": {} };
+var branchKeys = ["success", "failure", "complication", "bonus"];
+for (ci = 0; ci < choiceOrder.length; ci++) {
+  var fordChoice = choiceOrder[ci];
+  var fordCons = fordChoice.consequences || {};
+  var bk;
+  for (bk = 0; bk < branchKeys.length; bk++) {
+    var fordNode = fordCons[branchKeys[bk]];
+    if (!fordNode || !fordIds[fordNode.next]) continue;
+    var learned = fordNode.resolves && fordNode.resolves.indexOf("jin-ledger") !== -1;
+    assert(
+      (fordNode.next === "the-ford") === !!learned,
+      "informed ford iff jin-ledger: " + fordChoice.id + "." + branchKeys[bk]
+    );
+  }
+  if (fordIds[fordChoice._chapterId]) {
+    for (bk = 0; bk < branchKeys.length; bk++) {
+      var dest = fordCons[branchKeys[bk]] && fordCons[branchKeys[bk]].next;
+      if (endingIds[dest]) fordReached[fordChoice._chapterId][dest] = true;
+    }
+  }
+}
+var blindChapter = null;
+for (ci = 0; ci < arc.chapters.length; ci++) {
+  if (arc.chapters[ci].id === "the-ford-blind") blindChapter = arc.chapters[ci];
+}
+assert(blindChapter, "blind ford chapter");
+var blindLabelBad = false;
+var smokeLabels = 0;
+for (ci = 0; ci < blindChapter.choices.length; ci++) {
+  if (blindChapter.choices[ci].label.indexOf("Millbrook page") !== -1) blindLabelBad = true;
+  if (blindChapter.choices[ci].label === "Smoke bomb, then drag Thorne out of the tent") {
+    smokeLabels += 1;
+  }
+}
+assert(!blindLabelBad, "blind ford labels do not claim the Millbrook page");
+assert(
+  choiceById["jin-show-ledger"].label.indexOf("Millbrook page") !== -1,
+  "informed show still names the Millbrook page"
+);
+var nameCons = choiceById["jin-name-millbrook"].consequences;
+assert(nameCons.success.next === "end-hand-turns", "name success → end-hand-turns");
+var nameKeys = ["success", "failure", "complication", "bonus"];
+for (ci = 0; ci < nameKeys.length; ci++) {
+  assert(
+    nameCons[nameKeys[ci]].text.indexOf("page") === -1,
+    "name " + nameKeys[ci] + " does not say page"
+  );
+}
+for (ci = 0; ci < arc.chapters.length; ci++) {
+  if (arc.chapters[ci].id !== "the-ford") continue;
+  var informedSmoke = false;
+  var ic;
+  for (ic = 0; ic < arc.chapters[ci].choices.length; ic++) {
+    if (
+      arc.chapters[ci].choices[ic].label ===
+      "Smoke bomb, then drag Thorne out of the tent"
+    ) {
+      informedSmoke = true;
+    }
+  }
+  assert(informedSmoke, "informed ford still offers the smoke bomb");
+}
+assert(smokeLabels === 1, "blind ford still offers the smoke bomb");
+["end-hand-turns", "end-hand-falls", "end-hand-vanishes", "end-bargain", "end-captured"].forEach(
+  function (endingId) {
+    assert(fordReached["the-ford"][endingId], "informed ford reaches " + endingId);
+    assert(fordReached["the-ford-blind"][endingId], "blind ford reaches " + endingId);
+  }
+);
 
 var chapterIdSet = {};
 var endingIdSet = {};
@@ -520,6 +697,29 @@ Loop.continueRun(run);
 assert(run.nodeId === "end-hand-turns", "played run ends on end-hand-turns");
 assert(run.phase === "resolved", "played run phase resolved");
 assert(Loop.openThreads(run).length === 0, "played run open threads 0");
+
+var blind = Loop.createRun(arc, { characters: arc.characters, seed: 1 });
+Loop.choose(blind, "jin-rooftops", { rng: Dice.sequence([1]) });
+Loop.continueRun(blind);
+assert(blind.nodeId === "toll-bridge", "blind setup is the toll bridge");
+Loop.choose(blind, "jin-under-bridge", { rng: Dice.sequence([2]) });
+assert(blind.outcome.branch === "failure", "under-bridge 2 is failure");
+Loop.continueRun(blind);
+assert(blind.nodeId === "the-ford-blind", "unread post reaches the blind ford");
+Loop.choose(blind, "jin-name-millbrook", { rng: Dice.sequence([17]) });
+assert(blind.outcome.branch === "success", "name millbrook 17 is success");
+Loop.continueRun(blind);
+assert(blind.nodeId === "end-hand-turns", "blind success still reaches the Hand Turns");
+
+var blindFail = Loop.createRun(arc, { characters: arc.characters, seed: 1 });
+Loop.choose(blindFail, "jin-rooftops", { rng: Dice.sequence([1]) });
+Loop.continueRun(blindFail);
+Loop.choose(blindFail, "jin-under-bridge", { rng: Dice.sequence([2]) });
+Loop.continueRun(blindFail);
+Loop.choose(blindFail, "jin-name-millbrook", { rng: Dice.sequence([16]) });
+assert(blindFail.outcome.branch === "failure", "name millbrook 16 is failure");
+Loop.continueRun(blindFail);
+assert(blindFail.nodeId === "end-hand-vanishes", "blind failure reaches the Hand Vanishes");
 
 try {
   fs.unlinkSync(outJs);

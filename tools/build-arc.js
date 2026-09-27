@@ -25,7 +25,7 @@ var SYSTEM_PROMPT =
   "- id (string), version (number, use 1), title (string)\n" +
   '- characters: either the strings "john", "joel", "rafe", or full character objects with id/name/threadId/traits\n' +
   "- threads: array of { id, characterId, label }\n" +
-  "- chapters: length 3–5; each has id, title, setting, objective, choices (length 2–4)\n" +
+  "- chapters: length 3–6; each has id, title, setting, objective, choices (length 2–4)\n" +
   "- each choice: id, label, actor (john|joel|rafe), roll, consequences\n" +
   "- roll.die is d20|d10|2d6; d20 uses tier easy|medium|hard|veryHard (DCs 8/11/14/16); " +
   "d10 and 2d6 use numeric dc; tags are trait ids from the cast\n" +
