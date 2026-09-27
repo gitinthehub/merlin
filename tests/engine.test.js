@@ -270,6 +270,165 @@
     );
   })();
 
+  /* ——— Daily share line: identity, squares, attempts ——— */
+  var URL = "https://merlin-dnd.netlify.app";
+  var VELLUM_TOMB = "Vellum, nun. Mauled to death in the churchyard. Owed 9 gold.";
+
+  function checks(oks) {
+    var out = [];
+    for (var i = 0; i < oks.length; i++) out.push({ face: 10, ok: oks[i] });
+    return out;
+  }
+
+  function freshVellum(daily) {
+    resetStore();
+    E.newGame();
+    E.selectCharacter("vellum");
+    var st = E.getState();
+    st.gold = 9;
+    st.daily = daily || null;
+    return st;
+  }
+
+  function vellumDeath(daily, oks) {
+    var st = freshVellum(daily);
+    st.diceLog = checks(oks);
+    st.deathCause = "ghoul";
+    st.nodeId = "death";
+    return st;
+  }
+
+  (function () {
+    var st = freshVellum({ date: "2026-09-26", number: 269, seed: 1, attempts: 1 });
+    st.diceLog = checks([true, true, false, true]);
+    st.nodeId = "end_stake";
+    var line = E.shareLine("end_stake");
+    eq(
+      line,
+      "MERLIN #269 🧛 Vellum · 🎲 🟩🟩🟥🟩 · Ending: The Stake · " + URL,
+      "daily first-attempt ending share"
+    );
+    contains(line, "🟩🟩🟥🟩", "daily ending squares");
+    notContains(line, "Attempt", "first attempt has no attempt count");
+  })();
+
+  (function () {
+    vellumDeath({ date: "2026-09-26", number: 269, seed: 1, attempts: 1 }, [false, false, false]);
+    var line = E.shareLine("death");
+    eq(
+      line,
+      "MERLIN #269 🧛 Vellum · 🎲 🟥🟥🟥 · Ending: An Epitaph · " + VELLUM_TOMB + " · " + URL,
+      "daily first-attempt death share"
+    );
+    contains(line, "MERLIN #269", "daily death keeps number");
+    contains(line, "🟥🟥🟥", "daily death squares");
+    notContains(line, "Attempt", "daily first death has no attempt count");
+  })();
+
+  (function () {
+    vellumDeath({ date: "2026-09-26", number: 269, seed: 1, attempts: 2 }, [false, true, false]);
+    eq(
+      E.shareLine("death"),
+      "MERLIN #269 🧛 Vellum · 🎲 🟥🟩🟥 · Ending: An Epitaph · " + VELLUM_TOMB + " · Attempt 2 · " + URL,
+      "daily second-attempt death share"
+    );
+    E.getState().daily.attempts = 3;
+    eq(
+      E.shareLine("death"),
+      "MERLIN #269 🧛 Vellum · 🎲 🟥🟩🟥 · Ending: An Epitaph · " + VELLUM_TOMB + " · Attempt 3 · " + URL,
+      "daily third-attempt death share"
+    );
+  })();
+
+  (function () {
+    vellumDeath(null, [false, true, false]);
+    var line = E.shareLine("death");
+    eq(line, VELLUM_TOMB + " · " + URL, "non-daily vellum death share");
+    notContains(line, "MERLIN #", "non-daily death has no daily number");
+    eq(E.tombstoneLine(), VELLUM_TOMB, "vellum ghoul tombstone unchanged");
+  })();
+
+  freshPip();
+  (function () {
+    setDeath("gate");
+    eq(
+      E.tombstoneLine(),
+      "Pip, clerk. Schooled to death at the castle gate. Owed 3 gold.",
+      "pip gate tombstone unchanged"
+    );
+  })();
+
+  freshPip();
+  (function () {
+    var st = E.getState();
+    st.nodeId = "end_stake";
+    eq(E.shareLine("end_stake"), "Pip · The Stake · " + URL, "non-daily ending share unchanged");
+  })();
+
+  freshPip();
+  (function () {
+    var st = E.getState();
+    st.daily = { date: "2026-09-26", number: 41, seed: 1 };
+    st.diceLog = [20, 7, 2, 17];
+    st.nodeId = "end_clause";
+    eq(
+      E.shareLine("end_clause"),
+      "MERLIN #41 🧛 Pip · 🎲 20 · 7 · 2 · 17 · Ending: The Correction · " + URL,
+      "numeric dice log keeps number list"
+    );
+  })();
+
+  resetStore();
+  (function () {
+    store["merlin.daily.v1"] = JSON.stringify({
+      v: 1,
+      date: "2026-09-26",
+      number: 269,
+      heroId: "vellum",
+      endingId: "death",
+      shareLine: VELLUM_TOMB + " · " + URL,
+      review: "A short visit. One star."
+    });
+    var rec = E.readDailyRecord();
+    assert(rec !== null, "v1 daily record still readable");
+    eq(rec && rec.attempts, 1, "v1 daily record reads as one attempt");
+    eq(rec && rec.shareLine, VELLUM_TOMB + " · " + URL, "v1 daily share line preserved");
+  })();
+
+  resetStore();
+  (function () {
+    var day = new Date(Date.UTC(2026, 8, 26, 12));
+    E.startDaily(day);
+    E.goTo("end_stake");
+    E.startDaily(day);
+    eq(E.getState().daily.attempts, 2, "second startDaily is attempt 2");
+    E.goTo("end_stake");
+    var raw = store["merlin.daily.v1"];
+    contains(raw, "\"v\":2", "daily record is v2");
+    contains(raw, "\"attempts\":2", "daily record counts attempts");
+  })();
+
+  resetStore();
+  (function () {
+    E.startDaily(new Date(Date.UTC(2026, 8, 26, 12)));
+    E.goTo("gate");
+    assert(E.restoreGate(), "daily restore 1");
+    assert(E.restoreGate(), "daily restore 2");
+    var st = E.getState();
+    eq(st.daily.attempts, 3, "two gate restores make attempt 3");
+    st.diceLog = checks([false, true, false]);
+    st.deathCause = "ghoul";
+    st.nodeId = "death";
+    contains(E.shareLine("death"), "Attempt 3", "restored daily death shows attempt 3");
+  })();
+
+  (function () {
+    var st = vellumDeath({ date: "2026-09-26", number: 269, seed: 1, attempts: 2 }, [false, true, false]);
+    E.save();
+    E.load();
+    contains(E.shareLine("death"), "Attempt 2", "attempt count survives reload");
+  })();
+
   /* ——— Gold wasted excludes toll and shop ——— */
   freshPip();
   (function () {

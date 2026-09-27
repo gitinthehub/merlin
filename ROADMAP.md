@@ -137,6 +137,7 @@ The product brief: turn the shipped arc into a **reusable, data-driven dice-narr
 
 ## Changelog
 
+- **2026-09-26** — Pass 12: a Daily Curse death no longer loses its identity. `shareLine()` returned the tombstone line before it reached the daily branch, so a daily death was byte-identical to a non-daily one; the daily line now comes first and the tombstone follows the ending title. The dice in a daily share line are the checks themselves — a green square for a pass, a red one for a fail — and a second play on the same day says "Attempt N" before the URL. A save from before this change still renders its old number list, and a non-daily run's line is unchanged.
 - **2026-09-26** — Pass 11, from an independent QA review (`.qa/qa-pass4.md`): a Title button returns to the splash so the Daily Curse stays reachable once a save exists; tombstones name the place you actually died, including the five causes that used to read as a throne-room death plus the three the QA did not list; the Count's review counts every jab once and stops repeating its overheard clause; stale dice are cleared and the killing blow is shown; a death line and a share link on every ending; the portrait and shop-frame pass for phones.
 - **2026-09-26** — Pass 10: a failed check in The Last Signal of Oronath now ends on a road the success check does not take (roadmap 2.8).
 - **2026-09-26** — Follow-up: marsh jab site added to 1.6, so the Count's review names the place the spec example asks for ("in the marsh, where you thought I couldn't hear") instead of defaulting to the village gate.

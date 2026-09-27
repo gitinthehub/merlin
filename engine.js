@@ -477,7 +477,13 @@
   function noteD20(roll) {
     if (!state || !roll) return;
     if (!state.diceLog) state.diceLog = [];
-    state.diceLog.push(roll.kept);
+    state.diceLog.push({ face: roll.kept, ok: null });
+  }
+
+  function markLastCheck(ok) {
+    if (!state || !state.diceLog || !state.diceLog.length) return;
+    var last = state.diceLog[state.diceLog.length - 1];
+    if (last && typeof last === "object") last.ok = !!ok;
   }
 
   function rollD20(advantage) {
@@ -582,7 +588,9 @@
       var raw = localStorage.getItem(data().dailyKey);
       if (!raw) return null;
       var blob = JSON.parse(raw);
-      if (!blob || blob.v !== 1) return null;
+      if (!blob || (blob.v !== 1 && blob.v !== 2)) return null;
+      if (blob.v === 1) blob.attempts = 1;
+      if (!blob.attempts) blob.attempts = 1;
       return blob;
     } catch (err) {
       return null;
@@ -594,10 +602,11 @@
     try {
       var node = data().nodes[endingId || state.nodeId];
       var blob = {
-        v: 1,
+        v: 2,
         date: state.daily.date,
         number: state.daily.number,
         heroId: state.characterId,
+        attempts: state.daily.attempts || 1,
         endingId: endingId || state.nodeId,
         shareLine: shareLine(endingId),
         review: visitReview(endingId)
@@ -612,41 +621,62 @@
     var shortName = char ? char.shortName || char.name : "?";
     var url = data().siteUrl || "https://merlin-dnd.netlify.app";
     var eid = endingId || state.nodeId;
-    if (eid === "death") {
-      return tombstoneLine() + " · " + url;
-    }
     var node = data().nodes[eid];
     var title = node ? node.title : "Unknown";
     if (state.daily) {
-      var faces =
-        state.diceLog && state.diceLog.length
-          ? state.diceLog.join(" · ")
-          : "—";
+      var attempts = state.daily.attempts || 1;
       return (
         "MERLIN #" +
         state.daily.number +
         " 🧛 " +
         shortName +
         " · 🎲 " +
-        faces +
+        diceSlot(state.diceLog) +
         " · Ending: " +
         title +
+        (eid === "death" ? " · " + tombstoneLine() : "") +
+        (attempts > 1 ? " · Attempt " + attempts : "") +
         " · " +
         url
       );
     }
+    if (eid === "death") {
+      return tombstoneLine() + " · " + url;
+    }
     return shortName + " · " + title + " · " + url;
+  }
+
+  function diceSlot(log) {
+    if (!log || !log.length) return "—";
+    var allChecks = true;
+    var tokens = [];
+    for (var i = 0; i < log.length; i++) {
+      var entry = log[i];
+      if (entry && typeof entry === "object" && typeof entry.ok === "boolean") {
+        tokens.push(entry.ok ? "🟩" : "🟥");
+      } else {
+        allChecks = false;
+        tokens.push(
+          String(entry && typeof entry === "object" ? entry.face : entry)
+        );
+      }
+    }
+    return tokens.join(allChecks ? "" : " · ");
   }
 
   function startDaily(now) {
     var spec = dailySpec(now);
+    var prev = readDailyRecord();
+    var attempts =
+      prev && prev.date === spec.date ? (prev.attempts || 1) + 1 : 1;
     clearSave();
     newGame();
     installRng(spec.seed);
     state.daily = {
       date: spec.date,
       number: spec.number,
-      seed: spec.seed
+      seed: spec.seed,
+      attempts: attempts
     };
     state.diceLog = [];
     selectCharacter(spec.heroId);
@@ -1347,6 +1377,10 @@
       } else {
         installRng(null);
       }
+      if (state.daily) {
+        state.daily.attempts = (state.daily.attempts || 1) + 1;
+        writeCheckpoint();
+      }
       save();
       return true;
     } catch (err) {
@@ -1537,6 +1571,7 @@
     var total = roll.kept + mod;
     var success =
       roll.critSuccess || (!roll.critFail && total >= dc);
+    markLastCheck(success);
 
     result.roll = roll;
     result.text = formatRoll(roll, stat, mod, total, dc, "DC");
@@ -1857,6 +1892,7 @@
       var total = roll.kept + mod;
       var ok =
         roll.critSuccess || (!roll.critFail && total >= dc);
+      markLastCheck(ok);
       result.rollText = formatRoll(roll, move.save.stat, mod, total, dc);
       result.rolls = [packCheck(roll, move.save.stat, mod, total, dc)];
       if (ok) {
@@ -1941,6 +1977,7 @@
     var ac = enc.ac;
     var hit =
       roll.critSuccess || (!roll.critFail && total >= ac);
+    markLastCheck(hit);
     out.rollText = formatRoll(roll, "might", mod, total, ac, "AC");
     out.rolls = [packCheck(roll, "might", mod, total, ac)];
 
@@ -2018,6 +2055,7 @@
       var mod = state.spirit || 0;
       var total = roll.kept + mod;
       hit = roll.critSuccess || (!roll.critFail && total >= dc);
+      markLastCheck(hit);
       out.rollText = formatRoll(roll, "spirit", mod, total, dc);
       out.rolls = [packCheck(roll, "spirit", mod, total, dc)];
     }
@@ -2139,6 +2177,7 @@
     var total = roll.kept + mod;
     var ok =
       roll.critSuccess || (!roll.critFail && total >= dc);
+    markLastCheck(ok);
     out.rollText = formatRoll(roll, "wits", mod, total, dc, "DC");
     out.rolls = [packCheck(roll, "wits", mod, total, dc)];
     lastRoll = { text: out.rollText, success: ok, rolls: out.rolls };
@@ -2188,6 +2227,7 @@
     var total = roll.kept + mod;
     var ok =
       roll.critSuccess || (!roll.critFail && total >= dc);
+    markLastCheck(ok);
     out.rollText = formatRoll(roll, "wits", mod, total, dc, "DC");
     out.rolls = [packCheck(roll, "wits", mod, total, dc)];
 
