@@ -1,0 +1,149 @@
+# raw AX dump: /tmp/gbR.json
+elements=327 window={'height': 1319.0, 'width': 1280.0, 'x': 0.0, 'y': 30.0} captured_for=.qa/qa-pass14.md
+
+[   6] StaticText x=   64.0 y=  103.0 | MERLIN
+[   7] StaticText x=   64.0 y=  123.0 | I wouldn't ship this build yet. The dice mechanics are solid. All 33 choice buttons across both stories show the difficulty the roll actually needs, there are no console errors, and all five Pale Han…
+[   9] StaticText x=   64.0 y=  161.0 | Alva Watchdog
+[  10] StaticText x=   64.0 y=  181.0 | ALVA looks healthy. The health check just returned OK. The last poll was at 1:30 PM ET, 23 minutes ago, which is on schedule for the 30-minute cycle. The app has been up for about 70 hours 49 minutes…
+[  12] StaticText x=   64.0 y=  219.0 | MERLIN — a short gothic horror-comedy browser adventure, live at https:/
+[  13] StaticText x=   64.0 y=  239.0 | TOP 4 IDEAS FOR MERLIN
+[  15] StaticText x=   64.0 y=  277.0 | 1|# QA Bot Brief — MERLIN — PASS 3 (story clarity + UI/usability review)
+[  16] StaticText x=   64.0 y=  297.0 | Here's the list again. These are my top 4 ideas for MERLIN, ranked by how likely each one is to make a player share it.
+[  18] StaticText x=   64.0 y=  335.0 | Site QA Bot
+[  19] StaticText x=   64.0 y=  355.0 | The MERLIN pass 3 review is posted in its room, and it starts with a problem: the live site is byte-for-byte the same build I tested in pass 2. None of the input-flow fixes have deployed yet. That's …
+[  21] StaticText x=   64.0 y=  393.0 | # QA Bot Brief — BURN sunburn calculator — PASS 2 > This is your **secon
+[  22] StaticText x=   64.0 y=  413.0 | Sol, BURN pass 4. Tested live Fri Sep 25, 9:08–9:31 PM ET. Build confirmed: the page loads assets/index-87278f71.js and no other script. /burn logged no console errors.
+[  24] StaticText x=   64.0 y=  451.0 | # QA Bot Brief — MERLIN (dice-and-drama adventure) — PASS 2 Sol, this is
+[  25] StaticText x=   64.0 y=  471.0 | Sol, MERLIN pass 2. The verdict is FIX-FIRST and taste goes up to 8/10 (it was 7).
+[  27] StaticText x=   64.0 y=  509.0 | # QA Bot Brief — MERLIN (dice-and-drama adventure) — PASS 1 Sol, this is
+[  28] StaticText x=   64.0 y=  529.0 | Sol, MERLIN pass 1. Played live at desktop and 375 px (Sep 25, about 4:55 PM ET). All six required paths are covered. The Pip route reached end_clause ("The Correction"). Deaths came from the wight (…
+[  30] StaticText x=   64.0 y=  567.0 | Ideas Guy
+[  31] StaticText x=   64.0 y=  587.0 | It's set up. Starting Monday, you'll get a fresh batch of 3 to 5 ideas at 8:45 AM ET every weekday. Most of them will be about making your products more fun, with at most one each about making them f…
+[  34] StaticText x=   64.0 y=  683.0 | Job Search Bot
+[  35] StaticText x=   64.0 y=  703.0 | Morning, Lock. I found 7 picks today, but hardly anything was posted in the last 7 days, so I widened the window to about 3 weeks. None showed any sign of being closed. I couldn't confirm any of them…
+[  37] StaticText x=   64.0 y=  741.0 | Persephone
+[  38] StaticText x=   64.0 y=  761.0 | If that was “anyway” — here’s a tight prep pack for Friday’s call with Vivian (30 min, noon ET).
+[  40] StaticText x=   64.0 y=  799.0 | dr eggbot
+[  41] StaticText x=   64.0 y=  819.0 | rule's written at ~/.cursor/rules/pstack-models.mdc — budget large (xhigh), every role inherit-parent. applies to new sessions; re-run setup anytime to change it.
+[  43] StaticText x=   64.0 y=  857.0 | Critiquito: Design Critique
+[  44] StaticText x=   64.0 y=  877.0 | Want any of these connected so critiques can land where your team works?
+[  46] StaticText x=   64.0 y=  915.0 | Cooper
+[  47] StaticText x=   64.0 y=  935.0 | Want me to install Slack so I can DM you those briefings?
+[  49] StaticText x=   64.0 y=  973.0 | Account Research Desk
+[  50] StaticText x=   64.0 y=  993.0 | Any of these worth connecting for account work?
+[  52] StaticText x=   64.0 y= 1031.0 | Stalk Bot
+[  53] StaticText x=   64.0 y= 1051.0 | Which connectors should I install for research?
+[  55] StaticText x=   64.0 y= 1089.0 | Tradbot
+[  56] StaticText x=   64.0 y= 1109.0 | Want Slack too, for school or caretaker threads?
+[  58] StaticText x=   64.0 y= 1147.0 | Overheard
+[  59] StaticText x=   64.0 y= 1167.0 | Want either optional connector?
+[  61] StaticText x=   64.0 y= 1205.0 | YouTube Playlist Creator
+[  62] StaticText x=   64.0 y= 1225.0 | You’re signed out of Google on my computer. YouTube is back to showing Sign in.
+[  66] Heading    x=  724.0 y=   40.0 | 2
+[  68] StaticText x=  765.0 y=   51.0 | MERLIN
+[  70] StaticText x=  311.0 y=   30.0 | MERLIN
+[  71] StaticText x=  312.0 y=   30.0 | I wouldn't ship this build yet. The dice mechanics are solid. All 33 choice buttons across both stories show the difficulty the roll actually needs, there are no console errors, and all five Pale Hand endings are reachable. The problems are that the picker can silently wipe a run, and The Pale Hand's text often contradicts what the player just did. I couldn't confirm the build ID, because
+[  72] StaticText x=  673.0 y=   30.0 | 481c95c
+[  73] StaticText x=  312.0 y=   30.0 | doesn't appear in any served file. I played 26 full runs of The Pale Hand and 8 of The Last Signal at 1280 and 375px, including runs opened from file://.
+[  74] StaticText x=  312.0 y=   30.0 | A. Top 6 issues for a first-time player
+[  76] ListMarker x=  315.0 y=   30.0 | 1.
+[  77] StaticText x=  332.0 y=   30.0 | Beginning the same story again wipes an in-progress run with no warning.
+[  78] StaticText x=  332.0 y=   30.0 | (Cost: S) Where: the picker card that shows both "Begin" and "Resume — Chapter N". Repro: Begin The Pale Hand, then Begin again, and reach Chapter 2. Tap Stories, then tap Begin on the same card (the red primary button). The title screen shows no warning, and the next Begin puts you on "Chapter 1 of 5" with the save overwritten. Why it matters: the most prominent button on the card deletes your progress. The other story's card warns you, but this one doesn't, because the replace warning returns empty when the saved run belongs to the same story. "New Run" in the footer also clears the save with no confirmation.
+[  79] ListMarker x=  315.0 y=   30.0 | 2.
+[  80] StaticText x=  332.0 y=   30.0 | The ford offers "Show him the Millbrook page and tell him about his mother" even when Jin never read the page, and that choice wins The Hand Turns.
+[  81] StaticText x=  332.0 y=   30.0 | (Cost: M) Where: Chapter 5, The Hand at the Ford. Repro: The Lantern Quarter, then the fortune-teller at Crosshaven, then "Climb under the bridge on the beams" at the Toll Bridge and fail. The failure text says "You are across, and you did not read the post." The ford still offers Show, and success says "You show him the Millbrook page and say what the margin forbids." Any route through the Thornwood also skips the Toll Bridge, which is the only place the note gets read, and still wins with Show. Why it matters: the best ending depends on something the game just told the player Jin doesn't know. A fix that stays within the story data and needs no engine change is to split the ford into two versions, one where Jin read the page and one where she didn't.
+[  82] ListMarker x=  315.0 y=   30.0 | 3.
+[  83] StaticText x=  332.0 y=   30.0 | Every ending narrates Wren's band and marks the deserters closed, whatever the player did.
+[  84] StaticText x=  332.0 y=   30.0 | (Cost: M) Where: every Pale Hand ending screen. Repro: take the Toll Bridge route, which never enters the Thornwood. The ending still says "Wren's band comes down out of the Thornwood and takes the resistance's side," and the screen shows "the deserters — closed" and "Every character thread is closed." Other examples:
+[  86] ListMarker x=  315.0 y=   30.0 | •
+[  87] StaticText x=  332.0 y=   30.0 | After the deserters themselves "bind your hands with your own reins," the ending says "Wren's band cannot pull you out."
+[  88] ListMarker x=  315.0 y=   30.0 | •
+[  89] StaticText x=  332.0 y=   30.0 | The Courier's Bargain mentions "a promise the book no longer keeps," but no promise is made unless the Talk choice succeeded. Why it matters: the last screen, the one players remember, contradicts what they just played.
+[  91] ListMarker x=  315.0 y=   30.0 | 4.
+[  92] StaticText x=  332.0 y=   30.0 | The picker card lists three characters, but only Jin ever acts.
+[  93] StaticText x=  332.0 y=   30.0 | (Cost: S to change the label, L to write choices for the others) Where: the picker card reads "5 chapters · Jin, Wren, Thorne", and the title screen describes Wren and Thorne. Repro: all 20 choices are labelled "Jin · d20 · …", and Wren's and Thorne's traits are never rolled. Why it matters: in The Last Signal all three characters act, so this card sets up party play and then doesn't deliver it.
+[  94] ListMarker x=  315.0 y=   30.0 | 5.
+[  95] StaticText x=  332.0 y=   30.0 | Continuity slips read as bugs.
+[  96] StaticText x=  531.0 y=   30.0 | (Cost: S)
+[  98] ListMarker x=  315.0 y=   30.0 | •
+[  99] StaticText x=  332.0 y=   30.0 | The smoke bomb is taken ("they take the smoke bomb off your belt" after a failed "Fight them") or lost to the river at the bridge, but the ford still offers "Smoke bomb, then drag Thorne out of the tent."
+[ 100] ListMarker x=  315.0 y=   30.0 | •
+[ 101] StaticText x=  332.0 y=   30.0 | The Ledger thread shows "closed" before the ford, even though the ford's objective is "Get Thorne and the Ledger out of the ford alive" and you can still offer the Ledger away there.
+[ 102] ListMarker x=  315.0 y=   30.0 | •
+[ 103] StaticText x=  332.0 y=   30.0 | The chapter counter jumps, for example from "Chapter 1 of 5" to "Chapter 3 of 5", and some runs end at chapter 3 or 4 of 5. The branching is intended, but the counter makes it look like chapters were skipped.
+[ 105] ListMarker x=  315.0 y=   30.0 | 6.
+[ 106] StaticText x=  332.0 y=   30.0 | A finished run takes over the page.
+[ 107] StaticText x=  332.0 y=   30.0 | (Cost: S) Repro: finish a Pale Hand run, then reopen or reload
+[ 108] StaticText x=  480.0 y=   30.0 | oronath.html
+[ 109] StaticText x=  332.0 y=   30.0 | . You land on the old "RESOLUTION / Captured" screen instead of the picker. That card then offers "Resume," and the other card warns "Your run in The Pale Hand is saved — beginning this story will replace it." Why it matters: a story the player already finished is treated as a run that needs protecting.
+[ 110] StaticText x=  312.0 y=   30.0 | B. Defects
+[ 111] StaticText x=  312.0 y=   30.0 | Broken:
+[ 113] ListMarker x=  315.0 y=   30.0 | •
+[ 114] StaticText x=  332.0 y=   30.0 | Links between pages break under file://,
+[ 115] StaticText x=  332.0 y=   30.0 | which goes against your standing constraint.
+[ 116] StaticText x=  410.0 y=   30.0 | index.html
+[ 117] StaticText x=  493.0 y=   30.0 | links to
+[ 118] StaticText x=  552.0 y=   30.0 | href='/oronath'
+[ 119] StaticText x=  674.0 y=   30.0 | and
+[ 120] StaticText x=  711.0 y=   30.0 | href='/roadmap'
+[ 121] StaticText x=  332.0 y=   30.0 | , and
+[ 122] StaticText x=  364.0 y=   30.0 | roadmap.html
+[ 123] StaticText x=  464.0 y=   30.0 | links to
+[ 124] StaticText x=  522.0 y=   30.0 | href='/'
+[ 125] StaticText x=  590.0 y=   30.0 | and
+[ 126] StaticText x=  627.0 y=   30.0 | href='/oronath'
+[ 127] StaticText x=  332.0 y=   30.0 | . From file://, "Play an Oronath story" opens
+[ 128] StaticText x=  537.0 y=   30.0 | file:///oronath
+[ 129] StaticText x=  332.0 y=   30.0 | , which is a browser error page. This predates this build, and the in-story "Back to MERLIN" link works because it's relative. Using relative links like
+[ 130] StaticText x=  624.0 y=   30.0 | oronath.html
+[ 131] StaticText x=  723.0 y=   30.0 | fixes it (S).
+[ 132] ListMarker x=  315.0 y=   30.0 | •
+[ 133] StaticText x=  332.0 y=   30.0 | The served tests
+[ 134] StaticText x=  449.0 y=   30.0 | pale-hand.test.js
+[ 135] StaticText x=  587.0 y=   30.0 | and
+[ 136] StaticText x=  623.0 y=   30.0 | last-signal.test.js
+[ 137] StaticText x=  332.0 y=   30.0 | fail with "Cannot find module '../tools/build-arc.js'" unless you also fetch
+[ 138] StaticText x=  337.0 y=   30.0 | tools/build-arc.js
+[ 139] StaticText x=  389.0 y=   30.0 | and
+[ 140] StaticText x=  425.0 y=   30.0 | arcs/*.json
+[ 141] StaticText x=  516.0 y=   30.0 | . Those files are served but no page uses them.
+[ 142] StaticText x=  337.0 y=   30.0 | tests/oronath-ui.test.js
+[ 143] StaticText x=  530.0 y=   30.0 | returns a 404.
+[ 144] ListMarker x=  315.0 y=   30.0 | •
+[ 145] StaticText x=  332.0 y=   30.0 | Every button did something: Continue, Stories, All stories, New Run, Resume, Begin and Back to MERLIN.
+[ 146] StaticText x=  312.0 y=   30.0 | Picker and save states:
+[ 148] ListMarker x=  315.0 y=   30.0 | •
+[ 149] StaticText x=  332.0 y=   30.0 | There are three problems, all covered above: same-story Begin wipes the run silently, New Run doesn't confirm, and a finished run still counts as saved.
+[ 150] ListMarker x=  315.0 y=   30.0 | •
+[ 151] StaticText x=  332.0 y=   30.0 | Everything else holds up:
+[ 153] ListMarker x=  331.0 y=   30.0 | ◦
+[ 154] StaticText x=  348.0 y=   30.0 | Starting the other story warns before replacing, and "All stories" keeps the save.
+[ 155] ListMarker x=  331.0 y=   34.0 | ◦
+[ 156] StaticText x=  348.0 y=   36.0 | Reloading mid-run resumes the right story, including on a result screen.
+[ 157] ListMarker x=  331.0 y=   60.0 | ◦
+[ 158] StaticText x=  348.0 y=   62.0 | Saves from before the picker still load.
+[ 159] ListMarker x=  331.0 y=   86.0 | ◦
+[ 160] StaticText x=  348.0 y=   88.0 | The v1 game and Oronath use separate save keys, and neither touches the other.
+[ 161] StaticText x=  312.0 y=  142.0 | Story text that contradicts the game (besides items 2, 3 and 5 above):
+[ 163] ListMarker x=  315.0 y=  172.0 | •
+[ 164] StaticText x=  332.0 y=  174.0 | In the Thornwood, the failed "Fight them" says "What waits at the camp is already over." The ending is then The Hand Vanishes, which says "Thorne lives." The smoke-bomb complication ("The Hand has already been to the ford and gone") leads to the same ending.
+[ 165] ListMarker x=  315.0 y=  264.0 | •
+[ 166] StaticText x=  332.0 y=  266.0 | The Thornwood setting says "Wren leads five Ash Guard deserters," but the "Stay still…" success says "Four archers, and the fifth is Wren."
+[ 167] ListMarker x=  315.0 y=  312.0 | •
+[ 168] StaticText x=  332.0 y=  314.0 | Items like the potion, rope, silver and the extra smoke bomb from a bonus never affect anything later. "Twenty silver goes into the black water" costs nothing.
+[ 169] ListMarker x=  315.0 y=  360.0 | •
+[ 170] StaticText x=  332.0 y=  362.0 | The title pitch says "…before Aldric does," but Aldric isn't introduced as the Pale Hand until the ford.
+[ 171] ListMarker x=  315.0 y=  408.0 | •
+[ 172] StaticText x=  332.0 y=  410.0 | In The Last Signal, the "team-climb" label names all three characters, but only Joel rolls. This predates this build.
+[ 173] StaticText x=  312.0 y=  464.0 | Stated difficulty versus the actual roll: no mismatches. I checked all 33 buttons against the source and every played equation.
+[ 174] StaticText x=  312.0 y=  518.0 | Endings that leave out a thread they closed: none. The problem goes the other way, since endings narrate threads the player never touched (item 3).
+[ 175] StaticText x=  312.0 y=  572.0 | Unreachable endings or dead ends: none. One oddity is that a complication on a choice rolled with advantage needs two 1s (a 1 in 400 chance), so, for example, "Offer the Ledger" leading to Captured is almost never seen.
+[ 176] StaticText x=  312.0 y=  648.0 | Phone width: nothing is cut off or unstyled at 360 or 375px on the picker, title, chapter, result and ending screens. The footer buttons are a little small at 38px tall, and Netlify's "Powered by Netlify" badge covers part of Resume on the picker at 360px (that badge comes from hosting, not your code).
+[ 177] StaticText x=  312.0 y=  746.0 | Regression: none found. The v1 game and daily share line are unchanged, and the #269 death line still matches byte for byte. The last pass's attempt bug is fixed: I confirmed through the engine that a checkpoint restore no longer counts as an attempt, though I didn't reach it by playing to a death. The Last Signal played to four endings with no changes. The roadmap is fine at both widths and shows the new v2.1 milestone. Opened from file://, both stories play and resume, and every request stays local.
+[ 178] StaticText x=  312.0 y=  910.0 | C. Verdict:
+[ 179] StaticText x=  312.0 y=  910.0 | Not shippable as it stands. Fixing the silent same-story wipe and the three Pale Hand contradictions (the Millbrook page, Wren in every ending, and the cast list) would change my mind. All of those are small or medium fixes to text and story data that stay within your constraints.
+[ 180] StaticText x=  312.0 y= 1008.0 | I tested in Chromium only, not on a real phone, Safari or Firefox.
+[ 187] StaticText x=  666.0 y= 1126.0 | +3
+[ 188] StaticText x= 1211.0 y=   30.0 | 6:00 PM
+[ 189] TextArea   x=  345.0 y= 1301.0 | Message MERLIN
+[ 193] StaticText x=    0.0 y=   30.0 | MERLIN replied

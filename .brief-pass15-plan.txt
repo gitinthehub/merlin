@@ -1,0 +1,121 @@
+PASS 15 — PLAN BRIEF (read-only). Do not edit any file. Do not run any git command that writes.
+Your final message must BE the whole plan, beginning with the literal line
+
+PLAN — MERLIN PASS 15: THE REVIEW'S FIRST TRANCHE
+
+followed by these numbered sections, in this order:
+  1. FINDINGS
+  2. FILE-BY-FILE CHANGE LIST
+  3. THE SPLIT FORD — GRAPH AND PROSE
+  4. TESTS AND THEIR EVIDENCE
+  5. VERIFICATION COMMANDS
+  6. RISKS AND FIRST TRANCHE
+
+== WHAT THIS PASS IS ==
+
+An independent reviewer (the MERLIN bot) reviewed the pass-14 deploy `481c95c` and reported. Its
+report is committed as `.qa/qa-pass14.md`; the raw accessibility dump is `.qa/qa-pass14-raw-ax.txt`.
+The owner's decisions on every finding are committed as `.qa/qa-pass14-triage.md`.
+
+**The BUILD list in that triage file is the contract for this pass. Nothing else.** Read both files
+first, in full. Do not implement anything marked REJECT or DEFER, and do not re-open a rejected item
+because the reviewer stated it confidently — the reasons are given, and they are the owner's call.
+
+Summary of the BUILD list (the triage file has the detail and the exact reasoning):
+
+  B1  Beginning the same story again silently replaces an in-progress run. `replaceWarning()` in
+      `oronath-ui.js` returns "" when the saved run belongs to the story being begun, so the card
+      that owns the save is the only card with no warning. Warn on the card and on the title screen
+      for a mid-run save of the same arc; make the footer's New Run a two-step "press again" button.
+  B2  The ford offers "Show him the Millbrook page" on roads where the prose just told the player
+      Jin never read it, and that choice still wins the best ending at the same difficulty. The
+      owner's prompt wants DC 11 with the clue and DC 17 without it, which the engine cannot express
+      as a flag, so split the ford into two chapters — one for the roads that learned the page, one
+      for the roads that did not — and give the blind one its own option wording and harder roll.
+  B3  Every ending narrates Wren's band and the panel reports the deserters closed, including on
+      roads that never entered the Thornwood. Prose only: an ending's deserters sentence must be
+      true whether or not Wren ever joined. Leave the status line as the engine defines it.
+  B4  The picker card advertises three characters while only Jin ever rolls. Derive the card's cast
+      line from the actors that actually take choices; The Last Signal must still read John, Joel,
+      Rafe.
+  B5  The chapter kicker jumps (2 then 4 on the Thornwood road) because it uses the arc's ordinal.
+      Count the player's own path instead (`run.history.length + 1`, already tracked in `loop.js`)
+      and stop printing "of M".
+  B6  A finished run takes over the page on reload, and the card offers Resume for it. A resolved
+      save must not auto-resume; land on the picker, show which ending it reached, and offer Begin.
+  B7  The Ledger thread reads closed before the ford, while the ford's objective still promises the
+      Ledger. Relabel the thread so its closure is truthful (it closes when Jin learns the Millbrook
+      page) and align the bridge and Thornwood prose that resolves it.
+  B8  A failure takes or loses the smoke bomb and the ford still offers a smoke bomb. Change what
+      those failures cost so every option offered later is legal. There is no inventory to check.
+  B9  The Thornwood's failed fight says "What waits at the camp is already over" and the ending it
+      leads to says Thorne lives. Fix the text.
+  B10 The Thornwood setting says Wren leads five deserters; the Stay-still success says four archers
+      and the fifth is Wren. Make them agree.
+  B11 The pitch names Aldric before the story introduces him. Say the Pale Hand.
+  B12 `index.html` links to `/oronath` and `/roadmap`; `roadmap.html` links to `/` and `/oronath`.
+      The owner opens the site from disk, so make them relative — fix the one pass 14 added first.
+  B13 The hosting badge covers part of Resume at 360px. Give the picker's action row bottom room.
+
+== REPO FACTS ==
+
+- `~/Developer/merlin`, published as github.com/gitinthehub/merlin, live at
+  https://merlin-dnd.netlify.app. Static: no package.json, no build step, no bundler, no test
+  framework, no ES modules (`type="module"` is blocked on `file://`). Plain `<script>` tags and
+  IIFE → `window.*` globals. Zero-dependency Node scripts are fine for local tooling.
+- The arc pipeline: `arcs/pale-hand.json` is the source; `node tools/build-arc.js --from
+  arcs/pale-hand.json --out arcs/pale-hand.js` produces the keyless bundle the browser loads, and
+  refuses to write when `arc.js`'s `validateArc` reports any error. `arcs/last-signal.json` /
+  `arcs/last-signal.js` are the same shape. The bundle must contain no `import `, no `export `, no
+  `XAI_API_KEY`, no `OPENAI_API_KEY`, no `Bearer`.
+- Engine mechanics you must work within: a choice's roll is `roll: {die, tier, tags}` — a `tier`
+  (`easy` / `medium` / `hard` / `veryHard`), never a literal DC for a `d20`; the cast's traits carry
+  `difficulty` and `advantage`, and `characters.js` resolves the final number. Consequences are
+  `success` / `failure` / `complication` / `bonus`, each with `text`, `next` and optional `resolves`.
+  Endings carry `resolves`. `validateArc` walks the graph: unreachable nodes, cycles, unknown `next`,
+  a character without a thread, and any path that leaves a thread unsettled are errors. A choice
+  cannot be roll-free, so "automatic" in the owner's source prompt means "the easiest tier".
+- `run.history` (one entry per resolved choice) and `run.diceLog` exist in `loop.js` and are saved by
+  `persist.js`; `stories.js` classifies a save as `empty` / `ready` / `resolved` / `foreign` /
+  `unusable` and exposes `saveStatus()` and `savedArc()`. `oronath-ui.js` renders the picker, the
+  title screen, a chapter, an outcome and a resolution.
+- Frozen this pass — their diffs must be empty: `dice.js`, `arc.js`, `characters.js`, `loop.js`,
+  `persist.js`, `dice-view.js`, `sample-arc.js`, `engine.js`, `ui.js`, `data.js`, `style.css`.
+  `oronath-ui.js`, `oronath.css`, `stories.js`, `oronath.html`, `index.html`, `roadmap.html`,
+  `roadmap.js`, `ROADMAP.md`, `README.md`, `tools/build-arc.js`, `arcs/*`, `tests/*` are editable.
+- Tests are zero-dependency Node scripts run from the repo root, e.g. `node tests/pale-hand.test.js`;
+  they load modules with relative `require` and mock `localStorage`. `tests/harness.html` is the
+  browser view of the engine tests and loads only files that exist.
+- `ROADMAP.md` and `roadmap.js` both carry the milestone list and have drifted a whole pass behind
+  twice. Any status or name change lands in both, in the same commit. `.pale-hand-arc-spec.md` is the
+  content contract for the arc and `.qa/` holds review material.
+
+== WHAT THE PLAN MUST CONTAIN ==
+
+1. FINDINGS — what the pass-14 build actually does for each BUILD item, quoting the current code or
+   arc text that causes it. Where a BUILD item's premise is wrong, say so and propose the smallest
+   correct fix instead, with the code that proves it.
+2. FILE-BY-FILE CHANGE LIST — every file, what changes in it and why, with the exact strings or
+   identifiers. Say which files you will NOT touch and why that is safe.
+3. THE SPLIT FORD — the new graph: which roads reach which ford, what each ford's four options are,
+   their tiers, what context each option's consequences resolve, and how you keep every ending
+   reachable and every thread settled on every path. Name the chapter ids.
+4. TESTS AND THEIR EVIDENCE — the new or extended assertions, and for each one the specific defect it
+   would catch. Name the tamper you would apply to prove each assertion bites: the exact edit, the
+   rebuild, and the assertion that must fail. Include the assertions for B1, B2, B5, B6 and B7
+   specifically; those are the ones a text-only reading would miss.
+5. VERIFICATION COMMANDS — the exact commands, in order: the full test loop, the frozen-file diff,
+   the double bundle re-derivation with a byte comparison, the bundle hygiene grep, `validateArc` on
+   every arc, and the local browser checks for B1, B2, B5 and B6.
+6. RISKS AND FIRST TRANCHE — what could regress, what you are least sure of, and the order to build
+   in so that a failure in wave one leaves the repo shippable.
+
+== PROHIBITIONS ==
+
+Do not modify, rename or delete: `dice.js`, `arc.js`, `characters.js`, `loop.js`, `persist.js`,
+`dice-view.js`, `sample-arc.js`, `engine.js`, `ui.js`, `data.js`, `style.css`. Do not add a
+dependency, a package.json, a build step, a bundler, an ES module, a network request, a second save
+key, or a new localStorage key. Do not touch `.brief-pass12-*`. Do not implement a REJECT or DEFER
+item, and do not invent a new chapter, character, ending or mechanic beyond what B1–B13 need. Do not
+rewrite story prose that no BUILD item names. Do not commit, push, deploy or run anything that writes
+to git.
