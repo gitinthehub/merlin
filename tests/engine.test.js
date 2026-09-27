@@ -576,6 +576,140 @@
     eq(st.nodeId, "gate", "restoreGate at gate");
   })();
 
+  /* ——— every death cause is complete ———
+
+     A death cause is only half-wired if the tombstone knows it but the guest
+     book does not: the run records nothing, the book shows a blank line, and the
+     death scene falls back to the generic "The night keeps you." This caught
+     arrival/mayor/churchyard, which had tombstones for a full pass while staying
+     invisible in the book. */
+  (function () {
+    var D = sandbox.window.MERLIN;
+    var book = D.guestBook;
+    var causes = Object.keys(D.tombstone);
+    assert(causes.length >= 12, "tombstone has every cause");
+    for (var i = 0; i < causes.length; i++) {
+      var c = causes[i];
+      assert(
+        book.order.indexOf(c) !== -1,
+        "guest book lists cause " + c
+      );
+      assert(
+        typeof book.hints[c] === "string" && book.hints[c].length > 20,
+        "guest book hint for " + c
+      );
+      assert(
+        typeof book.titles[c] === "string" && book.titles[c].length > 2,
+        "guest book title for " + c
+      );
+    }
+    /* every cause except the fall-through "count" has its own death scene */
+    var variants = (D.nodes.death.variants || []).map(function (v) {
+      return v.if && v.if.deathCause;
+    });
+    for (var k = 0; k < causes.length; k++) {
+      if (causes[k] === "count") continue;
+      assert(
+        variants.indexOf(causes[k]) !== -1,
+        "death scene variant for " + causes[k]
+      );
+    }
+    /* and its own epitaph in the book — the default line is not good enough */
+    var epi = (D.epitaphs && D.epitaphs.death) || {};
+    for (var e = 0; e < causes.length; e++) {
+      assert(
+        typeof epi[causes[e]] === "string" && epi[causes[e]].length > 10,
+        "guest book epitaph for " + causes[e]
+      );
+    }
+  })();
+
+  /* ——— the three causes added in pass 11, driven for real ———
+
+     Seed 7 crit-fails each of these checks at 1 HP, so the death, its cause, its
+     tombstone and its guest-book entry are all produced by the engine rather than
+     asserted by hand. Before emptyDeaths() knew these causes they rendered a
+     tombstone but recorded nothing in the book. */
+  [
+    ["arrival", "Tell me something I can use",
+      "Pip, clerk. Quoted to death at the village gate. Owed 3 gold."],
+    ["mayor", "Pay me first",
+      "Pip, clerk. Taxed to death in the square. Owed 3 gold."],
+    ["churchyard", "Sneak the long way past",
+      "Pip, clerk. Shovelled to death in the churchyard. Owed 3 gold."]
+  ].forEach(function (t) {
+    var cause = t[0], label = t[1], epitaph = t[2];
+    freshPip();
+    E.goTo(cause);
+    var st = E.getState();
+    st.hp = 1;
+    st.gold = 3;
+    var opts = E.visibleOptions(E.resolveNode(cause));
+    var idx = -1;
+    for (var i = 0; i < opts.length; i++) {
+      if (opts[i].label === label) { idx = i; break; }
+    }
+    assert(idx >= 0, cause + ": option '" + label + "' is offered");
+    E.installRng(7);
+    E.chooseOption(idx, false);
+
+    st = E.getState();
+    eq(st.nodeId, "death", cause + ": a real roll kills at 1 HP");
+    eq(st.deathCause, cause, cause + ": the death carries its own cause");
+    eq(E.tombstoneLine(), epitaph, cause + ": tombstone names the place");
+
+    /* recorded in the guest book, and shown as a death (not as an ending) */
+    var view = E.fatesView();
+    var row = null;
+    for (var r = 0; r < view.rows.length; r++) {
+      if (view.rows[r].id === cause) { row = view.rows[r]; break; }
+    }
+    assert(row !== null, cause + ": has a guest book row");
+    eq(row.found, true, cause + ": recorded in the guest book");
+    assert(row.title !== "—", cause + ": row shows a title, not a dash");
+    assert(
+      typeof row.line === "string" && row.line.length > 10,
+      cause + ": row shows the Count's epitaph for this death"
+    );
+    var others = view.rows.filter(function (x) {
+      return x.id !== cause && x.found && x.id !== "polite_bat";
+    });
+    eq(others.length, 0, cause + ": records no other cause");
+
+    /* and the death screen shows this cause's own line, not the generic one */
+    var snap = E.snapshot();
+    var body = JSON.stringify(snap);
+    assert(
+      body.indexOf("The night keeps you.") === -1,
+      cause + ": death scene is not the generic line"
+    );
+  });
+
+  /* ——— a square means "that roll succeeded" ——— */
+  freshPip();
+  (function () {
+    var st = E.getState();
+    st.daily = { date: "2026-09-27", number: 270, seed: 1, attempts: 1 };
+    /* every roll marked => squares */
+    st.diceLog = [
+      { face: 15, ok: true },
+      { face: 17, ok: true },
+      { face: 5, ok: false }
+    ];
+    contains(E.shareLine("end_stake"), "🎲 🟩🟩🟥", "marked log renders squares");
+    /* a save written before squares existed: marked rolls still square up,
+       unmarked ones show the face, and the join switches to " · " */
+    st.diceLog = [{ face: 15, ok: true }, { face: 17, ok: null }];
+    contains(E.shareLine("end_stake"), "🎲 🟩 · 17", "mixed log interleaves square and face");
+    /* bare numbers only (an all-unmarked old save) */
+    st.diceLog = [15, 17];
+    contains(E.shareLine("end_stake"), "🎲 15 · 17", "old save renders numbers only");
+    notContains(E.shareLine("end_stake"), "🟩", "no squares when nothing is marked");
+    /* empty log */
+    st.diceLog = [];
+    contains(E.shareLine("end_stake"), "🎲 —", "empty log renders a dash");
+  })();
+
   if (fails === 0) {
     console.log("engine ok");
   } else {

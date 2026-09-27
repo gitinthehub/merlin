@@ -1825,6 +1825,33 @@
           ]
         },
         {
+          if: { deathCause: "arrival" },
+          lines: [
+            {
+              speaker: null,
+              text: "The gate has your words on file. It does not need the rest of you."
+            }
+          ]
+        },
+        {
+          if: { deathCause: "mayor" },
+          lines: [
+            {
+              speaker: null,
+              text: "The square settles its accounts. The mayor enters the shortfall under tidiness."
+            }
+          ]
+        },
+        {
+          if: { deathCause: "churchyard" },
+          lines: [
+            {
+              speaker: null,
+              text: "The spade is honest work. The plot was two feet short, and now it is not."
+            }
+          ]
+        },
+        {
           if: { deathCause: "wight" },
           lines: [
             {
@@ -1944,8 +1971,11 @@
         "end_clause",
         "end_board",
         "end_fled",
+        "arrival",
+        "mayor",
         "ghoul",
         "search",
+        "churchyard",
         "wight",
         "marsh",
         "gate",
@@ -1965,6 +1995,10 @@
           "A guest who took the seat and the salary of not being eaten. The chair is empty.",
         end_fled: "A guest who ran. I held the door. The log has a gap.",
         ghoul: "A guest the churchyard kept. The wreath has a vacancy.",
+        arrival: "A guest who gave the gate something to use. The gate used it.",
+        mayor: "A guest the square taxed in kind. The mayor polls at four percent.",
+        churchyard:
+          "A guest who took the long way and met the spade. The plot is two feet deeper.",
         search: "A guest who dug where the earth was still hungry.",
         wight: "A guest the marsh filed under paid. No receipt.",
         marsh: "A guest who insisted the marsh was empty. The bell disagrees.",
@@ -1980,6 +2014,9 @@
       },
       titles: {
         ghoul: "The Churchyard",
+        arrival: "The Village Gate",
+        mayor: "The Square",
+        churchyard: "The Long Way Round",
         search: "The Loose Earth",
         wight: "The Marsh",
         marsh: "The Unseen Toll",
@@ -2054,6 +2091,12 @@
           "Late fees. I would have itemised them. You collected them with your life.",
         search:
           "The loose earth kept a digger's fee. I do not refund soil.",
+        arrival:
+          "You gave the gate something to use. It used it. I would have billed you for the lesson.",
+        mayor:
+          "The square taxed you in kind. Cuthbert will spend it. He always spends it.",
+        churchyard:
+          "You took the long way and met the spade. The plot was two feet short. It is not now.",
         default: "The night kept you. I did not request the company."
       }
     },

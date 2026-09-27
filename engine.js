@@ -47,18 +47,23 @@
     };
   }
 
+  function deathCauseKeys() {
+    /* The tombstone map is the canonical list of ways to die. Everything else
+       that needs to know a cause — the fates store, the guest-book view — reads
+       it from here, because a duplicated list is how arrival/mayor/churchyard
+       ended up with tombstones but no guest-book entries. */
+    return Object.keys(data().tombstone || {});
+  }
+
+  function isDeathCause(id) {
+    return Object.prototype.hasOwnProperty.call(data().tombstone || {}, id);
+  }
+
   function emptyDeaths() {
-    return {
-      ghoul: false,
-      wight: false,
-      count: false,
-      fall: false,
-      gate: false,
-      marsh: false,
-      foyer: false,
-      ledger: false,
-      search: false
-    };
+    var keys = deathCauseKeys();
+    var out = {};
+    for (var i = 0; i < keys.length; i++) out[keys[i]] = false;
+    return out;
   }
 
   function emptySecrets() {
@@ -347,17 +352,7 @@
         found = !!(fates.secrets && fates.secrets.polite_bat);
         title = found ? titles.polite_bat || "Polite to the bat" : "—";
         line = found ? foundLines.polite_bat || null : null;
-      } else if (
-        id === "ghoul" ||
-        id === "wight" ||
-        id === "count" ||
-        id === "fall" ||
-        id === "gate" ||
-        id === "marsh" ||
-        id === "foyer" ||
-        id === "ledger" ||
-        id === "search"
-      ) {
+      } else if (isDeathCause(id)) {
         found = !!(fates.deaths && fates.deaths[id]);
         title = found ? titles[id] || id : "—";
         line = found ? epitaphLine("death", id) : null;
@@ -647,6 +642,13 @@
   }
 
   function diceSlot(log) {
+    /* A square means "that roll succeeded": a check that beat its DC, or an
+       attack that landed. Every roll a live run records is marked by
+       markLastCheck() at the site that knows the outcome, so a real log reads as
+       solid squares. A save written before squares existed holds bare numbers
+       instead, and a log can hold both: marked rolls still draw their square and
+       unmarked ones show the face, joined with " · " so the reader can tell which
+       is which. Only an all-marked log joins tightly. */
     if (!log || !log.length) return "—";
     var allChecks = true;
     var tokens = [];
