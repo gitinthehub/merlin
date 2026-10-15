@@ -150,6 +150,21 @@ Five endings — The Hand Turns, The Hand Falls, The Hand Vanishes, The Courier'
 
 ---
 
+## v2.2 — The front door 🔨
+
+`index.html` is the story picker. The castle night lives at `castle.html`. Cinder Mile is the featured arc. The Last Signal stays registered but off the door. A third story slot awaits the owner's choice.
+
+| # | Item | Deliverables | Size | Depends on | Status |
+|---|------|--------------|------|-----------|--------|
+| 2.12 | **Front door** | `index.html` renders `Stories.door()`: Cinder Mile, The Pale Hand, and an unplayable third slot | M | 2.10 | 🔨 in progress |
+| 2.13 | **Castle night preserved** | `castle.html` is the current castle page; `engine.js`, `ui.js`, `data.js`, `dice-view.js`, `style.css` stay byte-identical | S | — | 🔨 in progress |
+| 2.14 | **Featured arc: Cinder Mile** | `arcs/cinder-mile.json` and keyless `arcs/cinder-mile.js`; `validateArc` clean; five chapters | L | 2.2, 2.6 | 🔨 in progress |
+| 2.15 | **Last Signal leaves the door** | Still registered and playable at `oronath.html` and `#last-signal`; no front-door card; saves kept | S | 2.12 | 🔨 in progress |
+| 2.16 | **Third story awaits** | Door row title `A third story`, note `Not chosen yet.`, no setting and no play control | S | 2.12 | 🔨 in progress |
+| 2.17 | **Tests and docs** | `tests/front-door.test.js`, `tests/cinder-mile.test.js`, README, and this phase in both roadmap files | S | 2.12–2.16 | 🔨 in progress |
+
+---
+
 ## Escalations, defaults and open questions
 
 | Date | Item | Decision | Note |
@@ -162,6 +177,7 @@ Five endings — The Hand Turns, The Hand Falls, The Hand Vanishes, The Courier'
 
 ## Changelog
 
+- **2026-10-15** — Pass 16 in the working tree (not shipped): the front door at `/`, castle night at `castle.html`, Cinder Mile featured, Last Signal off the door.
 - **2026-09-27** — Pass 15: a finished save returns to the picker; same-story Begin warns before it replaces a mid-run; The Pale Hand's ford splits on whether Jin learned the Millbrook page.
 - **2026-09-27** — Pass 14: The Pale Hand is the second arc, and `oronath.html` lets the player choose a story before the splash. One save slot remains. A resumable run still opens straight into its chapter.
 - **2026-09-27** — Follow-up, from the QA pass-13 review (`.qa/qa-pass13.md`): "Back to the castle gate" was counting as a new attempt, so a daily death after a restore shared "· Attempt 2 ·" even though a restore is the same attempt. `restoreGate()` advanced `state.daily.attempts`; it now keeps the count as recorded (normalising a checkpoint written before the counter existed), and the test pins both halves of the rule — two restores leave a first attempt at attempt 1, and a restore on attempt 2 stays attempt 2.

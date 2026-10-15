@@ -133,6 +133,19 @@
         { id: "2.10", name: "Story picker", status: "done" },
         { id: "2.11", name: "Tests and docs", status: "done" }
       ]
+    },
+    {
+      id: "v2.2",
+      name: "The front door",
+      status: "in progress",
+      items: [
+        { id: "2.12", name: "Front door", status: "in progress" },
+        { id: "2.13", name: "Castle night preserved", status: "in progress" },
+        { id: "2.14", name: "Featured arc: Cinder Mile", status: "in progress" },
+        { id: "2.15", name: "Last Signal leaves the door", status: "in progress" },
+        { id: "2.16", name: "Third story awaits", status: "in progress" },
+        { id: "2.17", name: "Tests and docs", status: "in progress" }
+      ]
     }
   ];
 

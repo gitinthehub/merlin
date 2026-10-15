@@ -1,0 +1,33 @@
+/* Front door — story picker at /. Reuses oronath card tokens. */
+.door-panel {
+  padding: 1.25rem 1rem 1.5rem;
+}
+
+.door-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.door-awaiting-note {
+  margin: 0.5rem 0 0;
+  color: var(--mute);
+}
+
+.door-aside {
+  margin: 1.25rem 0 0;
+  font-size: 0.95rem;
+}
+
+.door-links {
+  margin: 1.5rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.door-links a {
+  font-size: 0.95rem;
+}

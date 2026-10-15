@@ -1,0 +1,651 @@
+{
+  "id": "cinder-mile",
+  "version": 1,
+  "title": "Cinder Mile",
+  "blurb": "A rail town, a painted mile, and one hour when the relay still speaks.",
+  "pitch": "Nim wants the posts to be a map. Pell wants tonight's hour to go out. Maro is still on the ladder, painting numbers close enough for a town. Every choice is a real roll — failure opens a new road, never a retry.",
+  "characters": [
+    {
+      "id": "nim",
+      "name": "Nim",
+      "threadId": "nim-map",
+      "traits": [
+        {
+          "id": "road-sense",
+          "label": "Road Sense",
+          "difficulty": -2,
+          "advantage": false
+        },
+        {
+          "id": "light-hands",
+          "label": "Light Hands",
+          "difficulty": 0,
+          "advantage": true
+        },
+        {
+          "id": "bad-knee",
+          "label": "Bad Knee",
+          "difficulty": 1,
+          "advantage": false
+        }
+      ]
+    },
+    {
+      "id": "pell",
+      "name": "Pell",
+      "threadId": "pell-hour",
+      "traits": [
+        {
+          "id": "solder",
+          "label": "Solder",
+          "difficulty": -2,
+          "advantage": false
+        },
+        {
+          "id": "night-shift",
+          "label": "Night Shift",
+          "difficulty": 0,
+          "advantage": true
+        }
+      ]
+    },
+    {
+      "id": "maro",
+      "name": "Maro",
+      "threadId": "maro-posts",
+      "traits": [
+        {
+          "id": "wet-brush",
+          "label": "Wet Brush",
+          "difficulty": -1,
+          "advantage": false
+        },
+        {
+          "id": "long-memory",
+          "label": "Long Memory",
+          "difficulty": 0,
+          "advantage": false
+        }
+      ]
+    }
+  ],
+  "threads": [
+    {
+      "id": "nim-map",
+      "characterId": "nim",
+      "label": "the tower on the posts"
+    },
+    {
+      "id": "pell-hour",
+      "characterId": "pell",
+      "label": "tonight's hour"
+    },
+    {
+      "id": "maro-posts",
+      "characterId": "maro",
+      "label": "the painted numbers"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "cinder-yard",
+      "title": "The Painted Yard",
+      "setting": "Cinder Mile keeps its name on the mile-posts even when the trains stopped coming. Maro is on a ladder in the yard, brush still wet on a number she calls close enough. Pell's lamp moves in the switch house. Past the yard the salt flat waits, and past the hills a relay speaks for one hour when the crank turns.",
+      "objective": "Pick a way toward the voice before the paint dries.",
+      "choices": [
+        {
+          "id": "nim-water-tower",
+          "label": "Cut through the yard water tower",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "medium",
+            "tags": [
+              "road-sense"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You take the tower stairs two at a time and come down on the switch-house side with dry boots and a clear look at Pell's lamp.",
+              "next": "switch-house",
+              "resolves": []
+            },
+            "failure": {
+              "text": "A rung gives and you hit the gravel hard. You still make the switch house, limping, with the yard behind you.",
+              "next": "switch-house",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The tank valve sticks open and the yard floods ankle-deep. You wade out toward the flat where the painted numbers are easier to read than Pell's crank.",
+              "next": "salt-flat",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You read the tower shadow like a road map and drop off the far side without a sound. Pell never looks up from the crank housing.",
+              "next": "switch-house",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "nim-trade-water",
+          "label": "Trade lamp oil for a look at Maro's ladder",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "easy",
+            "tags": [
+              "light-hands"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You palm the oil tin without dropping it and Maro points you at the switch-house door with paint on her knuckle.",
+              "next": "switch-house",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The tin slips and you chase it across the gravel. By the time you stand, the flat is the faster road and the numbers are already drying.",
+              "next": "salt-flat",
+              "resolves": []
+            },
+            "complication": {
+              "text": "Maro laughs once and tosses you a rag instead of directions. You wipe your hands and follow the posts straight into the dark relay, no crank in the switch house at all.",
+              "next": "relay-tower-dark",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "She trades you a clean rag for the oil and waves you toward Pell like it was always the plan.",
+              "next": "switch-house",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "maro-read-number",
+          "label": "Ask Maro what number she is painting",
+          "actor": "maro",
+          "roll": {
+            "die": "d20",
+            "tier": "medium",
+            "tags": [
+              "wet-brush"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "She reads the post aloud — a mile that is not on any map you own — and points you inside to Pell with the brush still dripping.",
+              "next": "switch-house",
+              "resolves": [
+                "maro-posts"
+              ]
+            },
+            "failure": {
+              "text": "The brush slips and the number smears. You back away toward the flat where the older posts still hold their lines.",
+              "next": "salt-flat",
+              "resolves": []
+            },
+            "complication": {
+              "text": "She reads the wrong post on purpose and sends you toward the relay without a crank, laughing at your boots in the salt.",
+              "next": "relay-tower-dark",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "She reads the post clean and steady, and the number stays on the wood while you go find Pell.",
+              "next": "switch-house",
+              "resolves": [
+                "maro-posts"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "switch-house",
+      "title": "The Switch House",
+      "setting": "Pell keeps a hand crank in a housing that should have been replaced years ago. The relay hour does not care about should. Nim can hear the flat wind through the boards.",
+      "objective": "Leave with a crank that turns, or without one.",
+      "choices": [
+        {
+          "id": "pell-crank",
+          "label": "Turn the crank until the housing stops complaining",
+          "actor": "pell",
+          "roll": {
+            "die": "d20",
+            "tier": "hard",
+            "tags": [
+              "night-shift"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "The teeth catch on the third turn and the relay line hums up the hill. Pell grins like the hour already belongs to the town.",
+              "next": "relay-tower",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The housing strips and the crank spins free in your hand, useless. You climb toward the relay anyway with empty pockets.",
+              "next": "relay-tower-dark",
+              "resolves": []
+            },
+            "complication": {
+              "text": "A tooth snaps and sends you out the back door onto the flat with grease on your sleeves and no hour in the wire.",
+              "next": "salt-flat",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "Pell finds the sweet spot on the second turn and the line sings. You take the hill with a crank that still has teeth.",
+              "next": "relay-tower",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "nim-take-crank",
+          "label": "Lift the crank out before Pell finishes the housing",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "medium",
+            "tags": [
+              "light-hands"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You lift the crank clean and Pell curses once, then follows you up the hill with solder still on his fingers.",
+              "next": "relay-tower",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The housing bites your wrist and you leave without the crank, taking the dark road up the mast.",
+              "next": "relay-tower-dark",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The pin sticks and you kick the housing open onto the flat instead of the hill.",
+              "next": "salt-flat",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You palm the crank on the quiet turn and Pell pretends not to notice until you are already on the path.",
+              "next": "relay-tower",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "salt-flat",
+      "title": "The Salt Flat",
+      "setting": "White ground and black posts. Maro's numbers are still wet on the nearest mile marker even if you never climbed her ladder. The relay clicks somewhere you cannot see.",
+      "objective": "Cross on the numbers, or lose them.",
+      "choices": [
+        {
+          "id": "nim-follow-paint",
+          "label": "Follow the wet paint line across the flat",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "hard",
+            "tags": [
+              "bad-knee"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You trust the paint more than the map and come to the relay mast with your knee complaining and your boots crusted white.",
+              "next": "relay-tower-dark",
+              "resolves": [
+                "maro-posts"
+              ]
+            },
+            "failure": {
+              "text": "The line fades halfway across and you walk the rest blind. The mast finds you anyway, uncranked and humming.",
+              "next": "relay-tower-dark",
+              "resolves": []
+            },
+            "complication": {
+              "text": "You misread a dried loop and leave the mile on the wrong number. The town stays small behind you.",
+              "next": "end-miles",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The wet numbers hold and you hit the relay road with Maro's mile still on your heel.",
+              "next": "relay-tower",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "nim-walk-off",
+          "label": "Walk off the mile before the flat fools you",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "easy",
+            "tags": [
+              "bad-knee"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You leave the posts where Maro painted them and take the long road out. The hour does not follow.",
+              "next": "end-miles",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The flat turns you in a circle and spits you toward the relay with static in your teeth.",
+              "next": "end-static",
+              "resolves": []
+            },
+            "complication": {
+              "text": "For one breath the mast sounds like it is calling your name. You keep walking anyway.",
+              "next": "end-hour",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You cut east off the numbers and the mile lets you go without argument.",
+              "next": "end-miles",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "relay-tower",
+      "title": "The Relay",
+      "setting": "The mast catches starlight on its guy wires. You have a crank that turns, or you borrowed one from a post that was never meant to hold it. The hour is a question with teeth.",
+      "objective": "Decide what the hour is for.",
+      "choices": [
+        {
+          "id": "nim-ask-hour",
+          "label": "Ask the relay what the hour is for",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "medium",
+            "tags": [
+              "road-sense"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "The voice answers with a timetable that ends at your boots. You understand enough to open the hour.",
+              "next": "end-hour",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The relay answers in static and you climb anyway with nothing but guesswork.",
+              "next": "relay-tower-dark",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The answer is a loop that does not include the switch house. You sit with it until static wins.",
+              "next": "end-static",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "It tells you the hour is for the town that still paints its miles. You believe it long enough to let it out.",
+              "next": "end-hour",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "nim-read-plate",
+          "label": "Read the maintenance plate on the mast door",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "easy",
+            "tags": [
+              "road-sense"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "The plate lists a mile you have already walked and a hour that starts when the crank turns. The map on the posts was never a joke.",
+              "next": "end-hour",
+              "resolves": [
+                "nim-map"
+              ]
+            },
+            "failure": {
+              "text": "The plate is scraped clean. You listen to the loop instead and learn nothing you can use.",
+              "next": "end-static",
+              "resolves": []
+            },
+            "complication": {
+              "text": "Someone painted over the plate with Maro's number. You laugh once and leave on the wrong mile.",
+              "next": "end-miles",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The plate matches the post in the yard. The tower on the posts was always the point.",
+              "next": "end-hour",
+              "resolves": [
+                "nim-map"
+              ]
+            }
+          }
+        },
+        {
+          "id": "nim-climb-dark",
+          "label": "Climb the mast even though the housing is wrong",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "veryHard",
+            "tags": [
+              "bad-knee"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You climb with a crank that should not fit and the hour goes out over the flat like a match held to oil.",
+              "next": "end-hour",
+              "resolves": []
+            },
+            "failure": {
+              "text": "Your knee gives on the third rung and you come down on the wrong mile with the wire still laughing.",
+              "next": "end-miles",
+              "resolves": []
+            },
+            "complication": {
+              "text": "Halfway up the voice offers you the loop instead of the hour. You take it because it is there.",
+              "next": "end-static",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You climb clean and the static learns your name before you cut it loose.",
+              "next": "end-static",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "relay-tower-dark",
+      "title": "The Relay, Uncranked",
+      "setting": "The housing is empty. The mast still hums like it remembers a crank. Maro's numbers are on the posts below whether you met her or not.",
+      "objective": "Climb, read, or walk off.",
+      "choices": [
+        {
+          "id": "nim-count-clicks",
+          "label": "Count the clicks between static bursts",
+          "actor": "nim",
+          "roll": {
+            "die": "d10",
+            "dc": 7,
+            "tags": [
+              "road-sense"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "The pattern is a loop with one gap where an hour should be. You know which screw to turn even without Pell.",
+              "next": "end-hour",
+              "resolves": []
+            },
+            "failure": {
+              "text": "You lose the count in the salt wind and leave on the painted mile instead.",
+              "next": "end-miles",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The gap is a voice offering the hour if you stay. You pocket the offer and let static win.",
+              "next": "end-static",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You count clean and the mast answers like you were always meant to hear it.",
+              "next": "end-hour",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "nim-climb-mast",
+          "label": "Climb the mast with nothing in the housing",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "veryHard",
+            "tags": [
+              "bad-knee"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "You climb until the static thins and the hour goes out over Cinder Mile with the switch house still dark.",
+              "next": "end-hour",
+              "resolves": []
+            },
+            "failure": {
+              "text": "You come down on the wrong mile with salt in your hair and no hour to show for it.",
+              "next": "end-miles",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The mast offers you the loop instead of the hour. You take it because it is there.",
+              "next": "end-static",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You top out as the voice starts and let the town have its minute.",
+              "next": "end-hour",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "nim-cut-cable",
+          "label": "Cut the feed cable and see what stops",
+          "actor": "nim",
+          "roll": {
+            "die": "d20",
+            "tier": "hard",
+            "tags": [
+              "light-hands"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "The static collapses into a single clean tone. Tonight's hour will not go out on this wire again.",
+              "next": "end-static",
+              "resolves": []
+            },
+            "failure": {
+              "text": "You cut the wrong line and the mile keeps counting without you.",
+              "next": "end-miles",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The cable sparks once and the hour goes out anyway, borrowed from somewhere else.",
+              "next": "end-hour",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You cut clean and the loop dies smiling.",
+              "next": "end-static",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "nim-count-the-plate",
+          "label": "Count the rivets on the blank plate",
+          "actor": "nim",
+          "roll": {
+            "die": "d10",
+            "dc": 6,
+            "tags": [
+              "road-sense"
+            ]
+          },
+          "consequences": {
+            "success": {
+              "text": "The count matches the post in the yard. The map was always the tower, and the tower was always a loop.",
+              "next": "end-static",
+              "resolves": [
+                "nim-map"
+              ]
+            },
+            "failure": {
+              "text": "You miscount by one and walk off on the wrong mile with the numbers still drying behind you.",
+              "next": "end-miles",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The rivets spell an hour Pell never cranked. You listen anyway.",
+              "next": "end-hour",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "The plate and the post agree. Static wins.",
+              "next": "end-static",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "endings": [
+    {
+      "id": "end-hour",
+      "title": "The Hour Goes Out",
+      "text": "The relay speaks for one hour over Cinder Mile. The switch house can stay dark; Pell's crank was never the only way. Maro's numbers are still on the posts, wet or dry, and Nim knows whether they pointed at the tower.",
+      "resolves": [
+        "nim-map",
+        "pell-hour",
+        "maro-posts"
+      ]
+    },
+    {
+      "id": "end-static",
+      "title": "A Voice in Salt",
+      "text": "The relay is a loop, and tonight's hour does not go out. Pell may never turn the crank you did not bring. The painted numbers stay where Maro left them, and the map on the posts was a kindness either way.",
+      "resolves": [
+        "nim-map",
+        "pell-hour",
+        "maro-posts"
+      ]
+    },
+    {
+      "id": "end-miles",
+      "title": "Wrong Miles",
+      "text": "You leave the mile on a number that was close enough for a town. Tonight's hour does not go out for you. The posts keep Maro's paint and Pell's lamp stays in the switch house whether you met him or not.",
+      "resolves": [
+        "nim-map",
+        "pell-hour",
+        "maro-posts"
+      ]
+    }
+  ]
+}

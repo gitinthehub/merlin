@@ -62,6 +62,12 @@
     };
   }
 
+  var DOOR = [
+    { id: "cinder-mile" },
+    { id: "pale-hand" },
+    { awaiting: true, title: "A third story", note: "Not chosen yet." }
+  ];
+
   function list() {
     var map = bundleMap();
     var out = [];
@@ -71,6 +77,36 @@
       var arc = map[id];
       if (!arc || !arc.id) continue;
       out.push(entryFor(arc));
+    }
+    return out;
+  }
+
+  function door() {
+    var out = [];
+    var i;
+    for (i = 0; i < DOOR.length; i++) {
+      var row = DOOR[i];
+      if (row.awaiting) {
+        out.push({
+          awaiting: true,
+          playable: false,
+          title: row.title,
+          note: row.note
+        });
+        continue;
+      }
+      var got = get(row.id);
+      if (got) {
+        var playable = Object.assign({ playable: true }, got);
+        out.push(playable);
+      } else {
+        out.push({
+          playable: false,
+          missing: true,
+          id: row.id,
+          cast: []
+        });
+      }
     }
     return out;
   }
@@ -219,6 +255,7 @@
 
   return {
     list: list,
+    door: door,
     get: get,
     fallback: fallback,
     savedArc: savedArc,

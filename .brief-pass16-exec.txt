@@ -1,0 +1,64 @@
+EXEC BRIEF — MERLIN, PASS 16 ("the front door"). IMPLEMENT NOW.
+
+IMPLEMENT NOW. Do not reply with a plan, an outline, a summary of the brief or an acknowledgement,
+and do not call CreatePlan. Make the code edits first, run the verification yourself, and make your
+final message the report. Begin your final message with the literal line FIX REPORT.
+
+Read, in this order:
+ 1. /Users/cloud/Dropbox/mac-mini-cloud/merlin-ops/briefs/2026-10-15-pass16-plan.txt
+    (the pass brief — the requirements)
+ 2. /Users/cloud/Dropbox/mac-mini-cloud/merlin-ops/briefs/2026-10-15-pass16-plan-out.md
+    (the approved plan: THE DESIGN OF RECORD. Implement it. Do not re-plan it.)
+ 3. .merlin-next-direction.md in the repo (owner direction; supersedes older notes)
+
+Repository /Users/cloud/Developer/merlin. Vanilla static HTML/CSS/JS. No package.json, no build
+step, no bundler, no ES modules (type="module" is blocked on file:// — that is how the owner opens
+it), no test framework, no runtime network request, no CDN link. Every suite is a plain
+`node tests/<name>.test.js` that prints its own summary.
+
+DELTAS — these are the requester's and they override the plan where they differ:
+ D1. arc.js requires 2-4 choices per chapter. The plan's roll table names only one Pell choice for
+     the switch-house chapter. If switch-house would end up with a single choice, add a second
+     choice in that chapter consistent with the table's own traps: Pell's night-shift tag grants
+     advantage, so any deterministic fixture for a night-shift choice needs TWO faces in
+     Dice.sequence([...]); and no choice's complication.next may equal its failure.next.
+ D2. The third door row stays exactly as planned: title "A third story", note "Not chosen yet.",
+     no id, no setting word, no play control, no blurb, no chapter count, no cast. It must not be
+     dimmed, greyed or otherwise made to look disabled or broken — same card border as the others.
+ D3. `last-signal` must NOT be a door row. It stays registered and playable via oronath.html
+     (no hash) and oronath.html#last-signal. Its save is never rewritten.
+ D4. The `#id/begin` boot must reach the title splash WITHOUT calling Persist.clear() or
+     startFresh(), and must never write storage. A Begin click on the title is what clears.
+
+VERIFICATION YOU MUST RUN AND REPORT (real output, not a summary):
+ - node tools/build-arc.js --from arcs/cinder-mile.json --out arcs/cinder-mile.js   (exit 0,
+   clean validation, bundle written)
+ - each suite individually, printing each exit code: the eleven existing suites plus
+   tests/front-door.test.js and tests/cinder-mile.test.js.
+ - the bite proof: write the HEAD copies of the files the two new suites read into a scratch dir
+   (`git show HEAD:<file>`) and run both new suites against them with MERLIN_HEAD pointing at that
+   dir. They MUST FAIL there. Report the failing assertion names.
+ - git diff --exit-code -- engine.js ui.js data.js dice-view.js style.css dice.js loop.js
+   persist.js characters.js arc.js   (must print nothing)
+ - node tests/cinder-mile.test.js with the three seeded paths from the plan's section 5, and say
+   which ending each reached.
+
+FLAT PROHIBITIONS — do not do any of these:
+ - Do not edit engine.js, ui.js, data.js, dice-view.js, style.css, dice.js, loop.js, persist.js,
+   characters.js, arc.js. They must be byte-identical after this pass.
+ - Do not touch merlin.save.v1, merlin.fates.v1, merlin.gate.v1, merlin.daily.v1 or
+   oronath.save.v1, and do not migrate, delete or rewrite any stored blob.
+ - Do not write, name, hint at or imply the third story's setting.
+ - Do not edit arcs/last-signal.js, arcs/last-signal.json, arcs/pale-hand.js, arcs/pale-hand.json,
+   oronath.css, sample-arc.js, netlify.toml, anything under images/, or any of the eleven existing
+   tests/*.test.js files.
+ - Do not add a package.json, a build step, a bundler, an ES module, a network request, a CDN
+   link, or any new image file.
+ - Do not reset, rebase, amend or rewrite the commits 3ac035b or 1b29f4b.
+ - Do not mark any roadmap item done: this pass is in progress, not shipped.
+ - Do not git add, git commit, git push, or run a Netlify deploy. Stop at working-tree changes.
+
+ROADMAP SYNC (same change, both files): add phase v2.2 "The front door" with items 2.12-2.17 at
+status in progress — identical ids, identical names, identical status strings in ROADMAP.md and
+roadmap.js. Update README.md too (/ is the door, castle.html is the castle night, the test command
+gains the two new files).

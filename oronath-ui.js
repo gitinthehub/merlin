@@ -540,7 +540,40 @@
     renderTitle(null);
   }
 
+  function parseHashBoot() {
+    if (typeof location === "undefined" || !location.hash) return null;
+    var raw = String(location.hash).replace(/^#/, "");
+    try {
+      raw = decodeURIComponent(raw);
+    } catch (e) {
+      return null;
+    }
+    if (!raw) return null;
+    var slash = raw.indexOf("/");
+    var id = slash === -1 ? raw : raw.slice(0, slash);
+    var rest = slash === -1 ? "" : raw.slice(slash + 1);
+    if (!/^[a-z0-9-]+$/.test(id)) return null;
+    return { id: id, begin: rest === "begin" };
+  }
+
   function boot() {
+    var hash = parseHashBoot();
+    if (hash) {
+      var entry = Stories && typeof Stories.get === "function" ? Stories.get(hash.id) : null;
+      if (entry && entry.arc) {
+        if (hash.begin) {
+          active = entry.arc;
+          run = null;
+          resumeNote = "";
+          screen = "splash";
+          renderTitle(null);
+          return;
+        }
+        bootSingle(entry.arc);
+        return;
+      }
+    }
+
     var list = registered();
     if (list.length === 0) {
       var fb = Stories
