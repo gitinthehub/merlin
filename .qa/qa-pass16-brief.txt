@@ -1,0 +1,42 @@
+MERLIN — QA BRIEF, PASS 16 (targeted). Site: https://merlin-dnd.netlify.app/  Commit under review: 516cfa3, deployed and ready.
+
+WHAT CHANGED — this commit is the whole surface to review
+1. `/` is a new story picker, not the castle game. It renders three cards from a data catalog:
+   Cinder Mile (new, featured), The Pale Hand, and a third card titled "A third story" with the
+   note "Not chosen yet." That third card is deliberate: the owner has not chosen its setting, so
+   it has no blurb, no cast, no chapter count and no play control. It is NOT a defect and it is NOT
+   meant to look disabled.
+2. The original castle night moved to /castle.html (one added link back to the picker). It must
+   still play exactly as before and still resume its own saved run.
+3. A new wasteland arc, Cinder Mile: 5 chapters, 14 choices, 3 endings, cast Nim / Pell / Maro.
+   Play it at /oronath.html#cinder-mile and start it at /oronath.html#cinder-mile/begin.
+4. The Last Signal of Oronath is off the front door but still fully playable at /oronath.html (no
+   hash) and /oronath.html#last-signal. Its save must never be rewritten.
+5. `#<story>/begin` must never clear or write a stored run: the confirm-to-replace lives on the
+   title screen's Begin, not on arrival at the hash.
+
+WHAT I ALREADY KNOW — please do not spend budget on these
+- The served HTML carries Netlify's injected comment and its links rewritten to `/oronath`,
+  `/roadmap` and so on. That is Netlify's doing, not the source.
+- The third card above is intentionally unplayable.
+- One Oronath run slot (`oronath.save.v1`) is by design; starting a different story replaces it,
+  after a plain-words warning.
+
+WHAT TO DO
+Play the live site: the front door, then Cinder Mile end to end, then the castle night, then Last
+Signal. No account or signup is needed. Check especially:
+- Whether a brand-new visitor's first screen makes sense and whether anything on it lies.
+- Whether Cinder Mile's choices produce outcomes that match their own dice line, and whether any
+  branch reads as a dead end, a retry, or a roll with no consequence.
+- Whether any ending narrates a character the player never met.
+- Whether the front door or the title screen ever wipes, hides or silently replaces an existing run.
+- Whether the castle night still works at all from /castle.html.
+
+REPLY FORMAT — please follow it exactly
+Start with one line: VERDICT — <ship / ship with fixes / hold>.
+Then a ranked list of at most 8 items, each: RANK. WHAT (one line) / WHY / WHERE (page and what you
+did) / REPRO / COST (S / M / L).
+Then a separate short list of outright DEFECTS (crashes, wrong state, lost saves, broken links).
+Then one line: WHAT I DID NOT CHECK.
+This is a static site with no build step and no dependency, and file:// support matters — do not
+propose a framework, a bundler, or a runtime service.

@@ -1,0 +1,61 @@
+FIX BRIEF — MERLIN, the pass-16 QA blocker (items 1-3). IMPLEMENT NOW.
+
+IMPLEMENT NOW. Do not reply with a plan, an outline, a summary of this brief or an
+acknowledgement, and do not call CreatePlan. Make the edits, run the verification yourself, and make
+your final message the report. Begin your final message with the literal line FIX REPORT.
+
+Repository: /Users/cloud/Developer/merlin (vanilla static, no build step, no bundler, no ES modules,
+file:// must keep working).
+
+THE DEFECT — confirmed by the requester in the source AND reproduced in real Chromium
+`persist.js` `load()` returns `reject()` -> `clear()` on an `arcId` mismatch, so it DELETES
+`oronath.save.v1`. The new hash boot in `oronath-ui.js` hands `Persist.load` a mismatched arc, so
+with a mid-run Last Signal save stored:
+
+    oronath.html#cinder-mile      -> oronath.save.v1 DELETED
+    oronath.html#pale-hand        -> oronath.save.v1 DELETED
+    oronath.html#last-signal      -> unchanged
+    oronath.html#<id>/begin       -> unchanged
+    oronath.html / #bogus / (no hash) -> unchanged
+
+That breaks the owner's rule that a stored run is never rewritten.
+
+REQUIRED BEHAVIOUR
+A1. `Persist.load` must never be called with an arc that does not own the stored blob. The hash boot
+    must peek first — `Stories.saveStatus()` and `Stories.savedArc()` are read-only — and when a run
+    belonging to another story (or a foreign/unusable blob) is stored, it must render the title
+    screen for the requested story instead of loading. Arriving at ANY url must leave the stored blob
+    byte-identical, including a reload of that url.
+A2. Reloading mid-run must not leave replace-everything as the only way on. When a matching run is in
+    progress and the player arrives at `#<id>/begin`, the title screen must offer Resume as well as
+    Begin, and Resume must land in the chapter they were on.
+A3. Begin must be a two-step arm exactly when it would replace a run (a matching in-progress save):
+    the first press arms it (label it as the footer's New Run does, "Press again to start over") and
+    the second press replaces. With no run in progress Begin stays one click.
+
+FILES THAT MUST NOT CHANGE — byte-identical after this fix (`git diff --exit-code` on each):
+`persist.js`, `arc.js`, `loop.js`, `dice.js`, `characters.js`, `engine.js`, `ui.js`, `data.js`,
+`dice-view.js`, `style.css`. The fix belongs in `oronath-ui.js` (and `front.js` only if A2 needs it).
+
+TESTS
+- Add a regression test that FAILS on the current tree: seed a real mid-run save for one story (build
+  it with the engine the way `tests/oronath-ui.test.js` does), then boot `oronath-ui.js` with
+  `location.hash` set to another story's id and assert `oronath.save.v1` is byte-identical
+  afterwards. Cover `#<id>`, `#<id>/begin`, `#bogus` and the empty hash. This is the assertion the
+  reviewer is right to say was missing.
+- `tests/oronath-ui.test.js` currently pins the one-click title Begin; if A3 changes that, update the
+  pinned expectation and say so in your report. Do not weaken any other assertion.
+- Every `tests/*.test.js` suite must pass individually with `node` — print each exit code.
+- Prove the new assertions bite: run the new test against the CURRENT committed `oronath-ui.js`
+  (e.g. `git show HEAD:oronath-ui.js > <scratch>/oronath-ui.js`) and watch it fail on exactly the new
+  assertions. Report the failing assertion names.
+
+FLAT PROHIBITIONS
+- Do not write, delete, migrate or rewrite any stored save blob.
+- Do not add a package.json, a build step, a bundler, an ES module, a network request, a CDN link or
+  any new image file.
+- Do not edit `arcs/cinder-mile.json` or `arcs/cinder-mile.js` (the story-data findings are a separate
+  pass), and do not edit `ROADMAP.md`, `roadmap.js`, `README.md`, `front.css`, `castle.html`,
+  `index.html` or any `images/` file.
+- Do not reset, rebase, amend or rewrite the commits `3ac035b`, `1b29f4b` or `516cfa3`.
+- Do not git add, commit, push or deploy. Stop at working-tree changes.

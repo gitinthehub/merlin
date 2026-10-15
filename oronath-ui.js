@@ -14,6 +14,7 @@
   var active = null;
   var screen = "splash";
   var newRunArmed = false;
+  var beginArmed = false;
 
   function el(tag, cls, text) {
     var node = document.createElement(tag);
@@ -142,14 +143,60 @@
     return "Resume";
   }
 
+  function matchingSave() {
+    if (!Stories) return null;
+    var saved = Stories.savedArc();
+    if (!saved || saved.phase === "resolved") return null;
+    if (!active || saved.arcId !== active.id) return null;
+    return saved;
+  }
+
+  function saveOwnsArc(arc) {
+    if (!Stories || !arc) return true;
+    var status = Stories.saveStatus();
+    if (status === "empty") return true;
+    if (status === "foreign" || status === "unusable") return false;
+    var saved = Stories.savedArc();
+    if (!saved) return false;
+    return saved.arcId === arc.id;
+  }
+
   function startFresh() {
     newRunArmed = false;
+    beginArmed = false;
     Persist.clear();
     resumeNote = "";
     run = Loop.createRun(active, { characters: active.characters });
     screen = "play";
     persist();
     render();
+  }
+
+  function onTitleBegin() {
+    if (matchingSave()) {
+      if (!beginArmed) {
+        beginArmed = true;
+        render();
+        return;
+      }
+      beginArmed = false;
+      startFresh();
+      return;
+    }
+    startFresh();
+  }
+
+  function onTitleResume() {
+    beginArmed = false;
+    var saved = matchingSave();
+    if (!saved) return;
+    var loaded = Persist.load(saved.arc);
+    if (loaded.ok && loaded.run) {
+      run = loaded.run;
+      resumeNote = "";
+      screen = "play";
+      render();
+    }
   }
 
   function onNewRun() {
@@ -159,6 +206,7 @@
       return;
     }
     newRunArmed = false;
+    beginArmed = false;
     Persist.clear();
     run = null;
     resumeNote = "";
@@ -174,6 +222,7 @@
 
   function onStories() {
     newRunArmed = false;
+    beginArmed = false;
     run = null;
     resumeNote = "";
     screen = "picker";
@@ -182,6 +231,7 @@
 
   function onChoose(choiceId) {
     newRunArmed = false;
+    beginArmed = false;
     if (!run || run.phase !== "choose") return;
     Loop.choose(run, choiceId);
     persist();
@@ -190,6 +240,7 @@
 
   function onContinue() {
     newRunArmed = false;
+    beginArmed = false;
     if (!run || run.phase !== "outcome") return;
     Loop.continueRun(run);
     persist();
@@ -357,9 +408,21 @@
       if (resumeNote) panel.appendChild(el("p", "muted", resumeNote));
       var warn = replaceWarning(active.id);
       if (warn) panel.appendChild(el("p", "muted oronath-story-warn", warn));
-      var begin = el("button", "btn primary", "Begin");
+      var savedMatch = matchingSave();
+      if (savedMatch) {
+        var resume = el("button", "btn primary", resumeLabel(savedMatch));
+        resume.type = "button";
+        resume.addEventListener("click", onTitleResume);
+        panel.appendChild(resume);
+      }
+      var beginLabel = beginArmed ? "Press again to start over" : "Begin";
+      var begin = el(
+        "button",
+        savedMatch ? "btn" : "btn primary",
+        beginLabel
+      );
       begin.type = "button";
-      begin.addEventListener("click", startFresh);
+      begin.addEventListener("click", onTitleBegin);
       panel.appendChild(begin);
     }
 
@@ -522,6 +585,16 @@
       renderTitle(validated.errors);
       return;
     }
+    if (!saveOwnsArc(active)) {
+      resumeNote =
+        Stories.saveStatus() === "unusable"
+          ? "Saved run could not be resumed."
+          : "";
+      run = null;
+      screen = "splash";
+      renderTitle(null);
+      return;
+    }
     var loaded = Persist.load(active);
     if (loaded.ok && loaded.run && loaded.run.phase !== "resolved") {
       run = loaded.run;
@@ -565,6 +638,7 @@
           active = entry.arc;
           run = null;
           resumeNote = "";
+          beginArmed = false;
           screen = "splash";
           renderTitle(null);
           return;

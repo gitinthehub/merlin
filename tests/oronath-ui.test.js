@@ -150,7 +150,7 @@ function loadScript(sandbox, rel) {
   });
 }
 
-function boot(prep) {
+function boot(prep, hash) {
   var store = makeStorage();
   var app = makeNode("div");
   app.id = "app";
@@ -165,7 +165,8 @@ function boot(prep) {
   var sandbox = {
     console: console,
     localStorage: store,
-    document: document
+    document: document,
+    location: { hash: hash || "" }
   };
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
@@ -176,6 +177,7 @@ function boot(prep) {
     "sample-arc.js",
     "arcs/last-signal.js",
     "arcs/pale-hand.js",
+    "arcs/cinder-mile.js",
     "loop.js",
     "persist.js",
     "stories.js"
@@ -183,8 +185,9 @@ function boot(prep) {
   var i;
   for (i = 0; i < files.length; i++) loadScript(sandbox, files[i]);
   if (prep) prep(sandbox, store);
+  var bytesBeforeUi = store.getItem(SAVE_KEY);
   loadScript(sandbox, "oronath-ui.js");
-  return { app: app, store: store, sandbox: sandbox };
+  return { app: app, store: store, sandbox: sandbox, bytesBeforeUi: bytesBeforeUi };
 }
 
 function parkCrosshaven(sandbox, store) {
@@ -196,6 +199,26 @@ function parkCrosshaven(sandbox, store) {
   Loop.choose(run, "jin-sewers", { rng: Dice.sequence([10]) });
   Loop.continueRun(run);
   Persist.save(run, store);
+}
+
+function parkLastSignalEcho(sandbox, store) {
+  var Loop = sandbox.OronathLoop;
+  var Persist = sandbox.OronathPersist;
+  var Dice = sandbox.OronathDice;
+  var arc = sandbox.OronathArcBundles["last-signal"];
+  var run = Loop.createRun(arc, { characters: arc.characters, seed: 1 });
+  Loop.choose(run, "rafe-shoots", { rng: Dice.sequence([9, 8]) });
+  Loop.continueRun(run);
+  Persist.save(run, store);
+}
+
+function assertSaveBytesUnchanged(label, hash, prep) {
+  var r = boot(prep, hash);
+  assert(r.bytesBeforeUi, label + " seeds a save");
+  assert(
+    r.store.getItem(SAVE_KEY) === r.bytesBeforeUi,
+    label + " leaves oronath.save.v1 byte-identical"
+  );
 }
 
 var parked = boot(parkCrosshaven);
@@ -217,8 +240,21 @@ assert(textOf(parked.app).indexOf(SAME_WARN) !== -1, "warning on the title");
 var titleBegin = byText(buttonsIn(parked.app), "Begin");
 assert(titleBegin, "title Begin");
 titleBegin.click();
+assert(
+  byText(buttonsIn(parked.app), "Press again to start over"),
+  "title Begin arms before replacing the run"
+);
+assert(
+  parked.store.getItem(SAVE_KEY),
+  "title Begin first click leaves save intact"
+);
+var armedBegin = byText(buttonsIn(parked.app), "Press again to start over");
+if (armedBegin) armedBegin.click();
 var replaced = JSON.parse(parked.store.getItem(SAVE_KEY));
-assert(replaced && replaced.nodeId === "lantern-quarter", "title Begin replaces the run");
+assert(
+  armedBegin && replaced && replaced.nodeId === "lantern-quarter",
+  "title Begin second click replaces the run"
+);
 
 var armed = boot(parkCrosshaven);
 var newRun = byText(buttonsIn(armed.app), "New Run");
@@ -286,6 +322,43 @@ var other = articleTitled(finished.app, "The Last Signal of Oronath");
 assert(
   textOf(other).indexOf("is saved — beginning this story will replace it.") === -1,
   "other card does not warn about a finished run"
+);
+
+assertSaveBytesUnchanged(
+  "hash #cinder-mile with foreign last-signal save",
+  "#cinder-mile",
+  parkLastSignalEcho
+);
+assertSaveBytesUnchanged(
+  "hash #cinder-mile/begin with foreign last-signal save",
+  "#cinder-mile/begin",
+  parkLastSignalEcho
+);
+assertSaveBytesUnchanged(
+  "hash #bogus with foreign last-signal save",
+  "#bogus",
+  parkLastSignalEcho
+);
+assertSaveBytesUnchanged(
+  "empty hash with foreign last-signal save",
+  "",
+  parkLastSignalEcho
+);
+
+var beginResume = boot(parkLastSignalEcho, "#last-signal/begin");
+assert(
+  buttonStarts(beginResume.app, "Resume — Chapter"),
+  "hash #last-signal/begin offers Resume for matching save"
+);
+var resumeBtn = buttonStarts(beginResume.app, "Resume — Chapter");
+resumeBtn.click();
+assert(
+  kickerText(beginResume.app) === "Chapter 2",
+  "title Resume lands on saved chapter"
+);
+assert(
+  textOf(beginResume.app).indexOf("The Echo Field") !== -1,
+  "title Resume shows echo-field chapter"
 );
 
 if (fails === 0) {

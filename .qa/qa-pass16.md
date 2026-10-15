@@ -1,0 +1,71 @@
+# Pass 16 QA — the MERLIN bot's reply
+
+Source: Grok Bot, the **MERLIN** bot, 2026-10-15 11:48 ET, against the `516cfa3` deploy.
+This is the reply read from the accessibility tree in element order. Inline fragments (code
+spans, hashes) were rejoined into the sentences that interrupt them and the UI furniture was
+dropped; **the raw element-order dump is committed beside this file as**
+`qa-pass16-raw-ax.txt`, and nothing in the wording was otherwise changed.
+
+The reply ended with three screenshots: the same-story title screen with a one-click Begin,
+the other-story replace warning with no confirm step, and the front door at 375px with a
+castle save (only the small castle link, no resume).
+
+---
+
+VERDICT — hold The dice are clean: in 40 honest Cinder Mile runs plus 7 branches I forced, the actor, die and DC always matched the result, and the outcome text always matched the roll. There were no console errors from your code, no network calls from file://, and all 11 served tests pass. I'm holding because of the first item below, which deletes a saved run with no warning. I couldn't tie the deploy to 516cfa3, because that hash doesn't appear in any served file.
+1.
+Opening a story link without /begin deletes another story's saved run with no warning.
+WHY: you said the Last Signal save must never be rewritten, and a bookmark, shared link or typed hash is enough to erase it. WHERE:
+/oronath.html#cinder-mile while a Last Signal run is saved mid-way. The hash path goes through bootSingle into Persist.load, which deletes any save that belongs to a different story. REPRO: on a fresh profile, open #last-signal/begin, click Begin, and play to "Chapter 2 / The Echo Field". Then open /oronath.html#cinder-mile. The Cinder Mile title appears with no warning, and oronath.save.v1 is now null. By contrast, /, /index.html, /castle.html, /roadmap.html, /oronath.html, #last-signal, #cinder-mile/begin, #pale-hand/begin, #last-signal/begin and #bogus all leave the save byte-identical, including after a reload. COST: S
+2.
+Begin on the title screen replaces a run in one click, so the warning has no confirm step.
+WHY: the brief puts the confirm-to-replace on that Begin, but there's only warning text. The same-story case from pass 14 now shows a warning but still wipes the run in one click. "New Run" in the footer does ask twice ("Press again to start over"). WHERE:
+#pale-hand/begin and #last-signal/begin while a Last Signal run is saved. REPRO: the title says "Your run in The Last Signal of Oronath is saved — beginning this story will replace it." One click on Begin opens "Chapter 1 / The Lantern Quarter" and the save becomes The Pale Hand's. For the same story, the title says "This story has a run in progress at Chapter 2 — The Echo Field. Beginning again replaces it." One click restarts it with no history. COST: S
+3.
+Reloading mid-run lands on a title screen whose only main button replaces the run.
+WHY: every Begin on the front door leads to #story/begin, and that hash stays in the address bar. After a reload the player sees a big Begin (which wipes the run, as in item 2) and no Resume. The only way back is All stories, then Resume. WHERE: Cinder Mile, started from the front door. REPRO: open /, click Begin on Cinder Mile, click Begin, make one choice, then reload. You see Begin, All stories, and "This story has a run in progress at Chapter 1 — The Painted Yard. Beginning again replaces it." I saw this under file://, and the live site runs the same code. COST: S
+4.
+The chapter counts on the front door overstate what a player gets.
+WHY: the cards read "5 chapters · Nim, Pell, Maro" and "6 chapters · Jin", because they count every chapter in the story data rather than the chapters in one run. Across 40 runs, Cinder Mile lasted 2 to 4 chapters and reached Chapter 4 only 3 times. The Pale Hand's sixth chapter is an alternate version of the ford, so a run is at most 5. The rest of the front door is truthful: The Pale Hand now lists only Jin, who is the only one who acts, and the third card does nothing when clicked, as intended. WHERE:
+/ on a fresh profile. REPRO: compare the card text with the chapter numbers you actually reach. COST: S
+5.
+Some Cinder Mile rolls pay off backwards: a bonus can lead to a worse ending than a plain success, and a complication can lead to the best one.
+WHY: it undercuts the promise that every choice is a real roll. WHERE: The Relay, The Relay Uncranked, and the Salt Flat. REPRO:
+• In an honest run, "Climb the mast even though the housing is wrong" rolled a natural 20 for a bonus and led to "A Voice in Salt". A plain success on the same choice leads to The Hour Goes Out.
+• With dice forced, the complications on "Cut the feed cable" and "Count the rivets" both lead to The Hour Goes Out, while a success on either leads to static.
+• The complication on "Walk off the mile" says "You keep walking anyway." and then leads to The Hour Goes Out. COST: S (story data only)
+6.
+Cinder Mile text contradicts what happened earlier in the run.
+WHY: these read as bugs, not story. WHERE: The Relay, The Relay Uncranked, and the endings. REPRO:
+• If you take the crank bonus ("You take the hill with a crank that still has teeth") and then fail "Ask the relay…", the next scene, The Relay Uncranked, says "The housing is empty."
+• If you get the bonus on "Follow the wet paint" without ever taking the crank, The Relay says "You have a crank that turns…"
+• The Uncranked objective says "Climb, read, or walk off", but none of its four choices is a walk-off.
+• Every ending closes all three threads, but no choice ever closes "tonight's hour".
+• Endings hedge about characters the player may never have met, for example "Pell's lamp stays in the switch house whether you met him or not."
+• No item gets used after it's lost, and the counter now reads "Chapter N" without "of 5", so it no longer appears to skip. COST: M
+7.
+Returning castle players and anyone following an old link now arrive at the picker, and it shows nothing about their saved castle run.
+WHY: returning castle players don't land on their game. That includes anyone following the share line, the roadmap's "Back to the game", or Oronath's "Back to MERLIN". WHERE:
+/ with a castle run saved mid-way. REPRO: with Bram saved at the inn, / shows only a small "The castle night" link, 37px tall, with no Resume. That link does reach castle.html, and the run resumes there. The castle save ( merlin.save.v1 ) stayed byte-identical through /, /oronath.html and /roadmap.html. The share line itself is unchanged and still ends · https://merlin-dnd.netlify.app, which now opens the picker. Nothing is broken; it's a routing gap. COST: S
+8.
+Pell and Maro barely act, and many rolls don't change where the story goes.
+WHY: the card promises three characters, and some dice only change the wording. WHERE: Cinder Mile. REPRO:
+• Of 14 choices, Nim acts in 12, Pell in one (the crank) and Maro in one (reading the number).
+• The title screen lists Pell's "Solder" and Maro's "Long Memory", but neither is ever rolled.
+• At the water tower, success, failure and bonus all lead to the Switch House.
+• Some results credit the wrong character: Maro's complication "reads the wrong post on purpose", and Pell's failure says the crank "spins free in your hand". COST: M
+DEFECTS
+• Lost save:
+opening /oronath.html#cinder-mile while another story has a saved run sets oronath.save.v1 to null (item 1).
+• Wrong state:
+after a reload mid-run, the title screen offers only a Begin that replaces the run (item 3).
+• Replace without confirm:
+Begin on the title screen replaces a run in one click (item 2).
+• Test gaps:
+tests/front.test.js returns a 404, and no test opens a story hash while another story's run is saved, which is how item 1 got through.
+• Broken links and crashes:
+none from your code. Under file://, the links the scripts build ( castle.html, oronath.html#…, index.html ) all work. The castle game, the daily share line and the Last Signal play and resume exactly as before.
+WHAT I DID NOT CHECK: real phones and non-Chromium browsers, playing a death through to the castle checkpoint (I tested restore through the engine instead, and attempts stayed at 1), and your unbuilt source repo, so I can't confirm the source links are relative.
+Same-story title screen: warning text with a one-click Begin
+Other-story replace warning with no confirm step
+Front door at 375px with a castle save: only a small castle link and no resume
