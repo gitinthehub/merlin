@@ -1,0 +1,22 @@
+NICKEL COAST — REVISION 2, three sentences still over-claim
+
+Apply only these, in `arcs/nickel-coast.json`, then regenerate the bundle with
+`node tools/build-arc.js --from arcs/nickel-coast.json --out arcs/nickel-coast.js`.
+
+1. `end-closed`: the phrase "the last line on the table is tonight's date with nothing owed after it"
+   is false on any route where `dez-pull-the-board` FAILED — that choice text says the ribbon came off
+   with the last line — and `end-closed` is reachable from exactly there. Make the sentence true
+   whether or not the last line survived.
+
+2. `end-open`: the phrase "the high-score table on the cabinet" is false on any route where
+   `dez-pull-the-board` SUCCEEDED, because the board is then on the bench, and `end-open` is reachable
+   from there. Refer to the table without asserting where the board physically is.
+
+3. `end-closed`: the phrase "one closed line under forty-one others" — the count forty-one is
+   established only by `rook-sign-the-hook` success, so on every other route it is unsupported. State
+   the closed line without the count.
+
+Everything else in the three endings stays. Then report: the validator output
+(`node -e "console.log(JSON.stringify(require('./arc.js').validateArc(require('./arcs/nickel-coast.json')).errors))"`),
+`node tests/nickel-coast.test.js`, and the three revised sentences verbatim. No commit, no push, and
+nothing outside `arcs/nickel-coast.json` and `arcs/nickel-coast.js`.

@@ -113,7 +113,7 @@
     {
       "id": "end-closed",
       "title": "The Season Closes",
-      "text": "The breaker goes down and the arcade takes its first honest dark since June. Dez pulls the board and keeps it on the bench, and the table on it ends at tonight with nobody's name in front — the cabinet was only ever writing down what the season owed. Vale signs room 11 out at the bottom of the register, one pencil line under forty-one others, and the key goes back on the hook where the hooks are all the same. Rook puts his coat on the desk and walks out through the office door into September, and the sand is cold and ordinary under his shoes. The sign goes off last. The coast does not argue.",
+      "text": "The arcade is shut for the winter and the boardwalk is empty under a sign that has finally gone dark. Dez leaves the high-score ledger where the machines can no longer add to it, and tonight closes what the ledger was keeping, whether the last line survived or not — the cabinet was only ever writing down what the season owed. Vale's register shows room 11 checked out at the bottom of the page, its line closed among the summer's open nights, and the key back on the hook where every hook is the same. Rook is across the threshold into September, coat on, the sand cold and ordinary under his shoes, and the reservation the book carried all summer is finished. The coast does not argue.",
       "resolves": [
         "dez-score",
         "vale-room",
@@ -123,7 +123,7 @@
     {
       "id": "end-open",
       "title": "The Season Never Closes",
-      "text": "The sign stays on. The arcade keeps its hum, the register keeps its line open, and room 11 keeps a guest who pays in quarters that were already spent. Dez stops fixing the payouts and starts designing them, and the high-score table he leaves on the cabinet fills with names of people who are standing in the room. Vale writes today's date at the top of the page and turns to a fresh one, and the book gets no shorter. Rook takes the bed in room 11 the way he has taken it since June, and the summer holds its breath on the room's meter. Out on the water the boardwalk lights run all the way to the horizon, and the horizon has an end of the season written on it that no one standing here can read.",
+      "text": "The sign stays on over a boardwalk that still sounds like summer. The arcade keeps its hum, the register keeps its line open, and room 11 keeps a guest who pays in quarters that were already spent. Dez tends the payouts the way the season tends him, and the high-score table still takes names and dates that run past tonight. Vale's book turns to a fresh page without getting shorter, today's date at the top and room 11 still booked ahead. Rook remains the guest the register has carried since June, the room's meter still tied to the arcade's. Out on the water the boardwalk lights run all the way to the horizon, and the horizon has an end of the season written on it that no one standing here can read.",
       "resolves": [
         "dez-score",
         "vale-room",
@@ -133,7 +133,7 @@
     {
       "id": "end-tide",
       "title": "The Nickel Coast",
-      "text": "The tide comes in over the pilings and takes the boards with it, one plank at a time, the way it has been taking the far end of the coast since before anyone built there. The salt gets into the cabinets and the cabinets stop arguing, and Dez carries a soaked board up the dune with the last line on it still legible and no one left to read it to. Vale stands in the office with the register under one arm and the water running through the door, and the page for room 11 goes soft in her hands until the four and the one are a smudge and the line is closed by weather instead of by hand. Rook walks out ahead of the water with his coat over his shoulder and stops where the sign used to hang. The coin in his pocket is warm. It stays warm for a long time.",
+      "text": "The tide comes in over the pilings and takes the boards with it, one plank at a time, the way it has been taking the far end of the coast since before anyone built there. The salt gets into the cabinets and the cabinets stop arguing; the high-score table blurs in the glass while the water climbs the dune, and Dez is up the sand with what the arcade can still yield of the ledger, no one left to read the last line to. Vale stands in the office with the register under one arm and the water through the door, and the page for room 11 is already soft — the four and the one weathered closed where no pencil could hold. Rook is ahead of the water with his coat over his shoulder, stopped where the sign used to hang over an arcade the sea is taking back. The coast keeps the name the summer wrote and does not give it back.",
       "resolves": [
         "dez-score",
         "vale-room",
@@ -410,7 +410,7 @@
       "id": "room-eleven",
       "title": "Room Eleven",
       "setting": "Room 11: one bed made tight, a window that looks straight at the arcade, and quarters stacked along the sill in rows nobody rolled.",
-      "objective": "Decide what room 11 has been keeping.",
+      "objective": "Take the bed, rewire the lamp onto the cabinet, or sign the line and close the room.",
       "choices": [
         {
           "id": "rook-take-the-bed",

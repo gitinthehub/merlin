@@ -1,0 +1,88 @@
+NICKEL COAST — ENDING PROSE FIX (pass 19)
+
+Repo: /Users/cloud/Developer/merlin
+
+## Why
+
+An independent review of `arcs/nickel-coast.json` found that all three endings narrate actions the
+player may never have taken. Each ending is reachable by **6,152 distinct route chains** (enumerated
+from the arc's own consequences), so a sentence that describes an action is false on almost every
+route into that ending.
+
+The route-independence rule already applied to Cinder Mile in pass 18: **an ending states what is true
+of the world and of all three characters at that ending — never an action the player took, and never a
+fact that only one road established.**
+
+The offending sentences, exactly as they stand:
+
+- `end-closed` ("The Season Closes"): "Dez pulls the board and keeps it on the bench", "the table on it
+  ends at tonight with nobody's name in front", "Vale signs room 11 out at the bottom of the register,
+  one pencil line under forty-one others", "Rook puts his coat on the desk and walks out through the
+  office door", and "The breaker goes down" as the first dark ("its first honest dark") — false after a
+  route where the breaker already tripped earlier, and after `rook-pay-for-another-week` failure, whose
+  own text describes a short stack and a light going out.
+- `end-open` ("The Season Never Closes"): "Dez stops fixing the payouts and starts designing them",
+  "the high-score table he leaves on the cabinet", "Rook takes the bed in room 11 the way he has taken
+  it since June", and "names of people who are standing in the room" — each false on routes where the
+  board is on the bench, the player slept on the floor, or nobody was in the room at all.
+- `end-tide` ("The Nickel Coast"): "Dez carries a soaked board up the dune with the last line on it
+  still legible", "the page for room 11 goes soft in her hands until the four and the one are a smudge
+  and the line is closed by weather instead of by hand", and "The coin in his pocket is warm. It stays
+  warm for a long time." — the coin is set up only by `rook-pay-for-another-week` failure, whose `next`
+  is `end-closed`, and `vale-sign-the-line` success says the quarters stop being warm.
+
+Also: `room-eleven`'s objective is "Decide what room 11 has been keeping." Its three choices are take
+the bed, rewire the lamp, or sign the line and close the room — decisions about the room, not about
+what it has been keeping. Tighten the objective to name the decision the choices actually offer. This
+is a copy fix, not a graph change.
+
+## What to do
+
+Change exactly these fields in `arcs/nickel-coast.json`:
+
+1. The `text` of `end-closed`, `end-open`, `end-tide`.
+2. The `objective` of the `room-eleven` chapter.
+
+Then regenerate the bundle: `node tools/build-arc.js --from arcs/nickel-coast.json --out
+arcs/nickel-coast.js`. Never hand-edit the bundle.
+
+Nothing else changes: not the ids, not the six chapters, not the nineteen choices, not any choice's
+label, roll, or consequence text, not any `resolves` list, not the characters, threads, pitch or blurb.
+
+## What each ending must still do
+
+- **`end-closed` — the season ends properly.** The arcade is shut for the winter, the sign goes off,
+  room 11 is signed out, and the three of them leave. Write it as the state of the place and of each
+  character at that ending, true whether or not the player pulled the board, rewired the lamp, or
+  bought another week.
+- **`end-open` — the season never closes.** The sign stays on, the register keeps an open line, room 11
+  keeps a guest who pays in quarters. Same rule: state what is true of the place, not what the player
+  did.
+- **`end-tide` — the coast takes the boardwalk.** The water comes over the pilings, the salt gets into
+  the cabinets, and what the coast keeps is the name. Same rule.
+- Each ending still names all three characters' fates, because every ending resolves all three threads:
+  the table (Dez), the register and room 11 (Vale), the stay (Rook). They are true on every route
+  because chapter one puts all three on stage, which is the honest fix the validator's rule demands.
+- Keep the three endings distinct from each other. A reader who has seen all three must be able to say
+  what differs: the season ended, the season kept running, or the sea ended it.
+
+## Verify and paste
+
+1. `node -e "console.log(JSON.stringify(require('./arc.js').validateArc(require('./arcs/nickel-coast.json')).errors))"`
+   → must print `[]`.
+2. `node tests/nickel-coast.test.js` → one `ok` line, then
+   `for f in tests/*.test.js; do node "$f" | tail -1; done` → fourteen `ok` lines.
+3. `git diff --stat HEAD -- arcs/nickel-coast.js arcs/nickel-coast.json` → only those two files; and
+   `git diff --stat HEAD -- stories.js index.html oronath.html tests/nickel-coast.test.js front.js ROADMAP.md roadmap.js`
+   → empty unless the test asserts ending prose (if you must touch the test, keep it to that
+   assertion and say so).
+4. For each of the three endings, a short list of the facts its prose asserts, and for each fact the
+   reason it holds regardless of which choices were taken. If your shell is sandboxed and cannot run
+   node, say so plainly instead of claiming a result; a source-trace answer with that fact stated is
+   acceptable, a claimed run is not.
+
+## Boundaries
+
+Stop at working-tree changes. Do not commit, do not push, do not run `netlify deploy`. Do not touch
+`ROADMAP.md` or `roadmap.js`. No new files in the repo; scratch goes in /tmp and is deleted. This is a
+prose fix to one arc: no engine change, no new chapter, no new choice, no change to any other arc.
