@@ -46,9 +46,11 @@ assert(v.errors.length === 0, "validateArc errors length 0");
 
 assert(arc.id === "cinder-mile", "id cinder-mile");
 assert(arc.chapters && arc.chapters.length === 5, "five chapters");
-assert(arc.endings && arc.endings.length === 3, "three endings");
+assert(arc.endings && arc.endings.length === 6, "six endings");
 
 var choiceCount = 0;
+var actors = { nim: 0, pell: 0, maro: 0 };
+var traitHits = {};
 var ci;
 var ch;
 var choices;
@@ -57,6 +59,10 @@ for (ci = 0; ci < arc.chapters.length; ci++) {
   choiceCount += choices.length;
   for (ch = 0; ch < choices.length; ch++) {
     var c = choices[ch];
+    if (actors[c.actor] != null) actors[c.actor] += 1;
+    var tags = (c.roll && c.roll.tags) || [];
+    var ti;
+    for (ti = 0; ti < tags.length; ti++) traitHits[tags[ti]] = true;
     var cons = c.consequences;
     if (cons && cons.complication && cons.failure) {
       assert(
@@ -66,7 +72,23 @@ for (ci = 0; ci < arc.chapters.length; ci++) {
     }
   }
 }
-assert(choiceCount === 14, "fourteen choices");
+assert(choiceCount === 15, "fifteen choices");
+assert(actors.nim === 5, "nim acts in 5 choices, got " + actors.nim);
+assert(actors.pell === 5, "pell acts in 5 choices, got " + actors.pell);
+assert(actors.maro === 5, "maro acts in 5 choices, got " + actors.maro);
+var needTraits = [
+  "road-sense",
+  "light-hands",
+  "bad-knee",
+  "solder",
+  "night-shift",
+  "wet-brush",
+  "long-memory"
+];
+var tr;
+for (tr = 0; tr < needTraits.length; tr++) {
+  assert(traitHits[needTraits[tr]] === true, "trait covered " + needTraits[tr]);
+}
 
 var tmpOut = path.join(require("os").tmpdir(), "cinder-mile-build-" + process.pid + ".js");
 var built = Build.bundleFromFile(jsonPath, tmpOut);
@@ -110,52 +132,75 @@ for (di = 0; di < deny.length; di++) {
 
 var bundle = global.OronathArcBundles["cinder-mile"];
 var runHour = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
-Loop.choose(runHour, "nim-water-tower", { rng: Dice.sequence([11]) });
+Loop.choose(runHour, "nim-give-the-oil", { rng: Dice.sequence([11, 3]) });
 Loop.continueRun(runHour);
-assert(runHour.nodeId === "switch-house", "hour path switch-house");
-Loop.choose(runHour, "pell-crank", { rng: Dice.sequence([14, 2]) });
+assert(runHour.nodeId === "switch-house", "oil path switch-house");
+Loop.choose(runHour, "pell-send-the-true", { rng: Dice.sequence([14, 2]) });
 Loop.continueRun(runHour);
-assert(runHour.nodeId === "relay-tower", "hour path relay-tower");
-Loop.choose(runHour, "nim-read-plate", { rng: Dice.sequence([8]) });
-Loop.continueRun(runHour);
-assert(runHour.nodeId === "end-hour", "seed 7 path reaches end-hour");
+assert(runHour.nodeId === "end-hour", "oil path reaches end-hour");
 
-var runStatic = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
-Loop.choose(runStatic, "nim-water-tower", { rng: Dice.sequence([1]) });
-Loop.continueRun(runStatic);
-assert(runStatic.nodeId === "salt-flat", "static path salt-flat");
-Loop.choose(runStatic, "nim-follow-paint", { rng: Dice.sequence([15]) });
-Loop.continueRun(runStatic);
-assert(runStatic.nodeId === "relay-tower-dark", "static path dark relay");
-Loop.choose(runStatic, "nim-count-the-plate", { rng: Dice.sequence([5]) });
-Loop.continueRun(runStatic);
-assert(runStatic.nodeId === "end-static", "seed 7 missed-Pell path reaches end-static");
+var runSpill = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
+Loop.choose(runSpill, "nim-give-the-oil", { rng: Dice.sequence([4, 3]) });
+Loop.continueRun(runSpill);
+assert(runSpill.nodeId === "relay-dark", "spilled oil reaches relay-dark");
+Loop.choose(runSpill, "nim-count-the-posts", { rng: Dice.sequence([12]) });
+Loop.continueRun(runSpill);
+assert(runSpill.nodeId === "end-map", "dark count reaches end-map");
+
+var runSpoken = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
+Loop.choose(runSpoken, "maro-say-the-mile", { rng: Dice.sequence([11]) });
+Loop.continueRun(runSpoken);
+assert(runSpoken.nodeId === "salt-flat", "spoken mile salt-flat");
+Loop.choose(runSpoken, "nim-keep-the-spoken", { rng: Dice.sequence([9]) });
+Loop.continueRun(runSpoken);
+assert(runSpoken.nodeId === "end-map", "spoken mile reaches end-map");
+
+var runSolder = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
+Loop.choose(runSolder, "pell-burn-the-solder", { rng: Dice.sequence([12]) });
+Loop.continueRun(runSolder);
+assert(runSolder.nodeId === "relay", "spent solder relay");
+Loop.choose(runSolder, "maro-overpaint", { rng: Dice.sequence([5]) });
+Loop.continueRun(runSolder);
+assert(runSolder.nodeId === "end-posts", "spent solder reaches end-posts");
+
+var runLie = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
+Loop.choose(runLie, "maro-say-the-mile", { rng: Dice.sequence([11]) });
+Loop.continueRun(runLie);
+assert(runLie.nodeId === "salt-flat", "repainted lie salt-flat");
+Loop.choose(runLie, "maro-take-it-back", { rng: Dice.sequence([3, 4]) });
+Loop.continueRun(runLie);
+assert(runLie.nodeId === "end-posts", "repainted lie reaches end-posts");
+
+var runCold = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
+Loop.choose(runCold, "pell-burn-the-solder", { rng: Dice.sequence([1]) });
+Loop.continueRun(runCold);
+assert(runCold.nodeId === "end-ash", "cold-solder complication reaches end-ash");
 
 var runTrade = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
 var threw = false;
 try {
-  Loop.choose(runTrade, "nim-trade-water", { rng: Dice.sequence([1]) });
+  Loop.choose(runTrade, "nim-give-the-oil", { rng: Dice.sequence([1]) });
 } catch (e) {
   threw = true;
 }
-assert(threw, "nim-trade-water sequence([1]) throws sequence exhausted");
+assert(threw, "nim-give-the-oil sequence([1]) throws sequence exhausted");
 
 var runTradeC = Loop.createRun(bundle, { characters: bundle.characters, seed: 7 });
-Loop.choose(runTradeC, "nim-trade-water", { rng: Dice.sequence([1, 1]) });
+Loop.choose(runTradeC, "nim-give-the-oil", { rng: Dice.sequence([1, 1]) });
 var view = Loop.view(runTradeC);
 assert(
-  view.outcome && view.outcome.next === "relay-tower-dark",
-  "nim-trade-water sequence([1, 1]) next is relay-tower-dark"
+  view.outcome && view.outcome.next === "end-ash",
+  "nim-give-the-oil sequence([1, 1]) next is end-ash"
 );
 
 var badRun = Loop.createRun(bundle, { seed: 7 });
 var actorFail = false;
 try {
-  Loop.choose(badRun, "nim-water-tower", { rng: Dice.sequence([10]) });
+  Loop.choose(badRun, "nim-give-the-oil", { rng: Dice.sequence([10]) });
 } catch (e) {
   actorFail = true;
 }
-assert(actorFail, "createRun without characters throws unknown actor on nim-water-tower");
+assert(actorFail, "createRun without characters throws unknown actor on nim-give-the-oil");
 
 if (fails === 0) {
   console.log("cinder-mile ok");

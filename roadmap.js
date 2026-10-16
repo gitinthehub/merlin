@@ -148,7 +148,9 @@
         { id: "2.18", name: "Third story: The Nickel Coast", status: "in progress" },
         { id: "2.19", name: "Door gains the third card", status: "in progress" },
         { id: "2.20", name: "Tests and docs", status: "in progress" },
-        { id: "2.21", name: "Fourth story: Wrong Numbers", status: "not started" }
+        { id: "2.21", name: "Fourth story: Wrong Numbers", status: "not started" },
+        { id: "2.22", name: "Cinder Mile rewrite", status: "in progress" },
+        { id: "2.23", name: "Rewrite tests and proof", status: "in progress" }
       ]
     }
   ];

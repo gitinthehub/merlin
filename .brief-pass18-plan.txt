@@ -1,0 +1,115 @@
+CINDER MILE — REWRITE THE STORY DATA SO IT MAKES SENSE
+
+Owner's words, 2026-10-15: "cinder mile story doesn't make sense either - pls have grok 4.7 via
+cursor rewrite it to make it better with clear motivations and soul crushing choices."
+
+Repo: /Users/cloud/Developer/merlin (git-in-the-hub/merlin, live at merlin-dnd.netlify.app).
+Cinder Mile is the FEATURED arc on the front door. Read `arcs/cinder-mile.json` as it stands,
+`.oronath-arc-spec.md` for the contract, and `tests/cinder-mile.test.js` for what is currently
+asserted about it.
+
+## The problem to solve
+
+The arc reads as atmosphere without motive. Nim, Pell and Maro want things the player is never
+told plainly; the choices are errands rather than decisions, so a failure costs a chapter and not
+anything the player cares about. The owner's diagnosis is that the story does not make sense.
+
+Rewrite the arc's story data so that:
+
+1. **Motivations are explicit and specific.** By the end of chapter one the player knows what each
+   of the three wants, why they want it now, and what they are afraid of losing. Put those wants in
+   `pitch` (one line per character, the shape the current file already uses) and let every chapter's
+   `setting` and `objective` carry the pressure rather than the scenery.
+2. **Every choice is a soul-crushing trade, not an errand.** A good choice here costs something the
+   player wants to keep: save the hour and lose the map, keep the promise and lose the town, clear
+   your name and burn the only copy. No choice may be obviously correct, and no road may be free.
+   Two goods against each other, never good against bad.
+3. **Failure opens a road with its own cost.** Never a retry, never a flat "you lose". The engine
+   already routes to a different node; make that node something the player now has to live with.
+
+## Hard rules — the validator is the gate
+
+`arc.js`'s `validateArc` must return zero errors. Concretely:
+
+- 3–6 chapters (the current arc has five; staying at five or six is fine), 2–4 choices per chapter.
+- Every choice needs `roll.die` (`d20` with tier `easy|medium|hard|veryHard`, or `d10`/`2d6` with a
+  numeric `dc`) and a `tags` array. A choice cannot be roll-free. "Automatic" means the easiest tier.
+- Every consequence (`success`, `failure`, and `complication`/`bonus` where used) needs `text`,
+  `next`, and `resolves`.
+- `complication.next` must differ from `failure.next`. No dangling `next`, no self-`next`, no cycles,
+  every chapter reachable from the first, every ending reachable, and **every ending must resolve all
+  three threads**.
+- Keep the arc's identity: `id` stays `cinder-mile`, `title` stays `Cinder Mile`. The door's
+  `stories.js` row and the front-door card depend on the id, and the card prints `blurb`,
+  `chapterCount` and `cast` — so keep the three-character cast shape and keep the cast names
+  Nim, Pell and Maro, and keep the three thread ids (`nim-map`, `pell-hour`, `maro-posts`).
+- No real product names, no franchise trade dress. The existing test asserts a denylist
+  (`Vault-Tec`, `Pip-Boy`, `Nuka-Cola`, `Brotherhood of Steel`, `Deathclaw`, `Super Mutant`) is
+  absent; that assertion stays.
+
+## The deferred review findings this rewrite must also fix
+
+A QA review of this arc found the following and they were deferred to exactly this kind of data pass
+(see `.qa/qa-pass16-triage.md`, items D2, D3, D5). All three are in scope now:
+
+- **D2 — roads that pay off backwards.** `nim-climb-dark`'s `bonus` goes to `end-static` while its
+  plain `success` goes to `end-hour`; `nim-cut-cable` and `nim-count-the-plate` take `end-hour` on
+  their `complication` where `success` takes `end-static`; `nim-walk-off`'s complication is
+  `end-hour`. Fix the ordering by DESTINATION, not by prose: for every choice, `bonus` must be at
+  least as good as `success`, and `complication` must be worse than `success` and no better than
+  `failure`. State that ordering in the plan per choice so it can be checked.
+- **D3 — text and graph contradict each other.** The Uncranked chapter's `objective` promises a
+  walk-off that none of its four choices offers (either give it the choice or change the objective,
+  and say which). The crank `bonus`'s text contradicts the next chapter's "the housing is empty".
+- **D5 — one character does everything.** Nim acts in 12 of the 14 choices; Pell in one, Maro in one;
+  and the traits `Solder` and `Long Memory` are never rolled. The rewrite must spread the acting
+  across all three characters (no character above roughly half the choices, each acting in at least
+  three) and every trait on every character must be the `tags` of at least one choice.
+
+## Files
+
+May change (and only these):
+- `arcs/cinder-mile.json` — the rewrite.
+- `arcs/cinder-mile.js` — regenerate ONLY by `node tools/build-arc.js --from arcs/cinder-mile.json
+  --out arcs/cinder-mile.js`. Never hand-edit the bundle.
+- `tests/cinder-mile.test.js` — the existing assertions (five chapters, fourteen choices, specific
+  node ids and seed-driven walks) will not survive a rewrite. Update them to the new arc, keeping
+  the file's existing shape: the `MERLIN_HEAD` head-mode path support, the validator check, the
+  fresh-bundle-equals-committed check, the bundle registration check, the cast check, the denylist
+  check, and real `Loop` walks that assert the node each declared road actually reaches. New
+  assertions must be shown to bite — see Verification.
+
+Must NOT change (byte-identical after this pass — verified with `git diff --stat HEAD -- <file>`):
+- `engine.js`, `ui.js`, `data.js`, `dice-view.js`, `style.css` (the v1 castle game)
+- `dice.js`, `arc.js`, `characters.js`, `loop.js`, `persist.js`, `sample-arc.js`
+- `oronath-ui.js`, `front.js`, `stories.js`, `index.html`, `oronath.html`, `castle.html`
+- `arcs/pale-hand.json`, `arcs/pale-hand.js`, `arcs/nickel-coast.json`, `arcs/nickel-coast.js`,
+  `arcs/last-signal.json`, `arcs/last-signal.js`
+- `ROADMAP.md` and `roadmap.js` — the pass's status rows are being edited on the other side of this
+  handoff; do not touch either file, and do not add a changelog line.
+- `tools/build-arc.js`, `tests/*.test.js` other than `tests/cinder-mile.test.js`.
+
+## Verification you must do and report
+
+- `node -e "console.log(JSON.stringify(require('./arc.js').validateArc(require('./arcs/cinder-mile.json')).errors))"`
+  → must be `[]`.
+- `node tests/cinder-mile.test.js` → one `ok` line, and every OTHER suite still passing
+  (`for f in tests/*.test.js; do node "$f"; done`).
+- **Prove the new assertions bite**: run the new test file against the pre-pass tree
+  (`git archive HEAD | tar -x -C /tmp/<dir>` then `MERLIN_HEAD=/tmp/<dir> node tests/cinder-mile.test.js`)
+  and require named failures. A suite that only prints `ok` proves nothing.
+- A per-choice table in your final report: choice id, actor, die/tier/tags, and the four roads'
+  destinations, with the D2 ordering verdict for each (bonus ≥ success, complication ≤ failure).
+  Then an actor-count line and a trait-coverage line for D5.
+- Report the exact command output for the validator and the suite. Do not claim a result you did not
+  produce.
+
+## Boundaries
+
+- Stop at working-tree changes. Do not commit, do not push, do not run `netlify deploy`.
+- Do not create files outside the three "may change" paths. No new scratch files in the repo; if you
+  need one, put it in /tmp and delete it.
+- Do not touch the v1 castle game or any other arc's files.
+- This is a data pass. If you believe the story needs an engine change (a flag, an inventory, a
+  per-road difficulty), STOP and say so in the report instead of changing engine code — the engine's
+  answer to "only if the player learned X" is a second chapter node, not new mechanics.

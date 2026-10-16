@@ -1,0 +1,52 @@
+CINDER MILE REWRITE — EXECUTION BRIEF (owner approved 2026-10-15, option a)
+
+Repo: /Users/cloud/Developer/merlin
+Approved plan: /Users/cloud/Dropbox/mac-mini-cloud/merlin-ops/briefs/2026-10-15-cinder-mile-rewrite-plan.md
+(the same text is in the repo as .brief-pass18-plan.txt, and in this chat's transcript)
+
+Implement the plan exactly as written. It is approved; the premise, the chapter graph, the fifteen
+choices, the six endings, the destination-rank ordering and the two structural rules are all settled.
+Do not redesign them. If you hit a contradiction between the plan and the validator, fix the JSON so
+the VALIDATOR passes while keeping the plan's intent (same wants, same prices, same ordering), and say
+in the report what you changed and why.
+
+## What changes (only these three paths)
+
+- `arcs/cinder-mile.json` — rewrite: pitch, blurb, five chapters, fifteen choices, six endings.
+- `arcs/cinder-mile.js` — regenerate ONLY with
+  `node tools/build-arc.js --from arcs/cinder-mile.json --out arcs/cinder-mile.js`. Never hand-edit it.
+- `tests/cinder-mile.test.js` — rewrite the assertions the plan names in its section 6, plus the new
+  ones it adds (actor counts, trait coverage, the relay walk, the repainted-lie walk, the cold-solder
+  complication walk). Keep the file's existing shape: MERLIN_HEAD support, validateArc ok, the
+  fresh-bundle-equals-committed check, the bundle map and `OronathArcBundle.id` check, the cast check,
+  the denylist check.
+
+## What must not change (byte-identical after this pass)
+
+`engine.js`, `ui.js`, `data.js`, `dice-view.js`, `style.css`, `dice.js`, `arc.js`, `characters.js`,
+`loop.js`, `persist.js`, `sample-arc.js`, `oronath-ui.js`, `front.js`, `stories.js`, `index.html`,
+`oronath.html`, `castle.html`, `arcs/pale-hand.*`, `arcs/nickel-coast.*`, `arcs/last-signal.*`,
+`ROADMAP.md`, `roadmap.js`, `tools/build-arc.js`, and every `tests/*.test.js` other than
+`tests/cinder-mile.test.js`.
+
+Verify with `git diff --stat HEAD -- <those paths>` before you report. No new files in the repo; any
+scratch goes in /tmp and is deleted.
+
+## Verification you must run and paste
+
+1. `node -e "console.log(JSON.stringify(require('./arc.js').validateArc(require('./arcs/cinder-mile.json')).errors))"`
+   → must print `[]`.
+2. `node tests/cinder-mile.test.js` → one `ok` line, then the whole suite:
+   `for f in tests/*.test.js; do node "$f" | tail -1; done` → fourteen `ok` lines.
+3. Bite proof: `mkdir -p /tmp/head18 && git archive HEAD | tar -x -C /tmp/head18` then
+   `MERLIN_HEAD=/tmp/head18 node tests/cinder-mile.test.js` → must fail BY NAME (six endings, fifteen
+   choices, unknown choice ids, actor counts, solder and long-memory coverage). Paste the failure lines.
+4. Per-choice ordering verdicts (bonus ≥ success, complication ≤ failure) for all fifteen choices, and
+   the actor counts and trait coverage lines.
+
+## Boundaries
+
+Stop at working-tree changes. Do not commit, do not push, do not run `netlify deploy`. Do not edit
+`ROADMAP.md` or `roadmap.js` — the pass rows are being written on the other side of this handoff. Do
+not add, remove or change any engine file: this is a data pass, and a price already paid is a separate
+chapter, not a new mechanic.
