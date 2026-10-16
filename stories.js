@@ -65,7 +65,7 @@
   var DOOR = [
     { id: "cinder-mile" },
     { id: "pale-hand" },
-    { awaiting: true, title: "A third story", note: "Not chosen yet." }
+    { id: "nickel-coast" }
   ];
 
   function list() {

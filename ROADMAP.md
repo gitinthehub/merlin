@@ -152,16 +152,20 @@ Five endings — The Hand Turns, The Hand Falls, The Hand Vanishes, The Courier'
 
 ## v2.2 — The front door 🔨
 
-`index.html` is the story picker. The castle night lives at `castle.html`. Cinder Mile is the featured arc. The Last Signal stays registered but off the door. A third story slot awaits the owner's choice.
+`index.html` is the story picker. The castle night lives at `castle.html`. Cinder Mile is the featured arc. The Last Signal stays registered but off the door. The owner chose **The Nickel Coast** as the third story on 2026-10-15; it is built in the working tree and held for the next push window.
 
 | # | Item | Deliverables | Size | Depends on | Status |
 |---|------|--------------|------|-----------|--------|
-| 2.12 | **Front door** | `index.html` renders `Stories.door()`: Cinder Mile, The Pale Hand, and an unplayable third slot | M | 2.10 | 🔨 in progress |
-| 2.13 | **Castle night preserved** | `castle.html` is the current castle page; `engine.js`, `ui.js`, `data.js`, `dice-view.js`, `style.css` stay byte-identical | S | — | 🔨 in progress |
-| 2.14 | **Featured arc: Cinder Mile** | `arcs/cinder-mile.json` and keyless `arcs/cinder-mile.js`; `validateArc` clean; five chapters | L | 2.2, 2.6 | 🔨 in progress |
-| 2.15 | **Last Signal leaves the door** | Still registered and playable at `oronath.html` and `#last-signal`; no front-door card; saves kept | S | 2.12 | 🔨 in progress |
-| 2.16 | **Third story awaits** | Door row title `A third story`, note `Not chosen yet.`, no setting and no play control | S | 2.12 | 🔨 in progress |
-| 2.17 | **Tests and docs** | `tests/front-door.test.js`, `tests/cinder-mile.test.js`, README, and this phase in both roadmap files | S | 2.12–2.16 | 🔨 in progress |
+| 2.12 | **Front door** | `index.html` renders `Stories.door()`: Cinder Mile, The Pale Hand, and a third slot | M | 2.10 | ✅ |
+| 2.13 | **Castle night preserved** | `castle.html` is the current castle page; `engine.js`, `ui.js`, `data.js`, `dice-view.js`, `style.css` stay byte-identical | S | — | ✅ |
+| 2.14 | **Featured arc: Cinder Mile** | `arcs/cinder-mile.json` and keyless `arcs/cinder-mile.js`; `validateArc` clean; five chapters | L | 2.2, 2.6 | ✅ |
+| 2.15 | **Last Signal leaves the door** | Still registered and playable at `oronath.html` and `#last-signal`; no front-door card; saves kept | S | 2.12 | ✅ |
+| 2.16 | **Third story slot** | Door row `A third story` / `Not chosen yet.` until the owner chose; the row is now `nickel-coast` (2.18) | S | 2.12 | ✅ |
+| 2.17 | **Tests and docs** | `tests/front-door.test.js`, `tests/cinder-mile.test.js`, README, and this phase in both roadmap files | S | 2.12–2.16 | ✅ |
+| 2.18 | **Third story: The Nickel Coast** | `arcs/nickel-coast.json` + keyless `arcs/nickel-coast.js`; six chapters, nineteen choices, three endings, Dez / Vale / Rook; `validateArc` clean; the engine's own crit roads (minimum face = complication, maximum = bonus) are real branches here | L | 2.12, 2.16 | 🔨 in progress |
+| 2.19 | **Door gains the third card** | `stories.js` `DOOR` row is `nickel-coast`; `index.html` and `oronath.html` load the bundle; no awaiting row remains anywhere | S | 2.18 | 🔨 in progress |
+| 2.20 | **Tests and docs** | `tests/nickel-coast.test.js` (new, and proven to bite against a tampered arc and against the pre-pass tree), `tests/front-door.test.js` moved off the awaiting row, README, and this phase in both roadmap files | S | 2.18, 2.19 | 🔨 in progress |
+| 2.21 | **Fourth story: Wrong Numbers** | Owner's pick for the arc after this one (2026-10-15): a 1920s night telephone exchange, one room, three operators, calls from a town that burned in 1908. Setting recorded; no arc written. The 1930s deep-sea salvage (**The Silver Bell**) is the owner's stated alternate and, if built, carries an art-deco underwater register with original names | L | 2.20 | ⬜ not started |
 
 ---
 
@@ -177,6 +181,7 @@ Five endings — The Hand Turns, The Hand Falls, The Hand Vanishes, The Courier'
 
 ## Changelog
 
+- **2026-10-15** — Pass 17 built and held: the third story is written. `arcs/nickel-coast.json` and its keyless bundle — six chapters, nineteen choices, three endings, Dez / Vale / Rook — validate clean, and the door carries it: `stories.js`'s `DOOR` row is `nickel-coast`, `index.html` and `oronath.html` load the bundle, and no awaiting row remains. The arc's four crit roads (a minimum face takes the choice's `complication`, a maximum face its `bonus`) are real branches, not decoration. `tests/nickel-coast.test.js` is new and was proved to bite twice: a tampered branch fails two named assertions, and against the pre-pass tree the suite fails on the missing arc. Nothing is pushed — the owner set a **one-push-per-week** cadence on 2026-10-15, so this pass joins `e65a021` and `d049c89` in the window of 2026-10-22 rather than the 72-hour window the entry below assumed. The owner's pick for the arc after this one is **Wrong Numbers** (2.21).
 - **2026-10-15** — Pass 16 shipped (deploy `516cfa3`): the front door at `/`, the castle night at `castle.html`, Cinder Mile featured, Last Signal off the door. The QA review (`.qa/qa-pass16.md`) found one real defect — opening a story hash without `/begin` deleted another story's saved run — and a follow-up commit (`e65a021`) fixes that plus two title-screen defects; it is committed locally and held for the next push window, because the production push gate allows one push per 72 hours. The review's story-data findings, the chapter counts on the cards, and the front door's silence about a saved castle run are deferred with reasons in `.qa/qa-pass16-triage.md`.
 - **2026-09-27** — Pass 15: a finished save returns to the picker; same-story Begin warns before it replaces a mid-run; The Pale Hand's ford splits on whether Jin learned the Millbrook page.
 - **2026-09-27** — Pass 14: The Pale Hand is the second arc, and `oronath.html` lets the player choose a story before the splash. One save slot remains. A resumable run still opens straight into its chapter.

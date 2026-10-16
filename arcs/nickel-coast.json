@@ -1,0 +1,486 @@
+{
+  "id": "nickel-coast",
+  "title": "The Nickel Coast",
+  "version": 1,
+  "blurb": "A boardwalk arcade, a motel that never closed out the season, and a high-score table with tonight's date on it.",
+  "pitch": "Dez fixes the cabinets that keep paying out on their own. Vale keeps a register with a line that will not close. Rook has been in room 11 since June. Every choice is a real roll — failure opens a new road, never a retry.",
+  "characters": [
+    {
+      "id": "dez",
+      "name": "Dez",
+      "threadId": "dez-score",
+      "traits": [
+        { "id": "machine-ear", "label": "Machine Ear", "difficulty": -2, "advantage": false },
+        { "id": "sure-hands", "label": "Sure Hands", "difficulty": 0, "advantage": true },
+        { "id": "smoke-lung", "label": "Smoke Lung", "difficulty": 1, "advantage": false }
+      ]
+    },
+    {
+      "id": "vale",
+      "name": "Vale",
+      "threadId": "vale-room",
+      "traits": [
+        { "id": "ledger-mind", "label": "Ledger Mind", "difficulty": -2, "advantage": false },
+        { "id": "even-voice", "label": "Even Voice", "difficulty": 0, "advantage": true },
+        { "id": "tired-heart", "label": "Tired Heart", "difficulty": 1, "advantage": false }
+      ]
+    },
+    {
+      "id": "rook",
+      "name": "Rook",
+      "threadId": "rook-stay",
+      "traits": [
+        { "id": "long-stay", "label": "Long Stay", "difficulty": -2, "advantage": false },
+        { "id": "coat-of-coins", "label": "Coat of Coins", "difficulty": 0, "advantage": true },
+        { "id": "sun-shy", "label": "Sun-Shy", "difficulty": 1, "advantage": false }
+      ]
+    }
+  ],
+  "threads": [
+    { "id": "dez-score", "characterId": "dez", "label": "the name on the high-score table" },
+    { "id": "vale-room", "characterId": "vale", "label": "the line for room 11" },
+    { "id": "rook-stay", "characterId": "rook", "label": "the reservation that never ends" }
+  ],
+  "endings": [
+    {
+      "id": "end-closed",
+      "title": "The Season Closes",
+      "text": "The breaker goes down and the arcade takes its first honest dark since June. Dez pulls the board and keeps it on the bench, and the table on it ends at tonight with nobody's name in front — the cabinet was only ever writing down what the season owed. Vale signs room 11 out at the bottom of the register, one pencil line under forty-one others, and the key goes back on the hook where the hooks are all the same. Rook puts his coat on the desk and walks out through the office door into September, and the sand is cold and ordinary under his shoes. The sign goes off last. The coast does not argue.",
+      "resolves": ["dez-score", "vale-room", "rook-stay"]
+    },
+    {
+      "id": "end-open",
+      "title": "The Season Never Closes",
+      "text": "The sign stays on. The arcade keeps its hum, the register keeps its line open, and room 11 keeps a guest who pays in quarters that were already spent. Dez stops fixing the payouts and starts designing them, and the high-score table he leaves on the cabinet fills with names of people who are standing in the room. Vale writes today's date at the top of the page and turns to a fresh one, and the book gets no shorter. Rook takes the bed in room 11 the way he has taken it since June, and the summer holds its breath on the room's meter. Out on the water the boardwalk lights run all the way to the horizon, and the horizon has an end of the season written on it that no one standing here can read.",
+      "resolves": ["dez-score", "vale-room", "rook-stay"]
+    },
+    {
+      "id": "end-tide",
+      "title": "The Nickel Coast",
+      "text": "The tide comes in over the pilings and takes the boards with it, one plank at a time, the way it has been taking the far end of the coast since before anyone built there. The salt gets into the cabinets and the cabinets stop arguing, and Dez carries a soaked board up the dune with the last line on it still legible and no one left to read it to. Vale stands in the office with the register under one arm and the water running through the door, and the page for room 11 goes soft in her hands until the four and the one are a smudge and the line is closed by weather instead of by hand. Rook walks out ahead of the water with his coat over his shoulder and stops where the sign used to hang. The coin in his pocket is warm. It stays warm for a long time.",
+      "resolves": ["dez-score", "vale-room", "rook-stay"]
+    }
+  ],
+  "chapters": [
+    {
+      "id": "penny-floor",
+      "title": "The Penny Floor",
+      "setting": "The arcade after the last quarter: neon on wet vinyl, thirty cabinets breathing in the dark, and the one in the corner still paying out.",
+      "objective": "Find which cabinet is playing itself.",
+      "choices": [
+        {
+          "id": "dez-open-the-back",
+          "label": "Open the back of the paying cabinet",
+          "actor": "dez",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["machine-ear"] },
+          "consequences": {
+            "success": {
+              "text": "The panel swings wide on a hinge you oiled yourself. The coin box is full and warm, the payout motor is running with nobody at the controls, and there is a repair tag inside in your own handwriting, dated tonight.",
+              "next": "high-score",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The latch bites and takes the skin off two knuckles. The cabinet keeps paying out behind you while you swear at it, and the sound carries out the open door onto the boardwalk.",
+              "next": "midway",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The coin box is wired to the motel's breaker, not the arcade's. You can see it from here: one line, two buildings, one meter. The office is the only place the line is written down.",
+              "next": "back-office",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "You read the loom the way you read sheet music and find the jumper in nine minutes. The payout stops and the cabinet starts printing a score instead, one line at a time, onto the glass.",
+              "next": "high-score",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "vale-read-the-register",
+          "label": "Read tonight's register lines",
+          "actor": "vale",
+          "roll": { "die": "d20", "tier": "easy", "tags": ["ledger-mind"] },
+          "consequences": {
+            "success": {
+              "text": "Every line is your handwriting and every line is tonight. Room 11 is booked from June through the end of August, one night at a time, and every night is paid in quarters.",
+              "next": "back-office",
+              "resolves": []
+            },
+            "failure": {
+              "text": "You turn two pages at once and lose the thread. The register closes on your thumb and the office goes quiet except for the compressor, which has not stopped since June either.",
+              "next": "midway",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "rook-feed-the-cabinet",
+          "label": "Feed the cabinet a quarter and watch the score climb",
+          "actor": "rook",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["coat-of-coins"] },
+          "consequences": {
+            "success": {
+              "text": "The quarter drops and the score climbs past the top number of the table without a hand on the stick. The initials it writes are yours, from a summer you did not spend here.",
+              "next": "midway",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The quarter falls through to the return tray, unspent. The cabinet takes it back a beat later and the score stays exactly where it was.",
+              "next": "midway",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "back-office",
+      "title": "The Office",
+      "setting": "The motel office at two in the morning: a register taped at the spine, a wall of hooks for rooms that are all rented, and the sign switch by the door.",
+      "objective": "Find the line for room 11 and what has been paying for it.",
+      "choices": [
+        {
+          "id": "vale-pull-the-card",
+          "label": "Pull room 11's registration card",
+          "actor": "vale",
+          "roll": { "die": "d20", "tier": "hard", "tags": ["ledger-mind"] },
+          "consequences": {
+            "success": {
+              "text": "The card is filled out in pencil, June 3, and never stamped out. The address on it is the motel's own, and the handwriting is yours — you have been carrying this card for weeks without once asking who wrote it.",
+              "next": "room-eleven",
+              "resolves": ["vale-room"]
+            },
+            "failure": {
+              "text": "The drawer sticks and the card tears along the fold. The half you keep has a check-in date and no name under it, which is worse than having neither.",
+              "next": "midway",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "dez-trace-the-cord",
+          "label": "Trace the cord from the arcade wall",
+          "actor": "dez",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["machine-ear"] },
+          "consequences": {
+            "success": {
+              "text": "The cord runs under the carpet, out through the office and into room 11's wall — one circuit for the arcade and the room. Whatever is paying out has been paying into the same meter all summer.",
+              "next": "room-eleven",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The cord vanishes into a conduit you cannot open without cutting the carpet. You lose it at the wall, and the wall is warm to the back of your hand.",
+              "next": "midway",
+              "resolves": []
+            },
+            "complication": {
+              "text": "You trace it wrong and come out at the ice machine, which has been running on room 11's meter since June. Cold water, a full bin, and a bill nobody in this building has been paying.",
+              "next": "room-eleven",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "rook-sign-the-hook",
+          "label": "Sign yourself in for another night",
+          "actor": "rook",
+          "roll": { "die": "d20", "tier": "easy", "tags": ["long-stay"] },
+          "consequences": {
+            "success": {
+              "text": "You write your name on the line under your own name, forty-one lines down the page, and the ink goes on coming. The clerk's pen ran dry in July. You have been using your own.",
+              "next": "room-eleven",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The pen skips and the line comes out unreadable, a scribble where a name should be. Vale takes the book back before you finish and closes it on your thumb.",
+              "next": "midway",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "midway",
+      "title": "The Midway",
+      "setting": "The boardwalk at two in the morning: half the bulbs dead, the tide working under the planks, and the motel sign humming over the dune.",
+      "objective": "Reach room 11 before the water gets over the pilings.",
+      "choices": [
+        {
+          "id": "dez-cut-across-the-lot",
+          "label": "Cut across the flooded parking lot",
+          "actor": "dez",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["sure-hands"] },
+          "consequences": {
+            "success": {
+              "text": "You walk the high line of the storm drain, dry to the ankle, and come up on room 11's window with the light still on inside and a shape standing at it.",
+              "next": "room-eleven",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The lot is deeper than it looks and colder than the sea. You reach the arcade door soaked, and every key in your pocket has gone green and useless.",
+              "next": "high-score",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The drain grate lifts under your boot and the whole lot goes down in a hurry, taking a roll of quarters and the motel's spare keys with it. The water does not come back up.",
+              "next": "room-eleven",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "vale-lock-the-office",
+          "label": "Lock the office and take the dune path",
+          "actor": "vale",
+          "roll": { "die": "d20", "tier": "easy", "tags": ["even-voice"] },
+          "consequences": {
+            "success": {
+              "text": "You lock the office with the sign still on and take the dune, where the sand is hard and the light from room 11 shows over the crest like something waiting up there.",
+              "next": "room-eleven",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The lock is stiff and the key bends in it. You leave the office standing open with the register on the desk and the register page turned to tonight.",
+              "next": "room-eleven",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "rook-walk-the-railing",
+          "label": "Walk the outer railing over the tide",
+          "actor": "rook",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["long-stay"] },
+          "consequences": {
+            "success": {
+              "text": "You walk the rail with your coat closed, past the sign and over black water, and put your hand flat on room 11's glass without once looking down.",
+              "next": "room-eleven",
+              "resolves": ["rook-stay"]
+            },
+            "failure": {
+              "text": "You go in to the knee and the tide takes one shoe. You climb out at the dune stairs still holding the rail, and the arcade's back door is the nearest dry floor.",
+              "next": "high-score",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "room-eleven",
+      "title": "Room Eleven",
+      "setting": "Room 11: one bed made tight, a window that looks straight at the arcade, and quarters stacked along the sill in rows nobody rolled.",
+      "objective": "Decide what room 11 has been keeping.",
+      "choices": [
+        {
+          "id": "rook-take-the-bed",
+          "label": "Take the bed like a guest",
+          "actor": "rook",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["long-stay"] },
+          "consequences": {
+            "success": {
+              "text": "You take the bed the way you have taken it since June and the room settles around you like a coat. The stack of quarters by the lamp has your initials worked into the top row.",
+              "next": "high-score",
+              "resolves": ["rook-stay"]
+            },
+            "failure": {
+              "text": "The bed is made tight as a display bed and you sleep on the floor with your coat for a pillow. In the morning the quarters are stacked differently and the window is fogged on the inside.",
+              "next": "high-score",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "dez-rewire-the-lamp",
+          "label": "Rewire the lamp onto the cabinet's line",
+          "actor": "dez",
+          "roll": { "die": "d20", "tier": "hard", "tags": ["sure-hands"] },
+          "consequences": {
+            "success": {
+              "text": "You patch the lamp into the cabinet's circuit and the room comes up in the score table's own light — the same number, the same font, reflected in the window where a face should be.",
+              "next": "high-score",
+              "resolves": []
+            },
+            "failure": {
+              "text": "The breaker trips and takes the arcade with it. You finish the splice by feel in the dark, and when the lamp comes on the room is a room again and the window shows nothing but weather.",
+              "next": "high-score",
+              "resolves": []
+            },
+            "complication": {
+              "text": "The splice holds but the room's meter starts running backwards, and through the wall you can hear the payout counter in the arcade climbing while you stand still.",
+              "next": "closing-time",
+              "resolves": []
+            },
+            "bonus": {
+              "text": "One wire, one clip, no trip. The lamp burns steady, the room's meter stops dead, and the payout counter in the arcade drops by exactly one night's worth.",
+              "next": "high-score",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "vale-sign-the-line",
+          "label": "Sign the line and close the room",
+          "actor": "vale",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["even-voice"] },
+          "consequences": {
+            "success": {
+              "text": "You write a check-out date beside the check-in date and the room lets go of the summer. The quarters stop being warm, and the key comes off the sill without sticking.",
+              "next": "closing-time",
+              "resolves": ["vale-room"]
+            },
+            "failure": {
+              "text": "You write the date and the pencil goes flat on the paper. The line stays open, and the room keeps its guest for one more night whether or not anyone agrees to it.",
+              "next": "high-score",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "high-score",
+      "title": "Service Mode",
+      "setting": "The back room: a bench of gutted cabinets, a soldering iron you know by its weight, and one board running a table of names that ends with tonight.",
+      "objective": "Read the table, or take the board out of the cabinet.",
+      "choices": [
+        {
+          "id": "dez-pull-the-board",
+          "label": "Pull the board and read it on the bench",
+          "actor": "dez",
+          "roll": { "die": "d20", "tier": "hard", "tags": ["machine-ear"] },
+          "consequences": {
+            "success": {
+              "text": "On the bench the table reads like a shift log: every date of the summer, every name, and the last line is yours, written ahead for tonight. It is not a high-score table. It is a ledger, and it has been kept by the machine.",
+              "next": "closing-time",
+              "resolves": ["dez-score"]
+            },
+            "failure": {
+              "text": "The ribbon comes off with the board and takes the last line with it. What is left is a list of names with no dates on it, in an order you cannot reconstruct.",
+              "next": "closing-time",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "dez-clear-the-table",
+          "label": "Clear the table and watch it write itself back",
+          "actor": "dez",
+          "roll": { "die": "d20", "tier": "easy", "tags": ["sure-hands"] },
+          "consequences": {
+            "success": {
+              "text": "You hold the test switch down until the memory empties, and the table writes itself back in nine seconds: the same names, tonight's date, and one line longer than before.",
+              "next": "closing-time",
+              "resolves": ["dez-score"]
+            },
+            "failure": {
+              "text": "The switch sticks halfway and the table comes back scrambled, half the names and none of the dates, in a font that has gone wide and wrong.",
+              "next": "closing-time",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "vale-copy-the-names",
+          "label": "Copy the names into the register",
+          "actor": "vale",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["ledger-mind"] },
+          "consequences": {
+            "success": {
+              "text": "You copy every name and date into the register in order, and the last one matches a line that has been in the book since the third of June, in your handwriting, under a name you have been signing all summer.",
+              "next": "closing-time",
+              "resolves": ["vale-room"]
+            },
+            "failure": {
+              "text": "Your hand cramps at the fortieth name and the ink runs. The register keeps what you managed and no more, which leaves the page short of the glass.",
+              "next": "closing-time",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "rook-play-one-more",
+          "label": "Play one more game on the table",
+          "actor": "rook",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["coat-of-coins"] },
+          "consequences": {
+            "success": {
+              "text": "You play until your initials come up, and they come up on the date you checked in, at the top of the table, above every name that has ever been on it including the ones from this summer.",
+              "next": "closing-time",
+              "resolves": ["rook-stay"]
+            },
+            "failure": {
+              "text": "You lose on the fourth ball. The machine eats the quarter without moving the table at all, and the payout tray stays empty in the way that means it is keeping score.",
+              "next": "closing-time",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "closing-time",
+      "title": "Closing Time",
+      "setting": "Dawn on the boardwalk: grey water under the pilings, the sign still burning over an empty lot, and the arcade speakers clicking through the shut-down tone.",
+      "objective": "Decide how the season ends.",
+      "choices": [
+        {
+          "id": "dez-cut-the-breaker",
+          "label": "Cut the arcade breaker for the season",
+          "actor": "dez",
+          "roll": { "die": "d20", "tier": "hard", "tags": ["machine-ear"] },
+          "consequences": {
+            "success": {
+              "text": "You put your hand on the breaker and pull it, and thirty cabinets go quiet in one long breath. The last thing the table writes is tonight's date, with nothing under it, which is the first time all summer it has told the truth about anything.",
+              "next": "end-closed",
+              "resolves": ["dez-score"]
+            },
+            "failure": {
+              "text": "The breaker arm shears at the hinge and stays live. You take your hand back off the panel, and behind you the cabinets keep their hum, and the water is already over the first plank of the boardwalk.",
+              "next": "end-tide",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "vale-keep-the-sign-on",
+          "label": "Keep the sign on and the register open",
+          "actor": "vale",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["ledger-mind"] },
+          "consequences": {
+            "success": {
+              "text": "You leave the sign burning and draw tomorrow's lines in the register before you close it, all the way down the page, including room 11. Somebody has to keep the book, and the book has been kept in your handwriting since June.",
+              "next": "end-open",
+              "resolves": ["vale-room"]
+            },
+            "failure": {
+              "text": "You reach for the switch and stop with your hand on it. The register sits open on the desk with the page for room 11 turned, and the tide is already moving under the boards.",
+              "next": "end-tide",
+              "resolves": []
+            }
+          }
+        },
+        {
+          "id": "rook-pay-for-another-week",
+          "label": "Pay for one more week in room 11",
+          "actor": "rook",
+          "roll": { "die": "d20", "tier": "medium", "tags": ["coat-of-coins"] },
+          "consequences": {
+            "success": {
+              "text": "You put a week of quarters on the desk in a stack you built yourself, and the sign stays lit for it. Vale writes the extension and does not ask where the coins came from, which is what a clerk does when the ledger balances.",
+              "next": "end-open",
+              "resolves": ["rook-stay"]
+            },
+            "failure": {
+              "text": "You count out the week and come up one night short, and the coin you are missing is the one in your pocket that has been warm since June. You put it on the stack and the desk light goes out over it.",
+              "next": "end-closed",
+              "resolves": []
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

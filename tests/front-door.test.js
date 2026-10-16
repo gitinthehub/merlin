@@ -122,6 +122,7 @@ var Stories;
   require(path.join(root, "arcs/last-signal.js"));
   require(path.join(root, "arcs/pale-hand.js"));
   require(path.join(root, "arcs/cinder-mile.js"));
+  require(path.join(root, "arcs/nickel-coast.js"));
   if (process.env.MERLIN_HEAD) {
     vm.runInNewContext(read("stories.js"), global, { filename: "stories.js" });
     Stories = global.OronathStories;
@@ -135,12 +136,12 @@ var door = typeof Stories.door === "function" ? Stories.door() : [];
 assert(door.length === 3, "door has 3 rows");
 assert(door[0] && door[0].id === "cinder-mile", "door[0] id cinder-mile");
 assert(door[1] && door[1].id === "pale-hand", "door[1] id pale-hand");
-assert(door[2] && door[2].awaiting, "door[2] awaiting");
-assert(door[2] && !door[2].id, "awaiting row has no id");
-assert(door[2] && door[2].title === "A third story", "awaiting title is A third story");
-assert(door[2] && door[2].note === "Not chosen yet.", "awaiting note is Not chosen yet.");
+assert(door[2] && door[2].id === "nickel-coast", "door[2] id nickel-coast");
+assert(door[2] && door[2].playable, "door[2] playable");
+assert(door[2] && !door[2].awaiting, "no awaiting row remains on the door");
+assert(door[2] && door[2].title === "The Nickel Coast", "door[2] title The Nickel Coast");
 
-var doorIds = { "cinder-mile": true, "pale-hand": true };
+var doorIds = { "cinder-mile": true, "pale-hand": true, "nickel-coast": true };
 var reg = global.OronathArcBundles || {};
 assert(reg["last-signal"], "last-signal is registered");
 assert(!doorIds["last-signal"], "last-signal is registered and not a door row");
